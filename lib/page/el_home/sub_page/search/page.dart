@@ -84,9 +84,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
           SizedBox(width: 10.w),
-          Expanded(
-            child: _buildSearchBox(),
-          ),
+          Expanded(child: _buildSearchBox()),
         ],
       ),
     );
@@ -100,38 +98,57 @@ class _SearchPageState extends State<SearchPage> {
       decoration: ShapeDecoration(
         color: Colors.white.withValues(alpha: 0.20),
         shape: RoundedRectangleBorder(
-          side: BorderSide(
-            width: 1.w,
-            strokeAlign: BorderSide.strokeAlignOutside,
-            color: const Color(0xFFE424AD),
-          ),
           borderRadius: BorderRadius.circular(39.r),
         ),
       ),
-      child: Row(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 12.w, right: 8.w),
-            child: Image.asset('ely_search_icon.png'.icon, width: 16.w, height: 16.h),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
           ),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
-              decoration: InputDecoration(
-                hintText: 'This Life as Dad',
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 14.sp),
-                border: InputBorder.none,
+          borderRadius: BorderRadius.circular(39.r),
+        ),
+        padding: EdgeInsets.all(1.w),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.20),
+            borderRadius: BorderRadius.circular(38.r),
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 12.w, right: 8.w),
+                child: Image.asset(
+                  'ely_search_icon.png'.icon,
+                  width: 16.w,
+                  height: 16.h,
+                ),
               ),
-              onSubmitted: (value) {
-                if (value.trim().isNotEmpty) {
-                  controller.saveSearchHistory(value.trim());
-                  // TODO: 执行搜索逻辑
-                }
-              },
-            ),
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                  decoration: InputDecoration(
+                    hintText: 'This Life as Dad',
+                    hintStyle: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 14.sp,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      controller.saveSearchHistory(value.trim());
+                      // TODO: 执行搜索逻辑
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -170,8 +187,10 @@ class _SearchPageState extends State<SearchPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 历史搜索记录
-          controller.state.showSearchHistory ? _buildHistorySection() : Container(),
-          
+          controller.state.showSearchHistory
+              ? _buildHistorySection()
+              : Container(),
+
           // 热门搜索轮播图
           _buildHotSearchSection(),
         ],
@@ -182,7 +201,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildHistorySection() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      margin: EdgeInsets.only(bottom: 20.h),
+      margin: EdgeInsets.only(top: 26.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -203,23 +222,29 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ],
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 12.h),
           Wrap(
-            spacing: 10.w,
-            runSpacing: 10.h,
+            spacing: 12.w,
+            runSpacing: 12.h,
             children: List.generate(
               controller.state.searchHistoryList.length,
               (index) => Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                height: 24.h,
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
                 decoration: BoxDecoration(
-                  color: Color(0xFF5116C1),
-                  borderRadius: BorderRadius.circular(20.r),
+                  color: Colors.white.withValues(alpha: 0.25), // #FFFFFF40
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Text(
-                  controller.state.searchHistoryList[index],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.sp,
+                child: Center(
+                  child: Text(
+                    controller.state.searchHistoryList[index],
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w400,
+                      height: 1,
+                    ),
                   ),
                 ),
               ),
@@ -234,41 +259,28 @@ class _SearchPageState extends State<SearchPage> {
     if (controller.state.hotSearchList.isEmpty) {
       return Container();
     }
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Hot search',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
+      margin: EdgeInsets.only(top: 27.h),
+      child: SizedBox(
+        height: 150.h,
+        child: Swiper(
+          itemCount: controller.state.hotSearchList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return _buildSwiperItem(controller.state.hotSearchList[index]);
+          },
+          pagination: SwiperPagination(
+            builder: DotSwiperPaginationBuilder(
+              color: Colors.white38,
+              activeColor: Color(0xFFFF6B00),
+              size: 8.w,
+              activeSize: 10.w,
             ),
           ),
-          SizedBox(height: 15.h),
-          SizedBox(
-            height: 150.h,
-            child: Swiper(
-              itemCount: controller.state.hotSearchList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return _buildSwiperItem(controller.state.hotSearchList[index]);
-              },
-              pagination: SwiperPagination(
-                builder: DotSwiperPaginationBuilder(
-                  color: Colors.white38,
-                  activeColor: Color(0xFFFF6B00),
-                  size: 8.w,
-                  activeSize: 10.w,
-                ),
-              ),
-              autoplay: true,
-              autoplayDelay: 5000,
-            ),
-          ),
-        ],
+          autoplay: true,
+          autoplayDelay: 5000,
+        ),
       ),
     );
   }
