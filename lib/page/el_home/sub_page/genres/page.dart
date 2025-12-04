@@ -139,14 +139,23 @@ class _GenresPageState extends State<GenresPage> {
             ),
           ),
 
-          Text(
-            'More',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontFamily: 'PingFang SC',
-              fontWeight: FontWeight.w600,
-              height: 1.25,
+          GestureDetector(
+            onTap: () {
+              // 跳转到vampire页面，传递category id和title
+              Get.toNamed('/vampire', arguments: {
+                'id': item.id,
+                'title': item.categoryName,
+              });
+            },
+            child: Text(
+              'More',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontFamily: 'PingFang SC',
+                fontWeight: FontWeight.w600,
+                height: 1.25,
+              ),
             ),
           ),
         ],

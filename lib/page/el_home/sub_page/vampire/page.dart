@@ -1,6 +1,6 @@
 import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/page/el_home/sub_page/new/controller.dart';
+import 'package:elyra/page/el_home/sub_page/vampire/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,26 +16,42 @@ class VampirePage extends StatefulWidget {
 }
 
 class _VampirePageState extends State<VampirePage> {
-  final controller = Get.put(NewController());
+  final controller = Get.put(VampireController());
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<NewController>(
+    return GetBuilder<VampireController>(
       builder: (controller) {
-        return SmartRefresher(
-          controller: controller.refreshController,
-          enablePullDown: true,
-          enablePullUp: false,
-          onRefresh: controller.onRefresh,
-          header: ClassicHeader(
-            textStyle: TextStyle(color: Colors.white),
-            idleText: 'Pull to refresh',
-            releaseText: 'Release to refresh',
-            refreshingText: 'Refreshing...',
-            completeText: 'Refresh completed',
-            failedText: 'Refresh failed',
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(controller.state.categoryTitle),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
-          child: _buildContent(),
+          body: SmartRefresher(
+            controller: controller.refreshController,
+            enablePullDown: true,
+            enablePullUp: true,
+            onRefresh: controller.onRefresh,
+            onLoading: controller.onLoadMore,
+            header: ClassicHeader(
+              textStyle: TextStyle(color: Colors.white),
+              idleText: 'Pull to refresh',
+              releaseText: 'Release to refresh',
+              refreshingText: 'Refreshing...',
+              completeText: 'Refresh completed',
+              failedText: 'Refresh failed',
+            ),
+            footer: ClassicFooter(
+              textStyle: TextStyle(color: Colors.white),
+              idleText: 'Pull up to load more',
+              loadingText: 'Loading...',
+              noDataText: 'No more data',
+              failedText: 'Load failed, tap to retry',
+            ),
+            child: _buildContent(),
+          ),
         );
       },
     );
@@ -98,26 +114,26 @@ class _VampirePageState extends State<VampirePage> {
   }
 
   Widget _buildStaggeredGrid() {
-    return Stack(
-        // 内容区（正常瀑布流）
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: MasonryGridView.count(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            mainAxisSpacing: 7.h,
-            crossAxisSpacing: 7.w,
-            padding: EdgeInsets.zero,
-            itemCount: controller.state.newList.length,
-            itemBuilder: (context, index) {
-              final item = controller.state.newList[index];
-              final height = 266.h;
+    return Container(
+      // 内容区（正常瀑布流）
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: MasonryGridView.count(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 7.h,
+          crossAxisSpacing: 7.w,
+          padding: EdgeInsets.zero,
+          itemCount: controller.state.vampireList.length,
+          itemBuilder: (context, index) {
+            final item = controller.state.vampireList[index];
+            final height = 266.h;
 
-              return _buildCollectionCard(item, double.infinity, height);
-            },
-          ),
+            return _buildCollectionCard(item, double.infinity, height);
+          },
         ),
+      ),
     );
   }
 
@@ -131,53 +147,59 @@ class _VampirePageState extends State<VampirePage> {
     double width,
     double height,
   ) {
-    return Container(
-      width: width, // 卡片宽度（动态计算）
-      height: height, // 卡片高度（131 或 266）
-      decoration: BoxDecoration(
-        color: Color(0xFF5116C1),
-        borderRadius: BorderRadius.circular(32.r), // 圆角 32
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32.r),
-        child: Column(
-          children: [
-            // 上部：图片区域（自适应高度）
-            ClipRRect(
-              borderRadius: BorderRadius.circular(32.r),
-              child: Image.network(
-                item.imageUrl ?? '',
-                width: double.infinity,
-                height: 224.h, // 固定高度
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54),
-                ),
-              ),
-            ),
-            // 下部：标题区域
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(top: 5.h),
-                width: 94,
-                height: double.infinity,
-                child: Text(
-                  item.name ?? '',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'PingFang SC',
-                    fontWeight: FontWeight.w500,
-                    height: 1.14,
+    return GestureDetector(
+      onTap: () {
+        // TODO: 导航到详情页
+        // Get.toNamed('/detail', arguments: {'id': item.shortPlayId});
+      },
+      child: Container(
+        width: width, // 卡片宽度（动态计算）
+        height: height, // 卡片高度（131 或 266）
+        decoration: BoxDecoration(
+          color: Color(0xFF5116C1),
+          borderRadius: BorderRadius.circular(32.r), // 圆角 32
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32.r),
+          child: Column(
+            children: [
+              // 上部：图片区域（自适应高度）
+              ClipRRect(
+                borderRadius: BorderRadius.circular(32.r),
+                child: Image.network(
+                  item.imageUrl ?? '',
+                  width: double.infinity,
+                  height: 224.h, // 固定高度
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey[800],
+                    child: Icon(Icons.error, color: Colors.white54),
                   ),
-                  maxLines: 2, // 最多两行
-                  overflow: TextOverflow.ellipsis, // 超出显示省略号
-                  textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
                 ),
               ),
-            ),
-          ],
+              // 下部：标题区域
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(top: 5.h),
+                  width: 94,
+                  height: double.infinity,
+                  child: Text(
+                    item.name ?? '',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w500,
+                      height: 1.14,
+                    ),
+                    maxLines: 2, // 最多两行
+                    overflow: TextOverflow.ellipsis, // 超出显示省略号
+                    textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

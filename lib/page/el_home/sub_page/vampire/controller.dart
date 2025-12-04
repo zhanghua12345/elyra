@@ -1,4 +1,4 @@
-import 'package:elyra/page/el_home/sub_page/new/state.dart';
+import 'package:elyra/page/el_home/sub_page/vampire/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -6,14 +6,23 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/bean/short_video_bean.dart';
 
-class NewController extends GetxController {
-  final state = NewState();
+class VampireController extends GetxController {
+  final state = VampireState();
   final RefreshController refreshController = RefreshController(initialRefresh: false);
+
+  @override
+  void onInit() {
+    super.onInit();
+    // 获取传递的参数
+    var arguments = Get.arguments ?? {};
+    state.categoryId = arguments['id'] ?? 0;
+    state.categoryTitle = arguments['title'] ?? "Vampire";
+  }
 
   @override
   void onReady() {
     super.onReady();
-    getNewData();
+    getVampireData();
   }
 
   @override
@@ -22,15 +31,30 @@ class NewController extends GetxController {
     super.onClose();
   }
 
-  getNewData({RefreshController? refreshCtrl}) async {
-    state.loadStatus = LoadStatusType.loading;
+  getVampireData({RefreshController? refreshCtrl, bool loadMore = false}) async {
+    // 如果正在加载或没有更多数据，则直接返回
+    if (state.isLoading || (!loadMore && !state.hasMore)) return;
+    
+    // 更新状态
+    if (!loadMore) {
+      state.loadStatus = LoadStatusType.loading;
+    }
+    state.isLoading = true;
     update();
+
     HttpClient().addHeader('lang-key', 'en');
     try {
+      // 构造请求参数
+      Map<String, dynamic> params = {
+        'current_page': loadMore ? state.currentPage + 1 : 1,
+        'page_size': state.pageSize,
+        'category_id': state.categoryId,
+      };
+
       ApiResponse response = await HttpClient().request(
-        Apis.rankingData,
-        method: HttpMethod.post,
-        queryParameters: {'type': 'new_releases'},
+        Apis.categoryListAppendShortPlay,
+        method: HttpMethod.get,
+        queryParameters: params,
       );
       
       if (refreshCtrl != null) {
@@ -40,18 +64,35 @@ class NewController extends GetxController {
       }
       
       if (response.success) {
-        state.newList.clear();
+        // 解析分页信息
+        var pagination = response.data['pagination'];
+        state.currentPage = pagination['current_page'] ?? 1;
+        state.totalPages = pagination['page_total'] ?? 0;
+        state.hasMore = state.currentPage < state.totalPages;
         
-        if (response.data['list'] != null && response.data['list'].length > 0) {
-          state.newList = [
-            ...response.data['list']
+        if (loadMore) {
+          // 加载更多数据
+          if (response.data['list'] != null && response.data['list'].length > 0) {
+            var newItems = response.data['list']
                 .map((item) => ShortVideoBean.fromJson(item))
-                .toList(),
-          ];
-          
-          state.loadStatus = LoadStatusType.loadSuccess;
+                .toList();
+            state.vampireList.addAll(newItems);
+          }
         } else {
-          state.loadStatus = LoadStatusType.loadNoData;
+          // 刷新数据
+          state.vampireList.clear();
+          
+          if (response.data['list'] != null && response.data['list'].length > 0) {
+            state.vampireList = [
+              ...response.data['list']
+                  .map((item) => ShortVideoBean.fromJson(item))
+                  .toList(),
+            ];
+            
+            state.loadStatus = LoadStatusType.loadSuccess;
+          } else {
+            state.loadStatus = LoadStatusType.loadNoData;
+          }
         }
         update();
       } else {
@@ -66,10 +107,23 @@ class NewController extends GetxController {
       }
       state.loadStatus = LoadStatusType.loadFailed;
       update();
+    } finally {
+      state.isLoading = false;
+      if (refreshCtrl == null) {
+        refreshController.loadComplete(); // 停止加载更多动画
+      }
     }
   }
 
   void onRefresh() {
-    getNewData();
+    getVampireData();
+  }
+  
+  void onLoadMore() {
+    if (state.hasMore) {
+      getVampireData(loadMore: true);
+    } else {
+      refreshController.loadNoData(); // 没有更多数据
+    }
   }
 }
