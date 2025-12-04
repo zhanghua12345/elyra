@@ -1,30 +1,14 @@
-class SearchState {
-  SearchState();
+import 'package:elyra/widgets/bad_status_widget.dart';
 
-  // 历史搜索记录
-  List<String> historyList = [];
-  
-  // 热门搜索数据
-  List<HotSearchItem> hotList = [];
-  
-  // 搜索关键字
-  String searchKeyword = '';
-  
-  // 是否显示历史记录
-  bool showHistory = false;
-  
-  // 是否显示热门搜索
-  bool showHotSearch = false;
-}
+class TestState {
+  TestState();
 
-class HotSearchItem {
-  final String title;
-  final String subtitle;
-  final String imageUrl;
+  LoadStatusType loadStatus = LoadStatusType.loading;
+  bool isLoading = false;
   
-  HotSearchItem({
-    required this.title,
-    required this.subtitle,
-    required this.imageUrl,
-  });
+  // 添加你需要的其他状态变量
+  // 示例：
+  // List<YourModel> dataList = [];
+  // int currentPage = 1;
+  // bool hasMore = true;
 }
