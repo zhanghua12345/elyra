@@ -24,150 +24,282 @@ class _SearchPageState extends State<SearchPage> {
     super.initState();
   }
 
-class _VampirePageState extends State<VampirePage> {
-  final controller = Get.put(VampireController());
-
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<VampireController>(
-      builder: (controller) {
-        return Scaffold(
-          extendBodyBehindAppBar: true,
-          body: Container(
-            padding: EdgeInsets.only(top: ScreenUtil().statusBarHeight),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('ely_background_image.png'.icon),
-                fit: BoxFit.fill,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              // 内容区域
-              children: [
-                _buildAppBar(context),
-                SizedBox(height: 10.h),
-                Expanded(
-                  child: SmartRefresher(
-                    controller: controller.refreshController,
-                    enablePullDown: true,
-                    enablePullUp: true,
-                    onRefresh: controller.onRefresh,
-                    onLoading: controller.onLoadMore,
-                    header: ClassicHeader(
-                      textStyle: TextStyle(color: Colors.white),
-                      idleText: 'Pull to refresh',
-                      releaseText: 'Release to refresh',
-                      refreshingText: 'Refreshing...',
-                      completeText: 'Refresh completed',
-                      failedText: 'Refresh failed',
-                    ),
-                    footer: ClassicFooter(
-                      textStyle: TextStyle(color: Colors.white),
-                      idleText: 'Pull up to load more',
-                      loadingText: 'Loading...',
-                      noDataText: 'No more data',
-                      failedText: 'Load failed, tap to retry',
-                    ),
-                    child: _buildContent(),
-                  ),
-                ),
-              ],
-            ),
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('ely_background_image.png'.icon),
+            fit: BoxFit.fill,
           ),
-        );
-      },
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // AppBar
+              _buildAppBar(),
+              
+              // 搜索框
+              _buildSearchBox(),
+              
+              // 内容区域
+              Expanded(
+                child: _buildContent(),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar() {
     return Container(
+      height: 44.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+          IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.w),
+            onPressed: () => Get.back(),
           ),
-          // 右侧可以放置其他操作按钮，暂时留空
-          
+          Expanded(
+            child: Container(),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBox() {
+    return Container(
+      height: 40.h,
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      margin: EdgeInsets.only(bottom: 20.h),
+      child: TextField(
+        controller: _searchController,
+        style: TextStyle(color: Colors.white, fontSize: 16.sp),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Color(0xFF2D0A5C),
+          hintText: 'Search',
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.r),
+            borderSide: BorderSide.none,
+          ),
+          prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.5)),
+          contentPadding: EdgeInsets.symmetric(vertical: 10.h),
+        ),
+        onSubmitted: (value) {
+          if (value.trim().isNotEmpty) {
+            logic.saveSearchHistory(value.trim());
+            // TODO: 执行搜索逻辑
+          }
+        },
       ),
     );
   }
 
   Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(child: CircularProgressIndicator(color: Color(0xFFFF6B00)));
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'Load Failed',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: controller.onRefresh,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFF6B00),
-              ),
-              child: Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox_outlined, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'No Data',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-            ),
-          ],
-        ),
-      );
-    }
-
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20.h),
-          _buildStaggeredGrid(),
-          SizedBox(height: 20.h),
+          // 历史搜索
+          Obx(() => state.showHistory ? _buildHistorySection() : Container()),
+          
+          // 热门搜索轮播图
+          Obx(() => state.showHotSearch ? _buildHotSearchSection() : Container()),
         ],
       ),
     );
   }
 
-  Widget _buildStaggeredGrid() {
+  Widget _buildHistorySection() {
     return Container(
-      // 内容区（正常瀑布流）
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      margin: EdgeInsets.only(bottom: 20.h),
       child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox_outlined, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'Info',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Historical search',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton(
+                onPressed: logic.clearHistory,
+                child: Text(
+                  'Clear',
+                  style: TextStyle(
+                    color: Color(0xFFFF6B00),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Wrap(
+            spacing: 10.w,
+            runSpacing: 10.h,
+            children: List.generate(
+              state.historyList.length,
+              (index) => Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: Color(0xFF5116C1),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  state.historyList[index],
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 
+  Widget _buildHotSearchSection() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Hot search',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 15.h),
+          SizedBox(
+            height: 150.h,
+            child: Swiper(
+              itemCount: state.hotList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildSwiperItem(state.hotList[index]);
+              },
+              pagination: SwiperPagination(
+                builder: DotSwiperPaginationBuilder(
+                  color: Colors.white38,
+                  activeColor: Color(0xFFFF6B00),
+                  size: 8.w,
+                  activeSize: 10.w,
+                ),
+              ),
+              autoplay: true,
+              autoplayDelay: 5000,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSwiperItem(HotSearchItem item) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5.w),
+      child: Stack(
+        children: [
+          // 背景卡片
+          Container(
+            height: 130.h,
+            decoration: BoxDecoration(
+              color: Color(0xFF5116C1),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              children: [
+                // 左侧文字内容
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: EdgeInsets.all(15.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          item.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5.h),
+                        Text(
+                          item.subtitle,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // 右侧图片区域
+                Expanded(
+                  flex: 1,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // 第二张图片（底层，旋转30度）
+                      Transform.rotate(
+                        angle: 30 * 3.14159 / 180, // 30度转换为弧度
+                        child: Container(
+                          width: 95.w,
+                          height: 118.h,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(item.imageUrl),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      ),
+                      // 第一张图片（顶层，旋转5度）
+                      Transform.rotate(
+                        angle: 5 * 3.14159 / 180, // 5度转换为弧度
+                        child: Container(
+                          width: 95.w,
+                          height: 118.h,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(item.imageUrl),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

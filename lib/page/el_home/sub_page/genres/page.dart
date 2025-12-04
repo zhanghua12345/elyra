@@ -141,8 +141,8 @@ class _GenresPageState extends State<GenresPage> {
 
           GestureDetector(
             onTap: () {
-              // 跳转到vampire页面，传递category id和title
-              Get.toNamed('/vampire', arguments: {
+              // 跳转到test页面，传递category id和title
+              Get.toNamed('/test', arguments: {
                 'id': item.id,
                 'title': item.categoryName,
               });
