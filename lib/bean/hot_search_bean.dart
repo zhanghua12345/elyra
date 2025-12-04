@@ -1,14 +1,14 @@
 class HotSearchBean {
   final int id;
-  final String title;
-  final String subTitle;
+  final String name;
+  final String description;
   final String imageUrl;
   final String type;
 
   HotSearchBean({
     required this.id,
-    required this.title,
-    required this.subTitle,
+    required this.name,
+    required this.description,
     required this.imageUrl,
     required this.type,
   });
@@ -16,8 +16,8 @@ class HotSearchBean {
   factory HotSearchBean.fromJson(Map<String, dynamic> json) {
     return HotSearchBean(
       id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      subTitle: json['sub_title'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
       imageUrl: json['image_url'] ?? '',
       type: json['type'] ?? '',
     );
@@ -26,8 +26,8 @@ class HotSearchBean {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'title': title,
-      'sub_title': subTitle,
+      'name': name,
+      'description': description,
       'image_url': imageUrl,
       'type': type,
     };

@@ -8,7 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // 竖屏
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -66,7 +66,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               backgroundColor: Colors.transparent,
               elevation: 0,
               scrolledUnderElevation: 0,
-              systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+              ),
+            ),
+            // 全局文字样式
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(height: 1.5),
+              bodyMedium: TextStyle(height: 1.5),
+              bodySmall: TextStyle(height: 1.5),
+              titleMedium: TextStyle(height: 1.5),
             ),
           ),
           builder: EasyLoading.init(),
@@ -75,6 +84,3 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
   }
 }
-
-
-

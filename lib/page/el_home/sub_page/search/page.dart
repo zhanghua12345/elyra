@@ -94,61 +94,47 @@ class _SearchPageState extends State<SearchPage> {
     return Container(
       width: 308.w,
       height: 32.h,
-      clipBehavior: Clip.antiAlias,
-      decoration: ShapeDecoration(
-        color: Colors.white.withValues(alpha: 0.20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(39.r),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('ely_search_title_bg.png'.icon),
+          fit: BoxFit.fill,
         ),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 18.w, right: 12.w),
+            child: Image.asset(
+              'ely_search_icon.png'.icon,
+              width: 20.w,
+              height: 20.h,
+            ),
           ),
-          borderRadius: BorderRadius.circular(39.r),
-        ),
-        padding: EdgeInsets.all(1.w),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.20),
-            borderRadius: BorderRadius.circular(38.r),
-          ),
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 12.w, right: 8.w),
-                child: Image.asset(
-                  'ely_search_icon.png'.icon,
-                  width: 16.w,
-                  height: 16.h,
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              style: TextStyle(color: Colors.white, fontSize: 12.sp),
+              decoration: InputDecoration(
+                isCollapsed: true, // 关键！去掉默认内部 padding
+                contentPadding: EdgeInsets.zero, // 关键！强制内容贴合父布局
+                hintText: 'This Life as Dad',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.50),
+                  fontSize: 12,
+                  fontFamily: 'PingFang SC',
+                  fontWeight: FontWeight.w400,
                 ),
+                border: InputBorder.none,
               ),
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  style: TextStyle(color: Colors.white, fontSize: 14.sp),
-                  decoration: InputDecoration(
-                    hintText: 'This Life as Dad',
-                    hintStyle: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 14.sp,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: (value) {
-                    if (value.trim().isNotEmpty) {
-                      controller.saveSearchHistory(value.trim());
-                      // TODO: 执行搜索逻辑
-                    }
-                  },
-                ),
-              ),
-            ],
+              onSubmitted: (value) {
+                if (value.trim().isNotEmpty) {
+                  controller.saveSearchHistory(value.trim());
+                }
+              },
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -157,7 +143,6 @@ class _SearchPageState extends State<SearchPage> {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(child: CircularProgressIndicator(color: Color(0xFFFF6B00)));
     }
-
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return Center(
         child: Column(
@@ -212,38 +197,50 @@ class _SearchPageState extends State<SearchPage> {
                 'Historical search',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  fontFamily: 'PingFang SC',
+                  fontWeight: FontWeight.w500,
+                  height: 1.21,
                 ),
               ),
               GestureDetector(
                 onTap: controller.clearSearchHistory,
-                child: Image.asset('ely_del.png'.icon, width: 20.w, height: 20.h),
+                child: Image.asset(
+                  'ely_del.png'.icon,
+                  width: 20.w,
+                  height: 20.h,
+                ),
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 18.h),
           Wrap(
             spacing: 12.w,
             runSpacing: 12.h,
             children: List.generate(
               controller.state.searchHistoryList.length,
-              (index) => Container(
-                height: 24.h,
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.25), // #FFFFFF40
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Center(
-                  child: Text(
-                    controller.state.searchHistoryList[index],
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                      fontFamily: 'PingFang SC',
-                      fontWeight: FontWeight.w400,
-                      height: 1,
+              (index) => IntrinsicWidth(
+                child: Container(
+                  height: 24.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  constraints: BoxConstraints(minWidth: 0), // 关键！
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Center(
+                    // 垂直居中
+                    child: Text(
+                      controller.state.searchHistoryList[index],
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
@@ -264,18 +261,21 @@ class _SearchPageState extends State<SearchPage> {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       margin: EdgeInsets.only(top: 27.h),
       child: SizedBox(
-        height: 150.h,
+        height: 140.h,
         child: Swiper(
           itemCount: controller.state.hotSearchList.length,
           itemBuilder: (BuildContext context, int index) {
             return _buildSwiperItem(controller.state.hotSearchList[index]);
           },
+
+          // ✅ Swiper 小点样式（你要求的）
           pagination: SwiperPagination(
+            margin: EdgeInsets.only(bottom: 5.h),
             builder: DotSwiperPaginationBuilder(
-              color: Colors.white38,
-              activeColor: Color(0xFFFF6B00),
-              size: 8.w,
-              activeSize: 10.w,
+              color: Colors.white.withValues(alpha: 0.60), // 未激活
+              activeColor: Colors.white, // 激活
+              size: 4.w, // 正常大小
+              activeSize: 4.w, // 激活同样大小
             ),
           ),
           autoplay: true,
@@ -290,92 +290,132 @@ class _SearchPageState extends State<SearchPage> {
       margin: EdgeInsets.symmetric(horizontal: 5.w),
       child: Stack(
         children: [
-          // 背景卡片
-          Container(
-            height: 130.h,
-            decoration: BoxDecoration(
-              color: Color(0xFF5116C1),
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: Row(
-              children: [
-                // 左侧文字内容
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: EdgeInsets.all(15.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
+          // ⭐ 背景卡片吸底（你要求的）
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0, // 吸底
+            child: Container(
+              height: 106.h,
+
+              // ⭐ 使用你提供的背景渐变
+              decoration: ShapeDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment(0.5, 0.0),
+                  end: Alignment(0.5, 1.0),
+                  colors: [Color(0xFF6018E6), Color(0xFFDC23B1)],
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+              ),
+
+              child: Row(
+                children: [
+                  // 左侧文字
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 8.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.name,
+                            maxLines: 1, // 限制最多两行
+                            overflow: TextOverflow.ellipsis, // 超出用省略号
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            item.description,
+                            maxLines: 2, // 限制最多两行
+                            overflow: TextOverflow.ellipsis, // 超出用省略号
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20.w), // 右侧间距
+
+                  // 右侧两张旋转图
+                  Expanded(
+                    flex: 1,
+                    child: Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        Text(
-                          item.type,
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12.sp,
+                        // 第二张底图（角度更大）
+                        Positioned(
+                          bottom: 20.h, // 距离底部
+                          right: 0, // 贴右边
+                          child: Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..translate(0.0, 4.h) // 下移 4.h（两图高度差）
+                              ..rotateZ(0.26), // 旋转角度
+                            child: Container(
+                              width: 90.w,
+                              height: 107.h,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2.r,
+                                ),
+                                borderRadius: BorderRadius.circular(13.r),
+                                image: DecorationImage(
+                                  image: NetworkImage(item.imageUrl),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        SizedBox(height: 5.h),
-                        Text(
-                          item.title,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 5.h),
-                        Text(
-                          item.subTitle,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontSize: 12.sp,
+
+                        // 第一张前景图（角度小一些）
+                        Positioned(
+                          bottom: 14.h,
+                          right: 16.w, // 贴右边
+                          child: Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()..rotateZ(0.12),
+                            child: Container(
+                              width: 95.w,
+                              height: 118.h,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2.r,
+                                ),
+                                borderRadius: BorderRadius.circular(13.r),
+                                image: DecorationImage(
+                                  image: NetworkImage(item.imageUrl),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-                // 右侧图片区域
-                Expanded(
-                  flex: 1,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // 第二张图片（底层，旋转30度）
-                      Transform.rotate(
-                        angle: 30 * 3.14159 / 180, // 30度转换为弧度
-                        child: Container(
-                          width: 95.w,
-                          height: 118.h,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(item.imageUrl),
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                        ),
-                      ),
-                      // 第一张图片（顶层，旋转5度）
-                      Transform.rotate(
-                        angle: 5 * 3.14159 / 180, // 5度转换为弧度
-                        child: Container(
-                          width: 95.w,
-                          height: 118.h,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(item.imageUrl),
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                  SizedBox(width: 34.w), // 右侧间距
+                ],
+              ),
             ),
           ),
         ],
