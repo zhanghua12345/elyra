@@ -4,6 +4,7 @@ import 'package:elyra/page/el_home/sub_page/genres/page.dart';
 import 'package:elyra/page/el_home/sub_page/new/page.dart';
 import 'package:elyra/page/el_home/sub_page/popular/page.dart';
 import 'package:elyra/page/el_home/sub_page/ranking/page.dart';
+import 'package:elyra/page/el_home/sub_page/search/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -74,7 +75,9 @@ class _HomePageState extends State<HomePage>
                           children: [
                             Image.asset('ely_home_logo.png'.icon, height: 22.h),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Get.toNamed('/search');
+                              },
                               child: Image.asset(
                                 'ely_search.png'.icon,
                                 height: 30.h,
