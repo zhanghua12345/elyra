@@ -73,23 +73,33 @@ class VampireController extends GetxController {
         if (loadMore) {
           // 加载更多数据
           if (response.data['list'] != null && response.data['list'].length > 0) {
-            var newItems = response.data['list']
-                .map((item) => ShortVideoBean.fromJson(item))
-                .toList();
-            state.vampireList.addAll(newItems);
+            try {
+              List<ShortVideoBean> newItems = response.data['list']
+                  .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
+                  .toList();
+              state.vampireList.addAll(newItems);
+            } catch (e) {
+              print('Error mapping new items: $e');
+              // 如果解析失败，我们仍然更新状态以停止加载
+              state.loadStatus = LoadStatusType.loadFailed;
+            }
           }
         } else {
           // 刷新数据
           state.vampireList.clear();
           
           if (response.data['list'] != null && response.data['list'].length > 0) {
-            state.vampireList = [
-              ...response.data['list']
-                  .map((item) => ShortVideoBean.fromJson(item))
-                  .toList(),
-            ];
-            
-            state.loadStatus = LoadStatusType.loadSuccess;
+            try {
+              List<ShortVideoBean> newItems = response.data['list']
+                  .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
+                  .toList();
+              state.vampireList = newItems;
+              
+              state.loadStatus = LoadStatusType.loadSuccess;
+            } catch (e) {
+              print('Error mapping items: $e');
+              state.loadStatus = LoadStatusType.loadFailed;
+            }
           } else {
             state.loadStatus = LoadStatusType.loadNoData;
           }
