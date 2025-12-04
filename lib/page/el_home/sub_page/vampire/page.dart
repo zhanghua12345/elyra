@@ -23,82 +23,77 @@ class _VampirePageState extends State<VampirePage> {
     return GetBuilder<VampireController>(
       builder: (controller) {
         return Scaffold(
-          body: Stack(
-            children: [
-              // 全屏背景图
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('ely_background_image.png'.icon),
-                      fit: BoxFit.fill,
+          extendBodyBehindAppBar: true,
+          body: Container(
+            padding: EdgeInsets.only(top: ScreenUtil().statusBarHeight),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('ely_background_image.png'.icon),
+                fit: BoxFit.fill,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // 内容区域
+              children: [
+                _buildAppBar(context),
+                SizedBox(height: 10.h),
+                Expanded(
+                  child: SmartRefresher(
+                    controller: controller.refreshController,
+                    enablePullDown: true,
+                    enablePullUp: true,
+                    onRefresh: controller.onRefresh,
+                    onLoading: controller.onLoadMore,
+                    header: ClassicHeader(
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull to refresh',
+                      releaseText: 'Release to refresh',
+                      refreshingText: 'Refreshing...',
+                      completeText: 'Refresh completed',
+                      failedText: 'Refresh failed',
                     ),
+                    footer: ClassicFooter(
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull up to load more',
+                      loadingText: 'Loading...',
+                      noDataText: 'No more data',
+                      failedText: 'Load failed, tap to retry',
+                    ),
+                    child: _buildContent(),
                   ),
                 ),
-              ),
-              
-              // 页面内容
-              Positioned.fill(
-                child: Column(
-                  children: [
-                    // 顶部AppBar区域
-                    Container(
-                      padding: EdgeInsets.only(
-                        top: ScreenUtil().statusBarHeight,
-                        bottom: 10.h,
-                      ),
-                      child: AppBar(
-                        title: Text(
-                          controller.state.categoryTitle,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        centerTitle: true,
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        leading: IconButton(
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
-                          onPressed: () => Get.back(),
-                        ),
-                      ),
-                    ),
-                    
-                    // 内容区域
-                    Expanded(
-                      child: SmartRefresher(
-                        controller: controller.refreshController,
-                        enablePullDown: true,
-                        enablePullUp: true,
-                        onRefresh: controller.onRefresh,
-                        onLoading: controller.onLoadMore,
-                        header: ClassicHeader(
-                          textStyle: TextStyle(color: Colors.white),
-                          idleText: 'Pull to refresh',
-                          releaseText: 'Release to refresh',
-                          refreshingText: 'Refreshing...',
-                          completeText: 'Refresh completed',
-                          failedText: 'Refresh failed',
-                        ),
-                        footer: ClassicFooter(
-                          textStyle: TextStyle(color: Colors.white),
-                          idleText: 'Pull up to load more',
-                          loadingText: 'Loading...',
-                          noDataText: 'No more data',
-                          failedText: 'Load failed, tap to retry',
-                        ),
-                        child: _buildContent(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Image.asset('ely_back.png'.icon, height: 20.h),
+          ),
+          Text(
+            controller.state.categoryTitle,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          // 右侧可以放置其他操作按钮，暂时留空
+          SizedBox(width: 24.w),
+        ],
+      ),
     );
   }
 
@@ -152,7 +147,7 @@ class _VampirePageState extends State<VampirePage> {
         children: [
           SizedBox(height: 20.h),
           _buildStaggeredGrid(),
-          SizedBox(height: 40.h),
+          SizedBox(height: 20.h),
         ],
       ),
     );

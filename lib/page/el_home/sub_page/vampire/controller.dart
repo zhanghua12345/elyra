@@ -32,8 +32,8 @@ class VampireController extends GetxController {
   }
 
   getVampireData({RefreshController? refreshCtrl, bool loadMore = false}) async {
-    // 如果正在加载或没有更多数据，则直接返回
-    if (state.isLoading || (!loadMore && !state.hasMore)) return;
+    // 如果正在加载，或者加载更多时没有更多数据，则直接返回
+    if (state.isLoading || (loadMore && !state.hasMore)) return;
     
     // 更新状态
     if (!loadMore) {
