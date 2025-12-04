@@ -47,7 +47,7 @@ class _TestPageState extends State<TestPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar('Test Page'),
-                SizedBox(height: 10.h),
+                SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,

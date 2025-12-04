@@ -54,7 +54,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
               child: Column(
                 children: [
                   _buildAppBar(),
-                  SizedBox(height: 10.h),
                   Expanded(
                     child: SmartRefresher(
                       controller: controller.refreshController,
@@ -178,7 +177,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildStaggeredGrid()],
+        children: [
+          SizedBox(height: 20.h),
+          _buildStaggeredGrid(),
+          SizedBox(height: 20.h),
+        ],
       ),
     );
   }
@@ -187,21 +190,21 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return Container(
       // 内容区（正常瀑布流）
       child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: MasonryGridView.count(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        mainAxisSpacing: 7.h,
-        crossAxisSpacing: 7.w,
-        padding: EdgeInsets.zero,
-        itemCount: controller.state.searchResultList.length,
-        itemBuilder: (context, index) {
-          final item = controller.state.searchResultList[index];
-          final height = 266.h;
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: MasonryGridView.count(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 7.h,
+          crossAxisSpacing: 7.w,
+          padding: EdgeInsets.zero,
+          itemCount: controller.state.searchResultList.length,
+          itemBuilder: (context, index) {
+            final item = controller.state.searchResultList[index];
+            final height = 266.h;
 
-          return _buildCollectionCard(item, double.infinity, height);
-        },
+            return _buildCollectionCard(item, double.infinity, height);
+          },
         ),
       ),
     );
