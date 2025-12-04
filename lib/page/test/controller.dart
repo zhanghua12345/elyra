@@ -24,10 +24,9 @@ class TestController extends GetxController {
 
   // 加载数据的方法
   void loadData() async {
-    if (state.isLoading ) return;
-    try {
+    if (state.isLoading) return;
     state.isLoading = true;
-
+    try {
       // 模拟加载数据
       await Future.delayed(Duration(seconds: 2));
 
@@ -35,10 +34,15 @@ class TestController extends GetxController {
       state.loadStatus = LoadStatusType.loadSuccess;
       update();
     } catch (err) {
-      print('Error mapping items: $err');
+      // 错误处理
+      state.loadStatus = LoadStatusType.loadFailed;
+      update();
     } finally {
       state.isLoading = false;
-      refreshController.loadComplete(); // 停止加载更多动画
+
+      // 确保刷新控制器正确完成
+      refreshController.refreshCompleted();
+      update();
     }
   }
 

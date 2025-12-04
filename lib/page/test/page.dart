@@ -75,7 +75,7 @@ class _TestPageState extends State<TestPage> {
             title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 18,
+              fontSize: 18.sp,
               fontFamily: 'PingFang SC',
               fontWeight: FontWeight.w600,
             ),
@@ -132,19 +132,11 @@ class _TestPageState extends State<TestPage> {
       );
     }
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildContentArea(),
-        ],
-      ),
-    );
+    return _buildContentArea();
   }
 
   Widget _buildContentArea() {
-    return Container(
-      height: 600.h,
-      color: Colors.white24,
+    return SizedBox.expand(
       child: Center(
         child: Text(
           'Content goes here',
