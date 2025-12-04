@@ -130,6 +130,8 @@ class _SearchPageState extends State<SearchPage> {
               onSubmitted: (value) {
                 if (value.trim().isNotEmpty) {
                   controller.saveSearchHistory(value.trim());
+                  // 跳转到搜索结果页面
+                      Get.toNamed('/search_result', arguments: {'search': value.trim()});
                 }
               },
             ),

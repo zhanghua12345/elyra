@@ -7,5 +7,5 @@ class Apis {
   static const String categoryListAppendShortPlay = "/categoryListAppendShortPlay";
   static const String videoList = "/videoList";
   static const String searchHots = "/search/hots";
-
+  static const String search = "/search"; // 添加搜索接口
 }

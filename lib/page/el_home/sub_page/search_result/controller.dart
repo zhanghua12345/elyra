@@ -8,15 +8,16 @@ import 'package:elyra/bean/short_video_bean.dart';
 
 class SearchResultPageController extends GetxController {
   final state = SearchResultState();
-  final RefreshController refreshController = RefreshController(initialRefresh: false);
+  final RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   @override
   void onInit() {
     super.onInit();
     // 获取传递的参数
     var arguments = Get.arguments ?? {};
-    state.categoryId = arguments['id'] ?? 0;
-    state.categoryTitle = arguments['title'] ?? "Vampire";
+    state.searchKeyword = arguments['search'] ?? '';
   }
 
   @override
@@ -31,78 +32,48 @@ class SearchResultPageController extends GetxController {
     super.onClose();
   }
 
-  getVampireData({RefreshController? refreshCtrl, bool loadMore = false}) async {
+  getVampireData({RefreshController? refreshCtrl}) async {
     // 如果正在加载，或者加载更多时没有更多数据，则直接返回
-    if (state.isLoading || (loadMore && !state.hasMore)) return;
-    
-    // 更新状态
-    if (!loadMore) {
-      state.loadStatus = LoadStatusType.loading;
-    }
+    if (state.isLoading) return;
+
     state.isLoading = true;
     update();
 
     HttpClient().addHeader('lang-key', 'en');
     try {
       // 构造请求参数
-      Map<String, dynamic> params = {
-        'current_page': loadMore ? state.currentPage + 1 : 1,
-        'page_size': state.pageSize,
-        'category_id': state.categoryId,
-      };
+      Map<String, dynamic> params = {'search': state.searchKeyword};
 
       ApiResponse response = await HttpClient().request(
-        Apis.videoList,  // 使用新的API接口
+        Apis.search, // 使用新的API接口
         method: HttpMethod.get,
         queryParameters: params,
       );
-      
+
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
       } else {
         refreshController.refreshCompleted();
       }
-      
+
       if (response.success) {
-        // 解析分页信息
-        var pagination = response.data['pagination'];
-        state.currentPage = pagination['current_page'] ?? 1;
-        state.totalPages = pagination['page_total'] ?? 0;
-        state.hasMore = state.currentPage < state.totalPages;
-        
-        if (loadMore) {
-          // 加载更多数据
-          if (response.data['list'] != null && response.data['list'].length > 0) {
-            try {
-              List<ShortVideoBean> newItems = response.data['list']
-                  .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
-                  .toList();
-              state.searchResultList.addAll(newItems);
-            } catch (e) {
-              print('Error mapping new items: $e');
-              // 如果解析失败，我们仍然更新状态以停止加载
-              state.loadStatus = LoadStatusType.loadFailed;
-            }
+        // 刷新数据
+        state.searchResultList.clear();
+
+        if (response.data['list'] != null && response.data['list'].length > 0) {
+          try {
+            List<ShortVideoBean> newItems = response.data['list']
+                .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
+                .toList();
+            state.searchResultList = newItems;
+
+            state.loadStatus = LoadStatusType.loadSuccess;
+          } catch (e) {
+            print('Error mapping items: $e');
+            state.loadStatus = LoadStatusType.loadFailed;
           }
         } else {
-          // 刷新数据
-          state.searchResultList.clear();
-          
-          if (response.data['list'] != null && response.data['list'].length > 0) {
-            try {
-              List<ShortVideoBean> newItems = response.data['list']
-                  .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
-                  .toList();
-              state.searchResultList = newItems;
-              
-              state.loadStatus = LoadStatusType.loadSuccess;
-            } catch (e) {
-              print('Error mapping items: $e');
-              state.loadStatus = LoadStatusType.loadFailed;
-            }
-          } else {
-            state.loadStatus = LoadStatusType.loadNoData;
-          }
+          state.loadStatus = LoadStatusType.loadNoData;
         }
         update();
       } else {
@@ -127,13 +98,5 @@ class SearchResultPageController extends GetxController {
 
   void onRefresh() {
     getVampireData();
-  }
-  
-  void onLoadMore() {
-    if (state.hasMore) {
-      getVampireData(loadMore: true);
-    } else {
-      refreshController.loadNoData(); // 没有更多数据
-    }
   }
 }

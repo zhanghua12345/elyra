@@ -23,6 +23,13 @@ class _SearchResultPageState extends State<SearchResultPage> {
   void initState() {
     super.initState();
     controller = Get.put(SearchResultPageController());
+
+    // 初始化搜索框的值
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _searchController.text = controller.state.searchKeyword;
+      });
+    });
   }
 
   @override
@@ -46,7 +53,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
             child: SafeArea(
               child: Column(
                 children: [
-                  _buildSearchAppBar(),
+                  _buildAppBar(),
+                  SizedBox(height: 10.h),
                   Expanded(
                     child: SmartRefresher(
                       controller: controller.refreshController,
@@ -73,7 +81,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
-  Widget _buildSearchAppBar() {
+  Widget _buildAppBar() {
     return Container(
       height: 44.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -179,21 +187,21 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return Container(
       // 内容区（正常瀑布流）
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        child: MasonryGridView.count(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 7.h,
-          crossAxisSpacing: 7.w,
-          padding: EdgeInsets.zero,
-          itemCount: controller.state.searchResultList.length,
-          itemBuilder: (context, index) {
-            final item = controller.state.searchResultList[index];
-            final height = 266.h;
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: MasonryGridView.count(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 7.h,
+        crossAxisSpacing: 7.w,
+        padding: EdgeInsets.zero,
+        itemCount: controller.state.searchResultList.length,
+        itemBuilder: (context, index) {
+          final item = controller.state.searchResultList[index];
+          final height = 266.h;
 
-            return _buildCollectionCard(item, double.infinity, height);
-          },
+          return _buildCollectionCard(item, double.infinity, height);
+        },
         ),
       ),
     );
