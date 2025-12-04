@@ -52,7 +52,7 @@ class VampireController extends GetxController {
       };
 
       ApiResponse response = await HttpClient().request(
-        Apis.categoryListAppendShortPlay,
+        Apis.videoList,  // 使用新的API接口
         method: HttpMethod.get,
         queryParameters: params,
       );

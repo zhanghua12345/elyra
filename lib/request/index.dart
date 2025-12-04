@@ -5,5 +5,6 @@ class Apis {
   static const String homeData = "/home/all-modules";
   static const String rankingData = "/homeRanking";
   static const String categoryListAppendShortPlay = "/categoryListAppendShortPlay";
+  static const String videoList = "/videoList";
 
 }

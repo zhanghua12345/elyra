@@ -23,34 +23,79 @@ class _VampirePageState extends State<VampirePage> {
     return GetBuilder<VampireController>(
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(controller.state.categoryTitle),
-            centerTitle: true,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          body: SmartRefresher(
-            controller: controller.refreshController,
-            enablePullDown: true,
-            enablePullUp: true,
-            onRefresh: controller.onRefresh,
-            onLoading: controller.onLoadMore,
-            header: ClassicHeader(
-              textStyle: TextStyle(color: Colors.white),
-              idleText: 'Pull to refresh',
-              releaseText: 'Release to refresh',
-              refreshingText: 'Refreshing...',
-              completeText: 'Refresh completed',
-              failedText: 'Refresh failed',
-            ),
-            footer: ClassicFooter(
-              textStyle: TextStyle(color: Colors.white),
-              idleText: 'Pull up to load more',
-              loadingText: 'Loading...',
-              noDataText: 'No more data',
-              failedText: 'Load failed, tap to retry',
-            ),
-            child: _buildContent(),
+          body: Stack(
+            children: [
+              // 全屏背景图
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('ely_background_image.png'.icon),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
+              ),
+              
+              // 页面内容
+              Positioned.fill(
+                child: Column(
+                  children: [
+                    // 顶部AppBar区域
+                    Container(
+                      padding: EdgeInsets.only(
+                        top: ScreenUtil().statusBarHeight,
+                        bottom: 10.h,
+                      ),
+                      child: AppBar(
+                        title: Text(
+                          controller.state.categoryTitle,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        centerTitle: true,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        leading: IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Get.back(),
+                        ),
+                      ),
+                    ),
+                    
+                    // 内容区域
+                    Expanded(
+                      child: SmartRefresher(
+                        controller: controller.refreshController,
+                        enablePullDown: true,
+                        enablePullUp: true,
+                        onRefresh: controller.onRefresh,
+                        onLoading: controller.onLoadMore,
+                        header: ClassicHeader(
+                          textStyle: TextStyle(color: Colors.white),
+                          idleText: 'Pull to refresh',
+                          releaseText: 'Release to refresh',
+                          refreshingText: 'Refreshing...',
+                          completeText: 'Refresh completed',
+                          failedText: 'Refresh failed',
+                        ),
+                        footer: ClassicFooter(
+                          textStyle: TextStyle(color: Colors.white),
+                          idleText: 'Pull up to load more',
+                          loadingText: 'Loading...',
+                          noDataText: 'No more data',
+                          failedText: 'Load failed, tap to retry',
+                        ),
+                        child: _buildContent(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
