@@ -33,7 +33,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('Test Page'),
+                _buildAppBar('Search Page'),
                 SizedBox(height: 10.h),
                 Expanded(
                   child: SmartRefresher(
