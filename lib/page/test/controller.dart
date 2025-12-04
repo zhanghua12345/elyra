@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 
-class TestController extends GetxController {
+class TestPageController extends GetxController {
   final state = TestState();
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,

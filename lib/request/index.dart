@@ -6,5 +6,6 @@ class Apis {
   static const String rankingData = "/homeRanking";
   static const String categoryListAppendShortPlay = "/categoryListAppendShortPlay";
   static const String videoList = "/videoList";
+  static const String searchHots = "/search/hots";
 
 }

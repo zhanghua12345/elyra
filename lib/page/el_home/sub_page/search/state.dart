@@ -1,14 +1,18 @@
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/bean/hot_search_bean.dart';
 
-class TestState {
-  TestState();
+class SearchState {
+  SearchState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
   bool isLoading = false;
   
-  // 添加你需要的其他状态变量
-  // 示例：
-  // List<YourModel> dataList = [];
-  // int currentPage = 1;
-  // bool hasMore = true;
+  // 搜索历史记录
+  List<String> searchHistoryList = [];
+  
+  // 热门搜索数据
+  List<HotSearchBean> hotSearchList = [];
+  
+  // 是否显示搜索历史
+  bool showSearchHistory = false;
 }

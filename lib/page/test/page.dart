@@ -14,11 +14,24 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
-  final controller = Get.put(TestController());
+  late final TestPageController controller;
+  final TextEditingController _testController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(TestPageController());
+  }
+
+  @override
+  void dispose() {
+    _testController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<TestController>(
+    return GetBuilder<TestPageController>(
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -75,7 +88,7 @@ class _TestPageState extends State<TestPage> {
             title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 18.sp,
+              fontSize: 18,
               fontFamily: 'PingFang SC',
               fontWeight: FontWeight.w600,
             ),
