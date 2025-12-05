@@ -121,6 +121,7 @@ class CollectController extends GetxController {
   }
 
   void onRefresh() {
+
     getVampireData();
   }
   

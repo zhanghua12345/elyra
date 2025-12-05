@@ -48,6 +48,7 @@ class _CollectPageState extends State<CollectPage> {
                     onRefresh: controller.onRefresh,
                     onLoading: controller.onLoadMore,
                     header: ClassicHeader(
+                      height: 40,
                       textStyle: TextStyle(color: Colors.white),
                       idleText: 'Pull to refresh',
                       releaseText: 'Release to refresh',
@@ -124,7 +125,9 @@ class _CollectPageState extends State<CollectPage> {
 
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(child: CircularProgressIndicator(color: Color(0xFFFF6B00)));
+      return Center(
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+      );
     }
 
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
