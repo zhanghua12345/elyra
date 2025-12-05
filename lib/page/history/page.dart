@@ -74,8 +74,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
-      height: 44.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

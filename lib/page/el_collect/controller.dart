@@ -52,7 +52,7 @@ class CollectController extends GetxController {
       };
 
       ApiResponse response = await HttpClient().request(
-        Apis.myCollections, // 使用收藏列表接口
+        Apis.videoList, // 使用收藏列表接口
         method: HttpMethod.get,
         queryParameters: params,
       );
