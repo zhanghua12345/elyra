@@ -101,8 +101,8 @@ class _CollectPageState extends State<CollectPage> {
                   },
                   child: Image.asset(
                     controller.state.isEdit
-                        ? 'ely_collect_edit.png'.icon
-                        : 'ely_collect_confirm.png'.icon,
+                        ? 'ely_collect_confirm.png'.icon
+                        : 'ely_collect_edit.png'.icon,
                     height: 26.h,
                   ),
                 ),
@@ -305,7 +305,9 @@ class _CollectPageState extends State<CollectPage> {
                       onConfirm: () async {
                         Navigator.of(context).pop();
                         // 调用取消收藏接口
-                        bool success = await controller.cancelCollect(shortPlayId);
+                        bool success = await controller.cancelCollect(
+                          shortPlayId,
+                        );
                         if (success) {
                           // 从列表中移除该项
                           controller.state.collectList.remove(item);

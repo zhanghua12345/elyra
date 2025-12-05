@@ -39,7 +39,6 @@ class CollectController extends GetxController {
     state.isLoading = true;
     update();
 
-    HttpClient().addHeader('lang-key', 'en');
     try {
       // 构造请求参数
       Map<String, dynamic> params = {
@@ -48,7 +47,7 @@ class CollectController extends GetxController {
       };
 
       ApiResponse response = await HttpClient().request(
-        Apis.videoList,  // 使用新的API接口
+        Apis.myCollections,  // 使用收藏列表接口
         method: HttpMethod.get,
         queryParameters: params,
       );
@@ -136,7 +135,6 @@ class CollectController extends GetxController {
   /// 取消收藏
   Future<bool> cancelCollect(shortPlayId) async {
     try {
-      HttpClient().addHeader('lang-key', 'en');
       ApiResponse response = await HttpClient().request(
         Apis.cancelCollect,
         method: HttpMethod.post,

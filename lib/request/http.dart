@@ -73,7 +73,12 @@ class HttpClient {
       connectTimeout: Duration(seconds: HttpConfig.connectTimeout),
       receiveTimeout: Duration(seconds: HttpConfig.receiveTimeout),
       sendTimeout: Duration(seconds: HttpConfig.sendTimeout),
-      headers: {'Content-Type': 'application/json; charset=utf-8', 'security': false, 'time-zone': 'GMT-08:00'},
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'security': false,
+        'time-zone': 'GMT-08:00',
+        'lang-key': 'en', // 全局语言设置
+      },
       responseType: ResponseType.json,
     );
 
