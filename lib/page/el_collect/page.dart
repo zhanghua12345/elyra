@@ -2,6 +2,7 @@ import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_confirm_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -211,61 +212,103 @@ class _CollectPageState extends State<CollectPage> {
     double width,
     double height,
   ) {
-    return GestureDetector(
-      onTap: () {
-        // TODO: 导航到详情页
-        // Get.toNamed('/detail', arguments: {'id': item.shortPlayId});
-      },
-      child: Container(
-        width: width, // 卡片宽度（动态计算）
-        height: height, // 卡片高度（131 或 266）
-        decoration: BoxDecoration(
-          color: Color(0xFF5116C1),
-          borderRadius: BorderRadius.circular(18.r), // 圆角 32
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18.r),
-          child: Column(
-            children: [
-              // 上部：图片区域（自适应高度）
-              ClipRRect(
-                borderRadius: BorderRadius.circular(18.r),
-                child: Image.network(
-                  item.imageUrl ?? '',
-                  width: double.infinity,
-                  height: 145.h, // 固定高度
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[800],
-                    child: Icon(Icons.error, color: Colors.white54),
-                  ),
-                ),
-              ),
-              // 下部：标题区域
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(top: 5.h),
-                  width: 94,
-                  height: double.infinity,
-                  child: Text(
-                    item.name ?? '',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontFamily: 'PingFang SC',
-                      fontWeight: FontWeight.w500,
-                      height: 1,
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            // TODO: 导航到详情页
+            // Get.toNamed('/detail', arguments: {'id': item.shortPlayId});
+          },
+          child: Container(
+            width: width, // 卡片宽度（动态计算）
+            height: height, // 卡片高度（131 或 266）
+            decoration: BoxDecoration(
+              color: Color(0xFF5116C1),
+              borderRadius: BorderRadius.circular(18.r), // 圆角 32
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18.r),
+              child: Column(
+                children: [
+                  // 上部：图片区域（自适应高度）
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(18.r),
+                    child: Image.network(
+                      item.imageUrl ?? '',
+                      width: double.infinity,
+                      height: 145.h, // 固定高度
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[800],
+                        child: Icon(Icons.error, color: Colors.white54),
+                      ),
                     ),
-                    maxLines: 2, // 最多两行
-                    overflow: TextOverflow.ellipsis, // 超出显示省略号
-                    textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
                   ),
-                ),
+                  // 下部：标题区域
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.only(top: 5.h),
+                      width: 94,
+                      height: double.infinity,
+                      child: Text(
+                        item.name ?? '',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w500,
+                          height: 1,
+                        ),
+                        maxLines: 2, // 最多两行
+                        overflow: TextOverflow.ellipsis, // 超出显示省略号
+                        textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
+        if (controller.state.isEdit)
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.75),
+                borderRadius: BorderRadius.circular(18.r), // 圆角 32
+              ),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    showElConfirmModal(
+                      Get.context!,
+                      image: AssetImage('el_model_cancel_collect.png'.icon),
+                      title: 'Remove from Favorites?',
+                      description:
+                          'This drama will be removed from your favorites.',
+                      cancelText: 'Cancel',
+                      confirmText: 'Remove',
+                      closeIcon: AssetImage('close.png'.icon),
+                      onCancel: () {
+                        Navigator.of(Get.context!).pop();
+                      },
+                      onConfirm: () {
+                        Navigator.of(Get.context!).pop();
+                        controller.state.collectList.remove(item);
+                        controller.update();
+                      },
+                    );
+                  },
+                  child: Image.asset(
+                    'ely_collect_del.png'.icon,
+                    width: 36.h,
+                    height: 36.h,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
