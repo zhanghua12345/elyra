@@ -1,6 +1,7 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class MePage extends StatefulWidget {
   const MePage({super.key});
@@ -200,12 +201,21 @@ class _MePageState extends State<MePage> {
               padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 16.w),
               child: Column(
                 children: [
-                  _buildMenuItem('assets/ely_my_language.png', 'Language'),
-                  _buildMenuItem('assets/ely_my_feedback.png', 'Feedback'),
-                  _buildMenuItem('assets/ely_my_about.png', 'About'),
+                  _buildMenuItem(
+                    'assets/ely_my_language.png',
+                    'Language',
+                    'language',
+                  ),
+                  _buildMenuItem(
+                    'assets/ely_my_feedback.png',
+                    'Feedback',
+                    'feedback',
+                  ),
+                  _buildMenuItem('assets/ely_my_about.png', 'About', 'about'),
                   _buildMenuItem(
                     'assets/ely_my_setting.png',
                     'Setting',
+                    'setting',
                     isLast: true,
                   ),
                 ],
@@ -217,7 +227,12 @@ class _MePageState extends State<MePage> {
     );
   }
 
-  Widget _buildMenuItem(dynamic icon, String title, {bool isLast = false}) {
+  Widget _buildMenuItem(
+    dynamic icon,
+    String title,
+    String id, {
+    bool isLast = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -249,6 +264,7 @@ class _MePageState extends State<MePage> {
         trailing: Icon(Icons.chevron_right, color: Colors.white70),
         onTap: () {
           // 点击事件
+          Get.toNamed('/$id');
         },
       ),
     );
