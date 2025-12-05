@@ -1,3 +1,4 @@
+import 'package:elyra/page/history/page.dart';
 import 'package:elyra/page/main_page.dart';
 import 'package:elyra/page/splash_page.dart';
 import 'package:elyra/page/el_home/sub_page/vampire/page.dart';
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String vampire = '/vampire';
   static const String search = '/search';
   static const String searchResult = '/search_result';
+  static const String history = '/history';
   static const String test = '/test';
 
   static final routes = [
@@ -20,6 +22,7 @@ class AppRoutes {
     GetPage(name: vampire, page: () => const VampirePage()),
     GetPage(name: search, page: () => const SearchPage()),
     GetPage(name: searchResult, page: () => const SearchResultPage()),
+    GetPage(name: history, page: () => const HistoryPage()),
     GetPage(name: test, page: () => const TestPage()),
   ];
 }

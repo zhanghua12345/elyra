@@ -109,7 +109,7 @@ class _CollectPageState extends State<CollectPage> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => Get.back(),
+                  onTap: () => {Get.toNamed('/history')},
                   child: Image.asset(
                     'ely_collect_history.png'.icon,
                     height: 26.h,
