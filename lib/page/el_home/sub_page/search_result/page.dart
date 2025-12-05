@@ -2,6 +2,7 @@ import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/search_result/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -61,6 +62,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                       enablePullUp: false,
                       onRefresh: controller.onRefresh,
                       header: ClassicHeader(
+                        height: 40,
                         textStyle: TextStyle(color: Colors.white),
                         idleText: 'Pull to refresh',
                         releaseText: 'Release to refresh',
@@ -148,29 +150,29 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(child: CircularProgressIndicator(color: Color(0xFFFF6B00)));
-    }
-    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'Load Failed',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: controller.onRefresh,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFF6B00),
-              ),
-              child: Text('Retry'),
-            ),
-          ],
-        ),
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
+      return ElNoDataWidget(
+        imagePath: 'ely_collect_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        title: null,
+        description: 'There is no data for the moment.',
+        buttonText: null,
       );
     }
 

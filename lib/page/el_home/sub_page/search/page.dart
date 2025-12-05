@@ -1,6 +1,7 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/search/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,6 +55,7 @@ class _SearchPageState extends State<SearchPage> {
                       enablePullUp: false,
                       onRefresh: controller.onRefresh,
                       header: ClassicHeader(
+                        height: 40,
                         textStyle: TextStyle(color: Colors.white),
                         idleText: 'Pull to refresh',
                         releaseText: 'Release to refresh',
@@ -131,7 +133,10 @@ class _SearchPageState extends State<SearchPage> {
                 if (value.trim().isNotEmpty) {
                   controller.saveSearchHistory(value.trim());
                   // 跳转到搜索结果页面
-                      Get.toNamed('/search_result', arguments: {'search': value.trim()});
+                  Get.toNamed(
+                    '/search_result',
+                    arguments: {'search': value.trim()},
+                  );
                 }
               },
             ),
@@ -143,31 +148,21 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(child: CircularProgressIndicator(color: Color(0xFFFF6B00)));
-    }
-    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'Load Failed',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: controller.onRefresh,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFF6B00),
-              ),
-              child: Text('Retry'),
-            ),
-          ],
-        ),
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
       );
     }
+
+    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
+      );
+    }
+
 
     return SingleChildScrollView(
       child: Column(
@@ -354,7 +349,6 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   SizedBox(width: 20.w), // 右侧间距
-
                   // 右侧两张旋转图
                   Expanded(
                     flex: 1,
