@@ -9,7 +9,9 @@ import 'package:elyra/bean/short_video_bean.dart';
 
 class CollectController extends GetxController {
   final state = CollectState();
-  final RefreshController refreshController = RefreshController(initialRefresh: false);
+  final RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   @override
   void onInit() {
@@ -28,10 +30,13 @@ class CollectController extends GetxController {
     super.onClose();
   }
 
-  getVampireData({RefreshController? refreshCtrl, bool loadMore = false}) async {
+  getVampireData({
+    RefreshController? refreshCtrl,
+    bool loadMore = false,
+  }) async {
     // 如果正在加载，或者加载更多时没有更多数据，则直接返回
     if (state.isLoading || (loadMore && !state.hasMore)) return;
-    
+
     // 更新状态
     if (!loadMore) {
       state.loadStatus = LoadStatusType.loading;
@@ -47,27 +52,28 @@ class CollectController extends GetxController {
       };
 
       ApiResponse response = await HttpClient().request(
-        Apis.myCollections,  // 使用收藏列表接口
+        Apis.myCollections, // 使用收藏列表接口
         method: HttpMethod.get,
         queryParameters: params,
       );
-      
+
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
       } else {
         refreshController.refreshCompleted();
       }
-      
+
       if (response.success) {
         // 解析分页信息
         var pagination = response.data['pagination'];
         state.currentPage = pagination['current_page'] ?? 1;
         state.totalPages = pagination['page_total'] ?? 0;
         state.hasMore = state.currentPage < state.totalPages;
-        
+
         if (loadMore) {
           // 加载更多数据
-          if (response.data['list'] != null && response.data['list'].length > 0) {
+          if (response.data['list'] != null &&
+              response.data['list'].length > 0) {
             try {
               List<ShortVideoBean> newItems = response.data['list']
                   .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
@@ -82,14 +88,15 @@ class CollectController extends GetxController {
         } else {
           // 刷新数据
           state.collectList.clear();
-          
-          if (response.data['list'] != null && response.data['list'].length > 0) {
+
+          if (response.data['list'] != null &&
+              response.data['list'].length > 0) {
             try {
               List<ShortVideoBean> newItems = response.data['list']
                   .map<ShortVideoBean>((item) => ShortVideoBean.fromJson(item))
                   .toList();
               state.collectList = newItems;
-              
+
               state.loadStatus = LoadStatusType.loadSuccess;
             } catch (e) {
               print('Error mapping items: $e');
@@ -121,10 +128,9 @@ class CollectController extends GetxController {
   }
 
   void onRefresh() {
-
     getVampireData();
   }
-  
+
   void onLoadMore() {
     if (state.hasMore) {
       getVampireData(loadMore: true);
@@ -139,20 +145,18 @@ class CollectController extends GetxController {
       ApiResponse response = await HttpClient().request(
         Apis.cancelCollect,
         method: HttpMethod.post,
-        data: {
-          'short_play_id': shortPlayId,
-        },
+        data: {'short_play_id': shortPlayId},
       );
 
       if (response.success) {
-        Message.show(response.data); 
+        Message.show(response.data);
         return true;
       } else {
-       Message.show(response.data); 
+        Message.show(response.data);
         return false;
       }
     } catch (e) {
-      Message.show('取消收藏异常: $e'); 
+      Message.show('取消收藏异常: $e');
       return false;
     }
   }

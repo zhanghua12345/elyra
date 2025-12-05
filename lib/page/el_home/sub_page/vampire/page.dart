@@ -75,6 +75,7 @@ class _VampirePageState extends State<VampirePage> {
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
+      height: 44.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,7 +94,7 @@ class _VampirePageState extends State<VampirePage> {
             ),
           ),
           // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 24.w),
+          SizedBox(width: 20.w),
         ],
       ),
     );
