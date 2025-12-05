@@ -78,7 +78,97 @@ class _CollectPageState extends State<CollectPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(width: 62.w),
+          Row(
+            children: [
+              // Demo 1: 传了 description（通过 child）
+              GestureDetector(
+                onTap: () {
+                  showElConfirmModal(
+                    context,
+                    image: AssetImage('el_model_cancel_collect.png'.icon),
+                    title: 'Remove from Favorites?',
+                    child: Text(
+                      'This dr11ama will be removed\nfrom your favorites.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1.50,
+                        letterSpacing: -0.01,
+                      ),
+                    ),
+                    cancelText: 'Cancel',
+                    confirmText: 'Remove',
+                    onCancel: () {
+                      Navigator.of(context).pop();
+                    },
+                    onConfirm: () {
+                      Navigator.of(context).pop();
+                      print('确认删除');
+                    },
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'D1',
+                    style: TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ),
+              ),
+              SizedBox(width: 4),
+              // Demo 2: 传了自定义 slot，只有一个确认按钮
+              GestureDetector(
+                onTap: () {
+                  showElConfirmModal(
+                    context,
+                    image: AssetImage('el_model_cancel_collect.png'.icon),
+                    title: 'Confirm Operation',
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.orange,
+                          size: 32,
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          'Custom Slot Content\nLine 1\nLine 2',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                    confirmText: 'OK',
+                    onConfirm: () {
+                      Navigator.of(context).pop();
+                      print('单按钮确认');
+                    },
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'D2',
+                    style: TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ),
+              ),
+            ],
+          ),
 
           Text(
             'Collect',
@@ -281,19 +371,24 @@ class _CollectPageState extends State<CollectPage> {
                 child: GestureDetector(
                   onTap: () {
                     showElConfirmModal(
-                      Get.context!,
+                      context,
                       image: AssetImage('el_model_cancel_collect.png'.icon),
                       title: 'Remove from Favorites?',
-                      description:
-                          'This drama will be removed from your favorites.',
+                      child: Text(
+                        'This drama will be removed\nfrom your favorites.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14.sp,
+                        ),
+                      ),
                       cancelText: 'Cancel',
                       confirmText: 'Remove',
-                      closeIcon: AssetImage('close.png'.icon),
                       onCancel: () {
-                        Navigator.of(Get.context!).pop();
+                        Navigator.of(context).pop();
                       },
                       onConfirm: () {
-                        Navigator.of(Get.context!).pop();
+                        Navigator.of(context).pop();
                         controller.state.collectList.remove(item);
                         controller.update();
                       },

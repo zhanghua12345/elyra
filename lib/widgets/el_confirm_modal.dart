@@ -1,44 +1,49 @@
+import 'package:elyra/extend/el_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ElConfirmModal extends StatelessWidget {
   final ImageProvider image;
+
+  /// Title
   final String title;
-  final String description;
-  final String cancelText;
-  final String confirmText;
-  final VoidCallback onCancel;
-  final VoidCallback onConfirm;
-  final ImageProvider? closeIcon;
-  final double topOffset;
+
+  /// Description slot (可传可不传)
+  final Widget? child;
+
+  /// Buttons text
+  final String? cancelText;
+  final String? confirmText;
+
+  /// Callbacks
+  final VoidCallback? onCancel;
+  final VoidCallback? onConfirm;
+
+  /// 是否显示右下角关闭按钮
+  final bool isCloseIcon;
+
+  /// layout configs
+  final double imageOffset;
+  final double imageWidth;
   final double moduleWidth;
   final double moduleHeight;
-  final double titleTop;
-  final double descSpacing;
-  final double betweenModuleAndClose;
-  final double imageWidth;
-  final double imageHeight;
-  final double imageTopAdjust;
+  final double titleOffset;
 
   const ElConfirmModal({
     super.key,
     required this.image,
     required this.title,
-    required this.description,
-    required this.cancelText,
-    required this.confirmText,
-    required this.onCancel,
-    required this.onConfirm,
-    this.closeIcon,
-    this.topOffset = 65,
-    this.moduleWidth = 328,
-    this.moduleHeight = 304,
-    this.titleTop = 185,
-    this.descSpacing = 12,
-    this.betweenModuleAndClose = 30,
+    this.child,
+    this.cancelText,
+    this.confirmText,
+    this.onCancel,
+    this.onConfirm,
+    this.isCloseIcon = true,
+    this.imageOffset = 65,
     this.imageWidth = 233,
-    this.imageHeight = 221,
-    this.imageTopAdjust = 110,
+    this.moduleWidth = 304,
+    this.moduleHeight = 328,
+    this.titleOffset = 185,
   });
 
   @override
@@ -48,163 +53,197 @@ class ElConfirmModal extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: Container(color: Colors.black.withOpacity(0.2)),
+            child: Container(color: Colors.black.withOpacity(0.5)),
           ),
-          Positioned(
-            top: topOffset.h,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                width: moduleWidth.w,
-                height: moduleHeight.h,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF404040),
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Column(
+
+          /// 中心布局
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: imageOffset.h),
+
+                /// 主模块 + 悬浮图片
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    SizedBox(height: titleTop.h),
-                    Padding(
+                    /// 模块背景
+                    Container(
+                      width: moduleWidth.w,
+                      height: moduleHeight.h,
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF404040),
+                        borderRadius: BorderRadius.circular(16.r),
                       ),
-                    ),
-                    SizedBox(height: descSpacing.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text(
-                        description,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 122.43.w,
-                          height: 36.h,
-                          child: OutlinedButton(
-                            onPressed: onCancel,
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(width: 1, color: Colors.white),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100.r),
-                              ),
-                              foregroundColor: Colors.white,
-                            ),
-                            child: Text(cancelText),
-                          ),
-                        ),
-                        SizedBox(width: 16.w),
-                        SizedBox(
-                          width: 122.43.w,
-                          height: 36.h,
-                          child: Ink(
-                            decoration: ShapeDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment(0.00, 0.50),
-                                end: Alignment(1.00, 0.50),
-                                colors: [Color(0xFFFF0BBA), Color(0xFF6018E6)],
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(34.r),
-                              ),
-                            ),
-                            child: TextButton(
-                              onPressed: onConfirm,
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(34.r),
-                                ),
-                              ),
-                              child: Text(confirmText),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: titleOffset.h),
+
+                          /// TITLE
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              height: 1,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.01,
                             ),
                           ),
-                        ),
-                      ],
+
+                          /// slot 内容区
+                          if (child != null) ...[
+                            SizedBox(height: 12.h),
+                            child!,
+                          ],
+
+                          SizedBox(height: 20.h),
+
+                          /// 按钮区（1 个或 2 个）
+                          _buildButtons(),
+                        ],
+                      ),
+                    ),
+
+                    /// 悬浮图片
+                    Positioned(
+                      top: -imageOffset.h,
+                      left: (moduleWidth.w - imageWidth.w) / 2,
+                      child: Image(image: image, width: imageWidth.w),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: topOffset.h - imageTopAdjust.h,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Image(
-                image: image,
-                width: imageWidth.w,
-                height: imageHeight.h,
-              ),
-            ),
-          ),
-          Positioned(
-            top: (topOffset + moduleHeight + betweenModuleAndClose).h,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: onCancel,
-                child: closeIcon != null
-                    ? Image(
-                        image: closeIcon!,
+
+                /// 底部关闭按钮
+                if (isCloseIcon)
+                  Padding(
+                    padding: EdgeInsets.only(top: 30.w),
+                    child: GestureDetector(
+                      onTap: onCancel ?? () => Navigator.pop(context),
+                      child: Image(
+                        image: AssetImage('ely_close.png'.icon),
                         width: 36.h,
                         height: 36.h,
-                      )
-                    : Icon(Icons.close, color: Colors.white, size: 36.h),
-              ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
+  /// 处理按钮逻辑
+  Widget _buildButtons() {
+    final hasCancel = cancelText != null && cancelText!.isNotEmpty;
+    final hasConfirm = confirmText != null && confirmText!.isNotEmpty;
+
+    if (!hasCancel && !hasConfirm) return const SizedBox.shrink();
+
+    /// 只有一个按钮
+    if (hasCancel ^ hasConfirm) {
+      final text = hasCancel ? cancelText! : confirmText!;
+      final callback = hasCancel ? onCancel : onConfirm;
+
+      return SizedBox(
+        width: 200.w,
+        height: 36.h,
+        child: ElevatedButton(
+          onPressed: callback,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.pinkAccent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.r),
+            ),
+          ),
+          child: Text(text, style: const TextStyle(color: Colors.white)),
+        ),
+      );
+    }
+
+    /// 两个按钮
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 122.w,
+          height: 36.h,
+          child: OutlinedButton(
+            onPressed: onCancel,
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Colors.white),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100.r),
+              ),
+            ),
+            child: Text(cancelText!),
+          ),
+        ),
+        SizedBox(width: 16.w),
+        SizedBox(
+          width: 122.w,
+          height: 36.h,
+          child: Container(
+            decoration: ShapeDecoration(
+              gradient: LinearGradient(
+                colors: [const Color(0xFFFF0BBA), const Color(0xFF6018E6)],
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(34),
+              ),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(34.r),
+              onTap: onConfirm,
+              child: Center(
+                child: Text(
+                  confirmText!,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
+//
+// 弹窗方法
+//
 Future<void> showElConfirmModal(
   BuildContext context, {
   required ImageProvider image,
   required String title,
-  required String description,
-  required String cancelText,
-  required String confirmText,
-  required VoidCallback onCancel,
-  required VoidCallback onConfirm,
-  ImageProvider? closeIcon,
+  Widget? child,
+  String? cancelText,
+  String? confirmText,
+  VoidCallback? onCancel,
+  VoidCallback? onConfirm,
+  bool isCloseIcon = true,
 }) {
-  return showGeneralDialog(
+  return showDialog(
     context: context,
     barrierDismissible: true,
-    barrierLabel: 'Dismiss',
-    barrierColor: Colors.black.withOpacity(0.2),
-    transitionDuration: const Duration(milliseconds: 200),
-    pageBuilder: (context, animation, secondaryAnimation) {
+    barrierColor: Colors.transparent,
+    builder: (context) {
       return ElConfirmModal(
         image: image,
         title: title,
-        description: description,
+        child: child,
         cancelText: cancelText,
         confirmText: confirmText,
         onCancel: onCancel,
         onConfirm: onConfirm,
-        closeIcon: closeIcon,
+        isCloseIcon: isCloseIcon,
       );
     },
   );
