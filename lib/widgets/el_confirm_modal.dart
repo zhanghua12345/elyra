@@ -121,7 +121,7 @@ class ElConfirmModal extends StatelessWidget {
                 /// 底部关闭按钮
                 if (isCloseIcon)
                   Padding(
-                    padding: EdgeInsets.only(top: 30.w),
+                    padding: EdgeInsets.only(top: 20.w),
                     child: GestureDetector(
                       onTap: onCancel ?? () => Navigator.pop(context),
                       child: Image(
@@ -152,17 +152,25 @@ class ElConfirmModal extends StatelessWidget {
       final callback = hasCancel ? onCancel : onConfirm;
 
       return SizedBox(
-        width: 200.w,
+        width: 256.w,
         height: 36.h,
-        child: ElevatedButton(
-          onPressed: callback,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.pinkAccent,
+
+        child: Container(
+          decoration: ShapeDecoration(
+            gradient: LinearGradient(
+              colors: [const Color(0xFFFF0BBA), const Color(0xFF6018E6)],
+            ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.r),
+              borderRadius: BorderRadius.circular(34),
             ),
           ),
-          child: Text(text, style: const TextStyle(color: Colors.white)),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(34.r),
+            onTap: callback,
+            child: Center(
+              child: Text(text, style: const TextStyle(color: Colors.white)),
+            ),
+          ),
         ),
       );
     }
