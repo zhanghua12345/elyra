@@ -39,7 +39,7 @@ class ElConfirmModal extends StatelessWidget {
     this.onCancel,
     this.onConfirm,
     this.isCloseIcon = true,
-    this.imageOffset = 65,
+    this.imageOffset = 0,
     this.imageWidth = 233,
     this.moduleWidth = 304,
     this.moduleHeight = 328,
@@ -61,7 +61,7 @@ class ElConfirmModal extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: imageOffset.h),
+                SizedBox(height: (imageOffset + 65).h),
 
                 /// 主模块 + 悬浮图片
                 Stack(
@@ -111,7 +111,7 @@ class ElConfirmModal extends StatelessWidget {
 
                     /// 悬浮图片
                     Positioned(
-                      top: -imageOffset.h,
+                      top: (imageOffset - 65).h,
                       left: (moduleWidth.w - imageWidth.w) / 2,
                       child: Image(image: image, width: imageWidth.w),
                     ),
@@ -237,6 +237,13 @@ Future<void> showElConfirmModal(
   VoidCallback? onCancel,
   VoidCallback? onConfirm,
   bool isCloseIcon = true,
+
+  // 🔥 新增暴露的布局参数
+  double imageOffset = 0,
+  double imageWidth = 233,
+  double moduleWidth = 304,
+  double moduleHeight = 328,
+  double titleOffset = 185,
 }) {
   return showDialog(
     context: context,
@@ -252,6 +259,12 @@ Future<void> showElConfirmModal(
         onCancel: onCancel,
         onConfirm: onConfirm,
         isCloseIcon: isCloseIcon,
+        // 🔥 传入布局参数
+        imageOffset: imageOffset,
+        imageWidth: imageWidth,
+        moduleWidth: moduleWidth,
+        moduleHeight: moduleHeight,
+        titleOffset: titleOffset,
       );
     },
   );

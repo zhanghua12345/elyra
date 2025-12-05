@@ -5,6 +5,7 @@ import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -137,17 +138,22 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget _buildHistoryList() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: controller.state.historyList.length,
-        separatorBuilder: (context, index) => SizedBox(height: 12.h),
-        itemBuilder: (context, index) {
-          final item = controller.state.historyList[index];
-          return _buildHistoryItem(item);
-        },
+    return Container(
+      // 内容区（正常瀑布流）
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: MasonryGridView.count(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          crossAxisCount: 1,
+          mainAxisSpacing: 12.h,
+          padding: EdgeInsets.zero,
+          itemCount: controller.state.historyList.length,
+          itemBuilder: (context, index) {
+            final item = controller.state.historyList[index];
+            return _buildHistoryItem(item);
+          },
+        ),
       ),
     );
   }
@@ -178,7 +184,7 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             // 左侧图片
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: BorderRadius.circular(12.r),
               child: Image.network(
                 item.imageUrl ?? '',
                 width: 68.w,
@@ -192,9 +198,9 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ),
             ),
-            
+
             SizedBox(width: 12.w),
-            
+
             // 中间内容区域
             Expanded(
               child: Column(
@@ -206,38 +212,48 @@ class _HistoryPageState extends State<HistoryPage> {
                     item.name ?? '',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       fontFamily: 'PingFang SC',
                       fontWeight: FontWeight.w500,
-                      height: 1.21,
+                      height: 1.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
                   // Episode
-                  Text(
-                    'EP ${item.episodeTotal ?? 0}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontFamily: 'PingFang SC',
-                      fontWeight: FontWeight.w600,
-                      height: 1.50,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'EP.1',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w600,
+                          height: 1.5,
+                        ),
+                      ),
+                      Text(
+                        '/EP.${item.episodeTotal ?? 0}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            
+
             SizedBox(width: 30.w),
-            
+
             // 右侧箭头
-            Image.asset(
-              'ely_right.png'.icon,
-              width: 20.w,
-              height: 20.h,
-            ),
+            Image.asset('ely_right.png'.icon, width: 20.w, height: 20.h),
           ],
         ),
       ),

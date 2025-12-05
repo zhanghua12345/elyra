@@ -38,8 +38,6 @@ class SearchResultPageController extends GetxController {
 
     state.isLoading = true;
     update();
-
-    HttpClient().addHeader('lang-key', 'en');
     try {
       // 构造请求参数
       Map<String, dynamic> params = {'search': state.searchKeyword};

@@ -1,6 +1,7 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/search/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_confirm_modal.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -163,7 +164,6 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
 
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +201,39 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               GestureDetector(
-                onTap: controller.clearSearchHistory,
+                onTap: () => {
+                  showElConfirmModal(
+                    context,
+                    image: AssetImage('ely_delete_info.png'.icon),
+                    imageOffset: 96,
+                    imageWidth: 72,
+                    moduleWidth: 304,
+                    moduleHeight: 277,
+                    titleOffset: 121,
+                    title: 'Delete Series',
+                    child: Text(
+                      'Confirm to \n delete series from My List',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1.50,
+                      ),
+                    ),
+                    cancelText: '',
+                    confirmText: 'Go',
+                    onCancel: () {
+                      Navigator.of(context).pop();
+                    },
+                    onConfirm: () async {
+                      Navigator.of(context).pop();
+                      controller.clearSearchHistory();
+                    },
+                  ),
+                },
+
                 child: Image.asset(
                   'ely_del.png'.icon,
                   width: 20.w,
@@ -216,28 +248,40 @@ class _SearchPageState extends State<SearchPage> {
             runSpacing: 12.h,
             children: List.generate(
               controller.state.searchHistoryList.length,
-              (index) => IntrinsicWidth(
-                child: Container(
-                  height: 24.h,
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  constraints: BoxConstraints(minWidth: 0), // 关键！
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Center(
-                    // 垂直居中
-                    child: Text(
-                      controller.state.searchHistoryList[index],
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.sp,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w400,
-                        height: 1,
+              (index) => GestureDetector(
+                onTap: () {
+                  final keyword = controller.state.searchHistoryList[index];
+                  // ← 这里写跳转逻辑
+                  controller.saveSearchHistory(keyword.trim());
+                  // 跳转到搜索结果页面
+                  Get.toNamed(
+                    '/search_result',
+                    arguments: {'search': keyword.trim()},
+                  );
+                },
+                child: IntrinsicWidth(
+                  child: Container(
+                    height: 24.h,
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    constraints: BoxConstraints(minWidth: 0), // 关键！
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Center(
+                      // 垂直居中
+                      child: Text(
+                        controller.state.searchHistoryList[index],
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.sp,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                          height: 1,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),

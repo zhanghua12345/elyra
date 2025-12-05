@@ -9,7 +9,6 @@ import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:elyra/extend/el_string.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

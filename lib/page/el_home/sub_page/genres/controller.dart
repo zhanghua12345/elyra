@@ -24,7 +24,6 @@ class GenresController extends GetxController {
   getCategoryData({RefreshController? refreshCtrl}) async {
     state.loadStatus = LoadStatusType.loading;
     update();
-    HttpClient().addHeader('lang-key', 'en');
     try {
       ApiResponse response = await HttpClient().request(
         Apis.categoryListAppendShortPlay,
