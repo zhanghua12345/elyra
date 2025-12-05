@@ -96,7 +96,7 @@ class _TestPageState extends State<TestPage> {
             ),
           ),
           // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 24.w),
+          SizedBox(width: 20.w),
         ],
       ),
     );
@@ -121,7 +121,7 @@ class _TestPageState extends State<TestPage> {
 
     if (controller.state.loadStatus == LoadStatusType.loadNoData) {
       return ElNoDataWidget(
-        imagePath: 'ely_collect_nodata.png',
+        imagePath: 'ely_nodata.png',
         imageWidth: 180,
         imageHeight: 223,
         title: null,

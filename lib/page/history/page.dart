@@ -1,10 +1,11 @@
+import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/history/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -15,24 +16,11 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  late final HistoryPageController controller;
-  final TextEditingController _historyController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.put(HistoryPageController());
-  }
-
-  @override
-  void dispose() {
-    _historyController.dispose();
-    super.dispose();
-  }
+  final controller = Get.put(HistoryController());
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<HistoryPageController>(
+    return GetBuilder<HistoryController>(
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -47,14 +35,15 @@ class _HistoryPageState extends State<HistoryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('History'),
-                SizedBox(height: 6.h),
+                _buildAppBar(context),
+                SizedBox(height: 10.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
                     enablePullDown: true,
-                    enablePullUp: false,
+                    enablePullUp: true,
                     onRefresh: controller.onRefresh,
+                    onLoading: controller.onLoadMore,
                     header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
@@ -63,6 +52,13 @@ class _HistoryPageState extends State<HistoryPage> {
                       refreshingText: 'Refreshing...',
                       completeText: 'Refresh completed',
                       failedText: 'Refresh failed',
+                    ),
+                    footer: ClassicFooter(
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull up to load more',
+                      loadingText: 'Loading...',
+                      noDataText: 'No more data',
+                      failedText: 'Load failed, tap to retry',
                     ),
                     child: _buildContent(),
                   ),
@@ -75,9 +71,8 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget _buildAppBar(String title) {
+  Widget _buildAppBar(BuildContext context) {
     return Container(
-      height: 44.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +82,7 @@ class _HistoryPageState extends State<HistoryPage> {
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
           Text(
-            title,
+            'History',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -96,7 +91,7 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
           ),
           // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 24.w),
+          SizedBox(width: 20.w),
         ],
       ),
     );
@@ -121,7 +116,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
     if (controller.state.loadStatus == LoadStatusType.loadNoData) {
       return ElNoDataWidget(
-        imagePath: 'ely_collect_nodata.png',
+        imagePath: 'ely_nodata.png',
         imageWidth: 180,
         imageHeight: 223,
         title: null,
@@ -130,15 +125,120 @@ class _HistoryPageState extends State<HistoryPage> {
       );
     }
 
-    return _buildContentArea();
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: 20.h),
+          _buildHistoryList(),
+          SizedBox(height: 20.h),
+        ],
+      ),
+    );
   }
 
-  Widget _buildContentArea() {
-    return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+  Widget _buildHistoryList() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: controller.state.historyList.length,
+        separatorBuilder: (context, index) => SizedBox(height: 12.h),
+        itemBuilder: (context, index) {
+          final item = controller.state.historyList[index];
+          return _buildHistoryItem(item);
+        },
+      ),
+    );
+  }
+
+  /// 历史记录单个 item
+  Widget _buildHistoryItem(ShortVideoBean item) {
+    return GestureDetector(
+      onTap: () {
+        // TODO: 导航到详情页
+        // Get.toNamed('/detail', arguments: {'id': item.shortPlayId});
+      },
+      child: Container(
+        width: 343.w,
+        height: 115.h,
+        padding: EdgeInsets.all(12.w),
+        decoration: ShapeDecoration(
+          color: Colors.white.withOpacity(0.20),
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              width: 1,
+              strokeAlign: BorderSide.strokeAlignOutside,
+              color: const Color(0xFF6018E6),
+            ),
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+        ),
+        child: Row(
+          children: [
+            // 左侧图片
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.r),
+              child: Image.network(
+                item.imageUrl ?? '',
+                width: 68.w,
+                height: 91.h,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 68.w,
+                  height: 91.h,
+                  color: Colors.grey[800],
+                  child: Icon(Icons.error, color: Colors.white54, size: 24),
+                ),
+              ),
+            ),
+            
+            SizedBox(width: 12.w),
+            
+            // 中间内容区域
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 标题
+                  Text(
+                    item.name ?? '',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w500,
+                      height: 1.21,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8.h),
+                  // Episode
+                  Text(
+                    'EP ${item.episodeTotal ?? 0}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w600,
+                      height: 1.50,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(width: 30.w),
+            
+            // 右侧箭头
+            Image.asset(
+              'ely_right.png'.icon,
+              width: 20.w,
+              height: 20.h,
+            ),
+          ],
         ),
       ),
     );

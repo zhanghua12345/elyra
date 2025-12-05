@@ -61,7 +61,7 @@ class _RankingPageState extends State<RankingPage> {
 
     if (controller.state.loadStatus == LoadStatusType.loadNoData) {
       return ElNoDataWidget(
-        imagePath: 'ely_collect_nodata.png',
+        imagePath: 'ely_nodata.png',
         imageWidth: 180,
         imageHeight: 223,
         title: null,
