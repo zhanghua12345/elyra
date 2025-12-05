@@ -1,4 +1,5 @@
 import 'package:elyra/page/el_home/sub_page/search_result/state.dart';
+import 'package:elyra/page/el_home/sub_page/search/controller.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -95,6 +96,25 @@ class SearchResultPageController extends GetxController {
   }
 
   void onRefresh() {
+    getVampireData();
+  }
+
+  /// 重新搜索（输入框提交时调用）
+  void searchWithNewKeyword(String keyword) {
+    // 更新自己的搜索关键词
+    state.searchKeyword = keyword;
+    
+    // 尝试获取搜索页面的 controller 并保存搜索历史
+    try {
+      final searchController = Get.find<SearchPageController>();
+      searchController.saveSearchHistory(keyword);
+    } catch (e) {
+      print('SearchPageController not found: $e');
+    }
+    
+    // 重新加载数据
+    state.loadStatus = LoadStatusType.loading;
+    update();
     getVampireData();
   }
 }

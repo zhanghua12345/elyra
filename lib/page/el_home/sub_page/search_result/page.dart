@@ -138,7 +138,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
               ),
               onSubmitted: (value) {
                 if (value.trim().isNotEmpty) {
-                  // controller.saveSearchHistory(value.trim());
+                  controller.searchWithNewKeyword(value.trim());
+                  // 更新输入框显示
+                  _searchController.text = value.trim();
                 }
               },
             ),
