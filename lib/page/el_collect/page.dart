@@ -3,6 +3,7 @@ import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_confirm_modal.dart';
+import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -127,42 +128,23 @@ class _CollectPageState extends State<CollectPage> {
     }
 
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'Load Failed',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: controller.onRefresh,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFF6B00),
-              ),
-              child: Text('Retry'),
-            ),
-          ],
-        ),
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
       );
     }
 
     if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.inbox_outlined, size: 64.sp, color: Colors.white54),
-            SizedBox(height: 16.h),
-            Text(
-              'No Data',
-              style: TextStyle(color: Colors.white54, fontSize: 16.sp),
-            ),
-          ],
-        ),
+      return ElNoDataWidget(
+        imagePath: 'ely_collect_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        title: null,
+        description: 'There is no data for the moment.',
+        buttonText: null,
       );
     }
 
