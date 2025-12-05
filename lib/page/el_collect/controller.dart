@@ -1,6 +1,7 @@
 import 'package:elyra/page/el_collect/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
+import 'package:elyra/utils/toast.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -129,6 +130,31 @@ class CollectController extends GetxController {
       getVampireData(loadMore: true);
     } else {
       refreshController.loadNoData(); // 没有更多数据
+    }
+  }
+
+  /// 取消收藏
+  Future<bool> cancelCollect(shortPlayId) async {
+    try {
+      HttpClient().addHeader('lang-key', 'en');
+      ApiResponse response = await HttpClient().request(
+        Apis.cancelCollect,
+        method: HttpMethod.post,
+        data: {
+          'short_play_id': shortPlayId,
+        },
+      );
+
+      if (response.success) {
+        Message.show(response.data); 
+        return true;
+      } else {
+       Message.show(response.data); 
+        return false;
+      }
+    } catch (e) {
+      Message.show('取消收藏异常: $e'); 
+      return false;
     }
   }
 }

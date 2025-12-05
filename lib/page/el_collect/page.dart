@@ -279,6 +279,8 @@ class _CollectPageState extends State<CollectPage> {
               child: Center(
                 child: GestureDetector(
                   onTap: () {
+                    // 传递 shortPlayId 到弹框
+                    final shortPlayId = item.shortPlayId ?? '';
                     showElConfirmModal(
                       context,
                       image: AssetImage('el_model_cancel_collect.png'.icon),
@@ -300,9 +302,15 @@ class _CollectPageState extends State<CollectPage> {
                       onCancel: () {
                         Navigator.of(context).pop();
                       },
-                      onConfirm: () {
+                      onConfirm: () async {
                         Navigator.of(context).pop();
-                        print('确认删除');
+                        // 调用取消收藏接口
+                        bool success = await controller.cancelCollect(shortPlayId);
+                        if (success) {
+                          // 从列表中移除该项
+                          controller.state.collectList.remove(item);
+                          controller.update();
+                        }
                       },
                     );
                   },
