@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class RecommendPage extends StatefulWidget {
   const RecommendPage({super.key});
@@ -20,12 +21,13 @@ class RecommendPage extends StatefulWidget {
   State<RecommendPage> createState() => _RecommendPageState();
 }
 
-class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveClientMixin {
+class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final RecommendPageController controller;
   final PageController _pageController = PageController();
   int _currentPageIndex = 0;
   final Map<int, VideoPlayerController> _videoControllers = {};
   final Map<int, bool> _videoInitialized = {};
+  bool _isPageVisible = true;
 
   @override
   void initState() {
@@ -33,6 +35,21 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     controller = Get.put(RecommendPageController());
     // 监听页面切换
     _pageController.addListener(_onPageChanged);
+    // 监听应用生命周期
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // 当应用进入后台或不可见时暂停视频
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      _isPageVisible = false;
+      _pauseAllVideos();
+    } else if (state == AppLifecycleState.resumed) {
+      _isPageVisible = true;
+      _playCurrentVideo();
+    }
   }
 
   void _onPageChanged() {
@@ -41,9 +58,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       // 暂停之前的视频
       _pauseVideo(_currentPageIndex);
       // 更新当前页面索引
-      setState(() {
-        _currentPageIndex = page;
-      });
+      _currentPageIndex = page;
       // 播放当前视频
       _playCurrentVideo();
       // 更新controller状态
@@ -52,6 +67,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         controller.state.curVideoId = controller.state.curVideo.id ?? -1;
         controller.update();
       }
+      setState(() {});
     }
   }
 
@@ -61,14 +77,25 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       _initializeAndPlayVideo(_currentPageIndex, video);
     }
   }
+  
+  void _pauseAllVideos() {
+    for (var ctrl in _videoControllers.values) {
+      ctrl.pause();
+    }
+  }
 
   void _pauseVideo(int index) {
     _videoControllers[index]?.pause();
   }
 
   void _initializeAndPlayVideo(int index, ShortVideoBean video) {
+    // 先暂停所有其他视频
+    _pauseAllVideos();
+    
     if (_videoControllers[index] != null && _videoInitialized[index] == true) {
-      _videoControllers[index]?.play();
+      if (_isPageVisible && _currentPageIndex == index) {
+        _videoControllers[index]?.play();
+      }
       return;
     }
 
@@ -87,19 +114,91 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
           setState(() {
             _videoInitialized[index] = true;
           });
-          if (_currentPageIndex == index) {
+          if (_currentPageIndex == index && _isPageVisible) {
+            // 确保只有当前视频播放
+            _pauseAllVideos();
             _videoControllers[index]?.play();
           }
         }
       })
-      ..setLooping(true) // 循环播放
+      ..setLooping(false) // 不循环播放，播放完后跳转下一个
       ..addListener(() {
         if (mounted && _currentPageIndex == index) {
+          // 检查视频是否播放完成
+          if (_videoControllers[index]?.value.position == _videoControllers[index]?.value.duration) {
+            // 播放完成，重置到0并暂停
+            _videoControllers[index]?.seekTo(Duration.zero);
+            _videoControllers[index]?.pause();
+            // 跳转到下一个视频
+            _jumpToNextVideo();
+          }
           setState(() {}); // 更新进度条
         }
       });
 
     _videoControllers[index] = videoCtrl;
+  }
+
+  void _preloadVideo(int index, ShortVideoBean video) {
+    final videoUrl = video.videoInfo?.videoUrl ?? '';
+    if (videoUrl.isEmpty) return;
+    
+    if (_videoControllers[index] != null) return;
+
+    final videoCtrl = VideoPlayerController.networkUrl(
+      Uri.parse(videoUrl),
+      formatHint: VideoFormat.hls,
+      viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
+          ? VideoViewType.platformView
+          : VideoViewType.textureView,
+    )
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _videoInitialized[index] = true;
+          });
+          // 预加载后不自动播放
+        }
+      })
+      ..setLooping(false)
+      ..addListener(() {
+        if (mounted && _currentPageIndex == index) {
+          // 检查视频是否播放完成
+          if (_videoControllers[index]?.value.position == _videoControllers[index]?.value.duration) {
+            // 播放完成，重置到0并暂停
+            _videoControllers[index]?.seekTo(Duration.zero);
+            _videoControllers[index]?.pause();
+            // 跳转到下一个视频
+            _jumpToNextVideo();
+          }
+          setState(() {});
+        }
+      });
+
+    _videoControllers[index] = videoCtrl;
+  }
+
+  // 跳转到下一个视频
+  void _jumpToNextVideo() {
+    if (_currentPageIndex < controller.state.recommendList.length - 1) {
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      // 已经是最后一个，如果有更多数据则加载
+      if (controller.state.hasMore && !controller.state.isLoading) {
+        _handleLoadMore().then((_) {
+          // 加载完成后跳转到下一个
+          if (_currentPageIndex < controller.state.recommendList.length - 1) {
+            _pageController.nextPage(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
+        });
+      }
+    }
   }
 
   @override
@@ -110,6 +209,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       controller.dispose();
     }
     _videoControllers.clear();
+    // 移除生命周期监听
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -165,21 +266,86 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       });
     }
 
-    return PageView.builder(
-      controller: _pageController,
-      scrollDirection: Axis.vertical,
-      itemCount: controller.state.recommendList.length,
-      onPageChanged: (index) {
-        // 预加载下一个视频
-        if (index + 1 < controller.state.recommendList.length) {
-          final nextVideo = controller.state.recommendList[index + 1];
-          _initializeAndPlayVideo(index + 1, nextVideo);
-        }
+    return RefreshIndicator(
+      color: ColorEnum.mainColor,
+      backgroundColor: Colors.white,
+      onRefresh: () async {
+        // 下拉刷新：重置到第一页
+        await _handleRefresh();
       },
-      itemBuilder: (context, index) {
-        return _buildVideoItem(index);
-      },
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification notification) {
+          // 检测是否到达底部
+          if (notification is ScrollEndNotification) {
+            if (_currentPageIndex == controller.state.recommendList.length - 1) {
+              // 到达最后一个，加载更多
+              if (controller.state.hasMore && !controller.state.isLoading) {
+                _handleLoadMore();
+              }
+            }
+          }
+          return false;
+        },
+        child: PageView.builder(
+          controller: _pageController,
+          scrollDirection: Axis.vertical,
+          itemCount: controller.state.recommendList.length,
+          onPageChanged: (index) {
+            // 预加载下一个视频
+            if (index + 1 < controller.state.recommendList.length) {
+              final nextVideo = controller.state.recommendList[index + 1];
+              // 只初始化，不播放
+              if (_videoControllers[index + 1] == null) {
+                _preloadVideo(index + 1, nextVideo);
+              }
+            }
+          },
+          itemBuilder: (context, index) {
+            return _buildVideoItem(index);
+          },
+        ),
+      ),
     );
+  }
+
+  // 处理下拉刷新
+  Future<void> _handleRefresh() async {
+    // 暂停所有视频
+    _pauseAllVideos();
+    
+    // 清空所有视频控制器
+    for (var ctrl in _videoControllers.values) {
+      ctrl.dispose();
+    }
+    _videoControllers.clear();
+    _videoInitialized.clear();
+    
+    // 重置到第一页
+    _currentPageIndex = 0;
+    
+    // 调用controller刷新数据
+    await controller.getRecommendData();
+    
+    // 刷新后自动播放第一个视频
+    if (controller.state.recommendList.isNotEmpty) {
+      // 跳转到第一页
+      if (_pageController.hasClients) {
+        await _pageController.animateToPage(
+          0,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+      _playCurrentVideo();
+    }
+    
+    setState(() {});
+  }
+
+  // 处理加载更多
+  Future<void> _handleLoadMore() async {
+    await controller.getRecommendData(loadMore: true);
+    setState(() {});
   }
 
   /// 构建单个视频项
@@ -188,17 +354,20 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     final videoCtrl = _videoControllers[index];
     final isInitialized = _videoInitialized[index] ?? false;
 
-    return Stack(
-      children: [
-        // 视频播放器
-        _buildVideoPlayer(index, video, videoCtrl, isInitialized),
-        
-        // 底部信息栏
-        _buildBottomInfo(index, video, videoCtrl, isInitialized),
-        
-        // 右侧收藏按钮
-        _buildCollectButton(index, video),
-      ],
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        children: [
+          // 视频播放器
+          _buildVideoPlayer(index, video, videoCtrl, isInitialized),
+          
+          // 底部信息栏
+          _buildBottomInfo(index, video, videoCtrl, isInitialized),
+          
+          // 右侧收藏按钮
+          _buildCollectButton(index, video),
+        ],
+      ),
     );
   }
 
@@ -206,16 +375,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   Widget _buildVideoPlayer(int index, ShortVideoBean video, VideoPlayerController? videoCtrl, bool isInitialized) {
     return GestureDetector(
       onTap: () {
-        // 点击视频区域：播放/暂停
-        if (videoCtrl != null && isInitialized) {
-          setState(() {
-            if (videoCtrl.value.isPlaying) {
-              videoCtrl.pause();
-            } else {
-              videoCtrl.play();
-            }
-          });
-        }
+        // 点击视频区域：跳转到详情页
+        _navigateToDetail(video, videoCtrl);
       },
       child: Container(
         width: ScreenUtil().screenWidth,
@@ -229,17 +390,29 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
                   Positioned.fill(
                     child: FittedBox(
                       fit: BoxFit.cover,
-                      child: SizedBox(
-                        width: videoCtrl.value.size.width,
-                        height: videoCtrl.value.size.height,
-                        child: VideoPlayer(videoCtrl),
+                      child: VisibilityDetector(
+                        key: Key('recommend-video-$index'),
+                        onVisibilityChanged: (VisibilityInfo info) {
+                          var visiblePercentage = info.visibleFraction * 100;
+                          // 当可见度小于20%时暂停
+                          if (visiblePercentage < 20 && _currentPageIndex == index) {
+                            videoCtrl.pause();
+                            _isPageVisible = false;
+                          } else if (visiblePercentage > 20 && _currentPageIndex == index) {
+                            _isPageVisible = true;
+                            videoCtrl.play();
+                          }
+                        },
+                        child: SizedBox(
+                          width: videoCtrl.value.size.width,
+                          height: videoCtrl.value.size.height,
+                          child: VideoPlayer(videoCtrl),
+                        ),
                       ),
                     ),
                   ),
                   
-                  // 播放/暂停图标
-                  if (!videoCtrl.value.isPlaying && !videoCtrl.value.isBuffering)
-                    Image.asset('play.png'.icon, width: 48.w),
+                  // 缓冲指示器
                   if (videoCtrl.value.isBuffering)
                     CircularProgressIndicator(color: ColorEnum.mainColor),
                 ],
@@ -270,31 +443,49 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     );
   }
 
+  // 跳转到详情页
+  void _navigateToDetail(ShortVideoBean video, VideoPlayerController? videoCtrl) {
+    // 暂停当前视频
+    videoCtrl?.pause();
+    _isPageVisible = false;
+    
+    // TODO: 跳转到视频详情页（需要实现短视频详情页路由）
+    // Get.toNamed(
+    //   AppRoutes.shortVideo,
+    //   arguments: {
+    //     'shortPlayId': video.shortPlayId,
+    //     'imageUrl': video.imageUrl ?? '',
+    //   },
+    // )?.then((value) {
+    //   // 返回后检查是否是当前页面，是的话继续播放
+    //   _isPageVisible = true;
+    //   if (_currentPageIndex == controller.state.recommendList.indexOf(video)) {
+    //     videoCtrl?.play();
+    //   }
+    // });
+    
+    print('跳转到详情页: ${video.name}');
+    // 临时处理：延迟后恢复播放
+    Future.delayed(Duration(milliseconds: 100), () {
+      _isPageVisible = true;
+      if (mounted) {
+        videoCtrl?.play();
+      }
+    });
+  }
+
   /// 构建底部信息栏（标题、描述、进度条）
   Widget _buildBottomInfo(int index, ShortVideoBean video, VideoPlayerController? videoCtrl, bool isInitialized) {
     return Positioned(
       left: 0,
-      right: 0,
+      right: 70.w, // 留出右侧收藏按钮的空间
       bottom: 0,
       child: GestureDetector(
+        // 阻止事件冒泡到视频播放器
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           // 点击底部信息栏：跳转到详情页
-          videoCtrl?.pause();
-          // TODO: 跳转到视频详情页（需要实现短视频详情页路由）
-          // Get.toNamed(
-          //   AppRoutes.shortVideo,
-          //   arguments: {
-          //     'shortPlayId': video.shortPlayId,
-          //     'imageUrl': video.imageUrl ?? '',
-          //   },
-          // )?.then((value) {
-          //   videoCtrl?.play();
-          // });
-          
-          // 临时处理：直接恢复播放
-          Future.delayed(Duration(milliseconds: 100), () {
-            videoCtrl?.play();
-          });
+          _navigateToDetail(video, videoCtrl);
         },
         child: Container(
           color: Colors.transparent,
@@ -341,7 +532,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
               ),
               SizedBox(height: 12.w),
               // 进度条
-              _buildProgressBar(videoCtrl, isInitialized),
+              _buildProgressBar(index, videoCtrl, isInitialized),
             ],
           ),
         ),
@@ -350,7 +541,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   }
 
   /// 构建进度条
-  Widget _buildProgressBar(VideoPlayerController? videoCtrl, bool isInitialized) {
+  Widget _buildProgressBar(int index, VideoPlayerController? videoCtrl, bool isInitialized) {
     if (videoCtrl == null || !isInitialized) {
       return SizedBox.shrink();
     }
@@ -361,69 +552,85 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         ? position.inMilliseconds / duration.inMilliseconds 
         : 0.0;
 
-    return Row(
-      children: [
-        // 当前时间
-        Text(
-          _formatDuration(position),
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                color: Colors.black.withOpacity(0.5),
-                offset: Offset(0, 1),
-                blurRadius: 2,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: 8.w),
-        // 进度条
-        Expanded(
-          child: SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 3.w,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.w),
-              overlayShape: RoundSliderOverlayShape(overlayRadius: 12.w),
-              activeTrackColor: ColorEnum.mainColor,
-              inactiveTrackColor: Colors.white.withOpacity(0.3),
-              thumbColor: ColorEnum.mainColor,
-              overlayColor: ColorEnum.mainColor.withOpacity(0.3),
-            ),
-            child: Slider(
-              value: progress.clamp(0.0, 1.0),
-              onChanged: (value) {
-                final seekPosition = duration * value;
-                videoCtrl.seekTo(seekPosition);
-                setState(() {});
-              },
-              onChangeStart: (value) {
-                videoCtrl.pause();
-              },
-              onChangeEnd: (value) {
-                videoCtrl.play();
-              },
+    return GestureDetector(
+      // 阻止进度条点击事件冒泡
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        // 阻止冒泡，不跳转详情页
+      },
+      child: Row(
+        children: [
+          // 当前时间
+          Text(
+            _formatDuration(position),
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.5),
+                  offset: Offset(0, 1),
+                  blurRadius: 2,
+                ),
+              ],
             ),
           ),
-        ),
-        SizedBox(width: 8.w),
-        // 总时长
-        Text(
-          _formatDuration(duration),
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                color: Colors.black.withOpacity(0.5),
-                offset: Offset(0, 1),
-                blurRadius: 2,
+          SizedBox(width: 8.w),
+          // 进度条
+          Expanded(
+            child: GestureDetector(
+              // 进度条可以拖动，但不跳转详情页
+              behavior: HitTestBehavior.opaque,
+              onTap: () {},
+              child: SliderTheme(
+                data: SliderThemeData(
+                  trackHeight: 3.w,
+                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.w),
+                  overlayShape: RoundSliderOverlayShape(overlayRadius: 12.w),
+                  activeTrackColor: ColorEnum.mainColor,
+                  inactiveTrackColor: Colors.white.withOpacity(0.3),
+                  thumbColor: ColorEnum.mainColor,
+                  overlayColor: ColorEnum.mainColor.withOpacity(0.3),
+                ),
+                child: Slider(
+                  value: progress.clamp(0.0, 1.0),
+                  onChanged: (value) {
+                    final seekPosition = duration * value;
+                    videoCtrl.seekTo(seekPosition);
+                    setState(() {});
+                  },
+                  onChangeStart: (value) {
+                    // 拖动进度条时暂停
+                    videoCtrl.pause();
+                  },
+                  onChangeEnd: (value) {
+                    // 拖动结束后继续播放
+                    if (_isPageVisible && _currentPageIndex == index) {
+                      videoCtrl.play();
+                    }
+                  },
+                ),
               ),
-            ],
+            ),
           ),
-        ),
-      ],
+          SizedBox(width: 8.w),
+          // 总时长
+          Text(
+            _formatDuration(duration),
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.5),
+                  offset: Offset(0, 1),
+                  blurRadius: 2,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
