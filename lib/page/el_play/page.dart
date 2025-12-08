@@ -1,743 +1,626 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:elyra/bean/short_video_bean.dart';
+import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/page/el_recommend/controller.dart';
-import 'package:elyra/routers/el_routers.dart';
-import 'package:elyra/utils/device_info.dart';
+import 'package:elyra/page/el_play/controller.dart';
+import 'package:elyra/page/el_play/sub_page/select/select_episode_page.dart';
 import 'package:elyra/utils/el_color.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
-import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class RecommendPage extends StatefulWidget {
-  const RecommendPage({super.key});
+class PlayDetailPage extends StatefulWidget {
+  const PlayDetailPage({super.key});
 
   @override
-  State<RecommendPage> createState() => _RecommendPageState();
+  State<PlayDetailPage> createState() => _PlayDetailPageState();
 }
 
-class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
-  late final RecommendPageController controller;
-  final PageController _pageController = PageController();
-  int _currentPageIndex = 0;
-  final Map<int, VideoPlayerController> _videoControllers = {};
-  final Map<int, bool> _videoInitialized = {};
+class _PlayDetailPageState extends State<PlayDetailPage> {
+  final logic = Get.put(PlayDetailController());
   bool _isPageVisible = true;
-  // 添加标记，记录哪些视频已经播放完成并触发了跳转
-  final Map<int, bool> _videoCompletedAndJumped = {};
-
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.put(RecommendPageController());
-    // 监听页面切换
-    _pageController.addListener(_onPageChanged);
-    // 监听应用生命周期
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    // 当应用进入后台或不可见时暂停视频
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      _isPageVisible = false;
-      _pauseAllVideos();
-    } else if (state == AppLifecycleState.resumed) {
-      _isPageVisible = true;
-      _playCurrentVideo();
-    }
-  }
-
-  void _onPageChanged() {
-    final page = _pageController.page?.round() ?? 0;
-    // 添加数据加载检查，防止数据未加载完成时跳转
-    if (controller.state.recommendList.isEmpty) {
-      // 数据未加载，重置回当前页面
-      if (_pageController.hasClients && _currentPageIndex < controller.state.recommendList.length) {
-        _pageController.jumpToPage(_currentPageIndex);
-      }
-      return;
-    }
-    
-    // 检查页面索引是否有效
-    if (page >= controller.state.recommendList.length || page < 0) {
-      // 索引无效，重置回当前页面
-      if (_pageController.hasClients && _currentPageIndex < controller.state.recommendList.length) {
-        _pageController.jumpToPage(_currentPageIndex);
-      }
-      return;
-    }
-    
-    if (page != _currentPageIndex) {
-      // 暂停之前的视频
-      _pauseVideo(_currentPageIndex);
-      // 更新当前页面索引
-      _currentPageIndex = page;
-      // 重置新页面的播放完成标记，允许新视频播放完成后跳转
-      _videoCompletedAndJumped[page] = false;
-      // 播放当前视频
-      _playCurrentVideo();
-      // 更新controller状态
-      if (page < controller.state.recommendList.length) {
-        controller.state.curVideo = controller.state.recommendList[page];
-        controller.state.curVideoId = controller.state.curVideo.id ?? -1;
-        controller.update();
-      }
-      setState(() {});
-    }
-  }
-
-  void _playCurrentVideo() {
-    if (_currentPageIndex < controller.state.recommendList.length) {
-      final video = controller.state.recommendList[_currentPageIndex];
-      _initializeAndPlayVideo(_currentPageIndex, video);
-    }
-  }
-  
-  void _pauseAllVideos() {
-    for (var ctrl in _videoControllers.values) {
-      ctrl.pause();
-    }
-  }
-
-  void _pauseVideo(int index) {
-    _videoControllers[index]?.pause();
-  }
-
-  void _initializeAndPlayVideo(int index, ShortVideoBean video) {
-    // 先暂停所有其他视频
-    _pauseAllVideos();
-    
-    if (_videoControllers[index] != null && _videoInitialized[index] == true) {
-      if (_isPageVisible && _currentPageIndex == index) {
-        // 重置播放完成标记，允许重新播放
-        _videoCompletedAndJumped[index] = false;
-        _videoControllers[index]?.play();
-      }
-      return;
-    }
-
-    final videoUrl = video.videoInfo?.videoUrl ?? '';
-    if (videoUrl.isEmpty) return;
-
-    final videoCtrl = VideoPlayerController.networkUrl(
-      Uri.parse(videoUrl),
-      formatHint: VideoFormat.hls,
-      viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
-          ? VideoViewType.platformView
-          : VideoViewType.textureView,
-    )
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _videoInitialized[index] = true;
-            // 初始化时重置播放完成标记
-            _videoCompletedAndJumped[index] = false;
-          });
-          if (_currentPageIndex == index && _isPageVisible) {
-            // 确保只有当前视频播放
-            _pauseAllVideos();
-            _videoControllers[index]?.play();
-          }
-        }
-      })
-      ..setLooping(false) // 不循环播放，播放完后跳转下一个
-      ..addListener(() {
-        if (mounted && _currentPageIndex == index) {
-          final ctrl = _videoControllers[index];
-          if (ctrl != null && ctrl.value.isInitialized) {
-            final position = ctrl.value.position;
-            final duration = ctrl.value.duration;
-            
-            // 检查视频是否真正播放完成：
-            // 1. duration 必须大于 0（视频已加载）
-            // 2. position 必须接近 duration（播放到结尾，允许 500ms 误差）
-            // 3. 还没有触发过跳转（防止重复触发）
-            // 4. 视频不在缓冲中
-            if (duration.inMilliseconds > 0 &&
-                position.inMilliseconds > 0 &&
-                position.inMilliseconds >= duration.inMilliseconds - 500 &&
-                _videoCompletedAndJumped[index] != true &&
-                !ctrl.value.isBuffering) {
-              // 标记为已完成并跳转，防止重复触发
-              _videoCompletedAndJumped[index] = true;
-              
-              // 播放完成，重置到0并暂停
-              ctrl.seekTo(Duration.zero);
-              ctrl.pause();
-              
-              // 播放完成后跳转到下一个视频
-              _jumpToNextVideo();
-            }
-          }
-          setState(() {}); // 更新进度条
-        }
-      });
-
-    _videoControllers[index] = videoCtrl;
-  }
-
-  void _preloadVideo(int index, ShortVideoBean video) {
-    final videoUrl = video.videoInfo?.videoUrl ?? '';
-    if (videoUrl.isEmpty) return;
-    
-    if (_videoControllers[index] != null) return;
-
-    final videoCtrl = VideoPlayerController.networkUrl(
-      Uri.parse(videoUrl),
-      formatHint: VideoFormat.hls,
-      viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
-          ? VideoViewType.platformView
-          : VideoViewType.textureView,
-    )
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _videoInitialized[index] = true;
-            // 初始化时重置播放完成标记
-            _videoCompletedAndJumped[index] = false;
-          });
-          // 预加载后不自动播放
-        }
-      })
-      ..setLooping(false)
-      ..addListener(() {
-        if (mounted && _currentPageIndex == index) {
-          final ctrl = _videoControllers[index];
-          if (ctrl != null && ctrl.value.isInitialized) {
-            final position = ctrl.value.position;
-            final duration = ctrl.value.duration;
-            
-            // 同样的播放完成检查逻辑
-            if (duration.inMilliseconds > 0 &&
-                position.inMilliseconds > 0 &&
-                position.inMilliseconds >= duration.inMilliseconds - 500 &&
-                _videoCompletedAndJumped[index] != true &&
-                !ctrl.value.isBuffering) {
-              // 标记为已完成并跳转
-              _videoCompletedAndJumped[index] = true;
-              
-              // 播放完成，重置到0并暂停
-              ctrl.seekTo(Duration.zero);
-              ctrl.pause();
-              
-              // 播放完成后跳转到下一个视频
-              _jumpToNextVideo();
-            }
-          }
-          setState(() {});
-        }
-      });
-
-    _videoControllers[index] = videoCtrl;
-  }
-
-  // 跳转到下一个视频
-  void _jumpToNextVideo() {
-    if (_currentPageIndex < controller.state.recommendList.length - 1) {
-      _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      // 已经是最后一个，如果有更多数据则加载
-      if (controller.state.hasMore && !controller.state.isLoading) {
-        _handleLoadMore().then((_) {
-          // 加载完成后跳转到下一个
-          if (_currentPageIndex < controller.state.recommendList.length - 1) {
-            _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          }
-        });
-      }
-    }
-  }
 
   @override
   void dispose() {
-    _pageController.dispose();
-    // 释放所有视频控制器
-    for (var controller in _videoControllers.values) {
-      controller.dispose();
+    // 上传最后的播放进度
+    if (logic.controllers.isNotEmpty && logic.currentIndex < logic.controllers.length) {
+      logic.uploadHistorySeconds(
+        logic.controllers[logic.currentIndex]?.value.position.inMilliseconds ?? 0,
+      );
     }
-    _videoControllers.clear();
-    // 移除生命周期监听
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return GetBuilder<RecommendPageController>(
-      builder: (controller) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          body: _buildContent(),
-        );
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (logic.controllers.isNotEmpty && logic.currentIndex < logic.controllers.length) {
+          logic.uploadHistorySeconds(
+            logic.controllers[logic.currentIndex]?.value.position.inMilliseconds ?? 0,
+          );
+        }
       },
-    );
-  }
-
-  Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(
-        child: CircularProgressIndicator(color: ColorEnum.mainColor),
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
-      return ElNoDataWidget(
-        imagePath: 'ely_error.png',
-        title: 'No connection',
-        description: 'Please check your network',
-        buttonText: 'Try again',
-        onButtonPressed: controller.onRefresh,
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return ElNoDataWidget(
-        imagePath: 'ely_nodata.png',
-        imageWidth: 180,
-        imageHeight: 223,
-        title: null,
-        description: 'There is no data for the moment.',
-        buttonText: null,
-      );
-    }
-
-    return _buildMainContent();
-  }
-
-  Widget _buildMainContent() {
-    // 初始化第一个视频
-    if (controller.state.recommendList.isNotEmpty && _videoControllers.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _playCurrentVideo();
-      });
-    }
-
-    return RefreshIndicator(
-      color: ColorEnum.mainColor,
-      backgroundColor: Colors.white,
-      onRefresh: () async {
-        // 下拉刷新：重置到第一页
-        await _handleRefresh();
-      },
-      child: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) {
-          // 检测是否到达底部
-          if (notification is ScrollEndNotification) {
-            if (_currentPageIndex == controller.state.recommendList.length - 1) {
-              // 到达最后一个，加载更多
-              if (controller.state.hasMore && !controller.state.isLoading) {
-                _handleLoadMore();
-              }
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: GetBuilder<PlayDetailController>(
+          builder: (ctrl) {
+            if (logic.videoStatus == LoadStatusType.loadFailed) {
+              return _buildErrorPage();
             }
-          }
-          return false;
-        },
-        child: PageView.builder(
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          itemCount: controller.state.recommendList.length,
-          onPageChanged: (index) {
-            // 预加载下一个视频
-            if (index + 1 < controller.state.recommendList.length) {
-              final nextVideo = controller.state.recommendList[index + 1];
-              // 只初始化，不播放
-              if (_videoControllers[index + 1] == null) {
-                _preloadVideo(index + 1, nextVideo);
-              }
-            }
-          },
-          itemBuilder: (context, index) {
-            return _buildVideoItem(index);
+            return _buildMainContent();
           },
         ),
       ),
     );
   }
 
-  // 处理下拉刷新
-  Future<void> _handleRefresh() async {
-    // 暂停所有视频
-    _pauseAllVideos();
-    
-    // 清空所有视频控制器
-    for (var ctrl in _videoControllers.values) {
-      ctrl.dispose();
-    }
-    _videoControllers.clear();
-    _videoInitialized.clear();
-    // 清空播放完成标记
-    _videoCompletedAndJumped.clear();
-    
-    // 重置到第一页
-    _currentPageIndex = 0;
-    
-    // 调用controller刷新数据
-    await controller.getRecommendData();
-    
-    // 刷新后自动播放第一个视频
-    if (controller.state.recommendList.isNotEmpty) {
-      // 跳转到第一页
-      if (_pageController.hasClients) {
-        await _pageController.animateToPage(
-          0,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-      _playCurrentVideo();
-    }
-    
-    setState(() {});
-  }
-
-  // 处理加载更多
-  Future<void> _handleLoadMore() async {
-    await controller.getRecommendData(loadMore: true);
-    setState(() {});
-  }
-
-  /// 构建单个视频项
-  Widget _buildVideoItem(int index) {
-    final video = controller.state.recommendList[index];
-    final videoCtrl = _videoControllers[index];
-    final isInitialized = _videoInitialized[index] ?? false;
-
+  /// 错误页面
+  Widget _buildErrorPage() {
     return Container(
-      color: Colors.black,
-      child: Stack(
+      width: ScreenUtil().screenWidth,
+      height: ScreenUtil().screenHeight,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 视频播放器
-          _buildVideoPlayer(index, video, videoCtrl, isInitialized),
-          
-          // 底部信息栏
-          _buildBottomInfo(index, video, videoCtrl, isInitialized),
-          
-          // 右侧收藏按钮
-          _buildCollectButton(index, video),
+          Container(
+            margin: EdgeInsets.only(top: kToolbarHeight + 20.w),
+            child: IconButton(
+              onPressed: () => Get.back(),
+              icon: Icon(Icons.arrow_back_outlined, size: 28),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('ely_error.png'.icon, width: 180.w, height: 180.w),
+                  SizedBox(height: 20.h),
+                  Text(
+                    'No connection',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Please check your network',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 30.h),
+                  ElevatedButton(
+                    onPressed: logic.getVideoDetails,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorEnum.mainColor,
+                      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
+                    ),
+                    child: Text(
+                      'Try again',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  /// 构建视频播放器
-  Widget _buildVideoPlayer(int index, ShortVideoBean video, VideoPlayerController? videoCtrl, bool isInitialized) {
-    return GestureDetector(
-      onTap: () {
-        // 点击视频区域：跳转到详情页
-        _navigateToDetail(video, videoCtrl);
-      },
-      child: Container(
-        width: ScreenUtil().screenWidth,
-        height: ScreenUtil().screenHeight,
-        color: Colors.black,
-        child: videoCtrl != null && isInitialized
-            ? Stack(
-                alignment: Alignment.center,
-                children: [
-                  // 视频内容
-                  Positioned.fill(
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: VisibilityDetector(
-                        key: Key('recommend-video-$index'),
-                        onVisibilityChanged: (VisibilityInfo info) {
-                          var visiblePercentage = info.visibleFraction * 100;
-                          // 当可见度小于20%时暂停
-                          if (visiblePercentage < 20 && _currentPageIndex == index) {
-                            videoCtrl.pause();
-                            _isPageVisible = false;
-                          } else if (visiblePercentage > 20 && _currentPageIndex == index) {
-                            _isPageVisible = true;
-                            videoCtrl.play();
-                          }
-                        },
-                        child: SizedBox(
-                          width: videoCtrl.value.size.width,
-                          height: videoCtrl.value.size.height,
-                          child: VideoPlayer(videoCtrl),
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  // 缓冲指示器
-                  if (videoCtrl.value.isBuffering)
-                    CircularProgressIndicator(color: ColorEnum.mainColor),
-                ],
-              )
-            : Stack(
-                alignment: Alignment.center,
-                children: [
-                  if (video.imageUrl != null)
-                    Image.network(
-                      video.imageUrl!,
-                      width: ScreenUtil().screenWidth,
-                      height: ScreenUtil().screenHeight,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(color: Colors.black);
-                      },
-                    ),
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.3),
-                    ),
-                  ),
-                  CircularProgressIndicator(color: ColorEnum.mainColor),
-                ],
-              ),
-      ),
-    );
-  }
+  /// 主要内容
+  Widget _buildMainContent() {
+    String bgImageUrl = logic.state.imageUrl.isNotEmpty
+        ? logic.state.imageUrl
+        : (logic.state.detailBean?.shortPlayInfo?.imageUrl ?? '');
 
-  // 跳转到详情页
-  void _navigateToDetail(ShortVideoBean video, VideoPlayerController? videoCtrl) {
-    // 暂停当前视频
-    videoCtrl?.pause();
-    _isPageVisible = false;
-    
-    // TODO: 跳转到视频详情页（需要实现短视频详情页路由）
-    // Get.toNamed(
-    //   AppRoutes.shortVideo,
-    //   arguments: {
-    //     'shortPlayId': video.shortPlayId,
-    //     'imageUrl': video.imageUrl ?? '',
-    //   },
-    // )?.then((value) {
-    //   // 返回后检查是否是当前页面，是的话继续播放
-    //   _isPageVisible = true;
-    //   if (_currentPageIndex == controller.state.recommendList.indexOf(video)) {
-    //     videoCtrl?.play();
-    //   }
-    // });
-    
-    print('跳转到详情页: ${video.name}');
-    // 临时处理：延迟后恢复播放
-    Future.delayed(Duration(milliseconds: 100), () {
-      _isPageVisible = true;
-      if (mounted) {
-        videoCtrl?.play();
-      }
-    });
-  }
-
-  /// 构建底部信息栏（标题、描述、进度条）
-  Widget _buildBottomInfo(int index, ShortVideoBean video, VideoPlayerController? videoCtrl, bool isInitialized) {
-    return Positioned(
-      left: 0,
-      right: 70.w, // 留出右侧收藏按钮的空间
-      bottom: 0,
-      child: GestureDetector(
-        // 阻止事件冒泡到视频播放器
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          // 点击底部信息栏：跳转到详情页
-          _navigateToDetail(video, videoCtrl);
-        },
-        child: Container(
-          color: Colors.transparent,
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 标题
-              Text(
-                video.name ?? '',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.5),
-                      offset: Offset(0, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: 8.w),
-              // 描述
-              Text(
-                video.description ?? '',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.white.withOpacity(0.8),
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.5),
-                      offset: Offset(0, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: 12.w),
-              // 进度条
-              _buildProgressBar(index, videoCtrl, isInitialized),
-            ],
+    return Stack(
+      children: [
+        // 背景模糊图片
+        if (bgImageUrl.isNotEmpty)
+          Image.network(
+            bgImageUrl,
+            width: ScreenUtil().screenWidth,
+            height: ScreenUtil().screenHeight,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(color: Colors.black),
+          ),
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            color: Colors.black.withOpacity(0.3),
+            width: ScreenUtil().screenWidth,
+            height: ScreenUtil().screenHeight,
           ),
         ),
+        
+        // 加载指示器
+        if (logic.state.detailBean == null)
+          Center(
+            child: CircularProgressIndicator(color: ColorEnum.mainColor),
+          ),
+
+        // 视频列表
+        PageView.builder(
+          controller: logic.pageController,
+          scrollDirection: Axis.vertical,
+          onPageChanged: (index) => logic.onEpisodeChanged(index),
+          itemCount: logic.state.episodeList.length,
+          itemBuilder: (context, index) => _buildVideoPage(index),
+        ),
+      ],
+    );
+  }
+
+  /// 单个视频页面
+  Widget _buildVideoPage(int index) {
+    if (logic.controllers.isEmpty || index >= logic.controllers.length) {
+      return Container();
+    }
+
+    final controller = logic.controllers[index];
+    final episode = logic.state.episodeList[index];
+
+    return Stack(
+      children: [
+        // 视频播放器
+        _buildVideoPlayer(index, controller, episode),
+        
+        // 底部信息栏
+        _buildBottomBar(index, controller, episode),
+        
+        // 顶部导航栏
+        _buildTopBar(),
+      ],
+    );
+  }
+
+  /// 视频播放器
+  Widget _buildVideoPlayer(
+    int index,
+    VideoPlayerController? controller,
+    EpisodeList episode,
+  ) {
+    if (controller == null || !controller.value.isInitialized) {
+      return _buildLoadingPlaceholder();
+    }
+
+    return GestureDetector(
+      onTap: () {
+        if (controller.value.isPlaying) {
+          controller.pause();
+        } else {
+          controller.play();
+        }
+        setState(() {});
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: VisibilityDetector(
+                key: Key('video-$index'),
+                onVisibilityChanged: (VisibilityInfo info) {
+                  var visiblePercentage = info.visibleFraction * 100;
+                  if (visiblePercentage > 20 && logic.currentIndex == index) {
+                    _isPageVisible = true;
+                    controller.play();
+                  } else {
+                    _isPageVisible = false;
+                    controller.pause();
+                  }
+                },
+                child: SizedBox(
+                  width: controller.value.size.width,
+                  height: controller.value.size.height,
+                  child: VideoPlayer(controller),
+                ),
+              ),
+            ),
+          ),
+          
+          // 缓冲指示器
+          if (controller.value.isBuffering)
+            CircularProgressIndicator(color: ColorEnum.mainColor),
+            
+          // 播放/暂停按钮
+          if (!controller.value.isPlaying && !controller.value.isBuffering)
+            Icon(
+              Icons.play_circle_outline,
+              color: Colors.white,
+              size: 60.w,
+            ),
+        ],
       ),
     );
   }
 
-  /// 构建进度条
-  Widget _buildProgressBar(int index, VideoPlayerController? videoCtrl, bool isInitialized) {
-    if (videoCtrl == null || !isInitialized) {
-      return SizedBox.shrink();
-    }
+  /// 加载占位符
+  Widget _buildLoadingPlaceholder() {
+    String bgImageUrl = logic.state.imageUrl.isNotEmpty
+        ? logic.state.imageUrl
+        : (logic.state.detailBean?.shortPlayInfo?.imageUrl ?? '');
 
-    final duration = videoCtrl.value.duration;
-    final position = videoCtrl.value.position;
-    final progress = duration.inMilliseconds > 0 
-        ? position.inMilliseconds / duration.inMilliseconds 
+    return Stack(
+      children: [
+        if (bgImageUrl.isNotEmpty)
+          Image.network(
+            bgImageUrl,
+            width: ScreenUtil().screenWidth,
+            height: ScreenUtil().screenHeight,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(color: Colors.black),
+          ),
+        Center(
+          child: CircularProgressIndicator(color: ColorEnum.mainColor),
+        ),
+      ],
+    );
+  }
+
+  /// 底部信息栏
+  Widget _buildBottomBar(
+    int index,
+    VideoPlayerController? controller,
+    EpisodeList episode,
+  ) {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Platform.isAndroid
+          ? SafeArea(child: _buildBottomContent(controller, episode))
+          : _buildBottomContent(controller, episode),
+    );
+  }
+
+  /// 底部内容
+  Widget _buildBottomContent(
+    VideoPlayerController? controller,
+    EpisodeList episode,
+  ) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.w),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.black.withOpacity(0),
+            Colors.black.withOpacity(0.3),
+            Colors.black.withOpacity(0.6),
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 标题
+          Text(
+            logic.state.detailBean?.shortPlayInfo?.name ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 10.w),
+          
+          // 进度条
+          if (controller != null && controller.value.isInitialized)
+            _buildProgressBar(controller),
+          SizedBox(height: 10.w),
+          
+          // 底部控制条（集数选择和倍速）
+          _buildBottomControls(controller, episode),
+        ],
+      ),
+    );
+  }
+
+  /// 进度条
+  Widget _buildProgressBar(VideoPlayerController controller) {
+    final duration = controller.value.duration;
+    final position = controller.value.position;
+    final progress = duration.inMilliseconds > 0
+        ? position.inMilliseconds / duration.inMilliseconds
         : 0.0;
 
-    return GestureDetector(
-      // 阻止进度条点击事件冒泡
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        // 阻止冒泡，不跳转详情页
-      },
-      child: Row(
-        children: [
-          // 当前时间
-          Text(
-            _formatDuration(position),
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: Offset(0, 1),
-                  blurRadius: 2,
-                ),
-              ],
+    return Row(
+      children: [
+        // 当前时间
+        Text(
+          _formatDuration(position),
+          style: TextStyle(fontSize: 12.sp, color: Colors.white),
+        ),
+        SizedBox(width: 8.w),
+        
+        // 进度条
+        Expanded(
+          child: SliderTheme(
+            data: SliderThemeData(
+              trackHeight: 3.w,
+              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.w),
+              overlayShape: RoundSliderOverlayShape(overlayRadius: 12.w),
+              activeTrackColor: ColorEnum.mainColor,
+              inactiveTrackColor: Colors.white.withOpacity(0.3),
+              thumbColor: ColorEnum.mainColor,
+              overlayColor: ColorEnum.mainColor.withOpacity(0.3),
+            ),
+            child: Slider(
+              value: progress.clamp(0.0, 1.0),
+              onChanged: (value) {
+                final seekPosition = duration * value;
+                controller.seekTo(seekPosition);
+                setState(() {});
+              },
             ),
           ),
-          SizedBox(width: 8.w),
-          // 进度条
-          Expanded(
-            child: GestureDetector(
-              // 进度条可以拖动，但不跳转详情页
-              behavior: HitTestBehavior.opaque,
-              onTap: () {},
-              child: SliderTheme(
-                data: SliderThemeData(
-                  trackHeight: 3.w,
-                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.w),
-                  overlayShape: RoundSliderOverlayShape(overlayRadius: 12.w),
-                  activeTrackColor: ColorEnum.mainColor,
-                  inactiveTrackColor: Colors.white.withOpacity(0.3),
-                  thumbColor: ColorEnum.mainColor,
-                  overlayColor: ColorEnum.mainColor.withOpacity(0.3),
-                ),
-                child: Slider(
-                  value: progress.clamp(0.0, 1.0),
-                  onChanged: (value) {
-                    final seekPosition = duration * value;
-                    videoCtrl.seekTo(seekPosition);
-                    setState(() {});
-                  },
-                  onChangeStart: (value) {
-                    // 拖动进度条时暂停
-                    videoCtrl.pause();
-                  },
-                  onChangeEnd: (value) {
-                    // 拖动结束后继续播放
-                    if (_isPageVisible && _currentPageIndex == index) {
-                      videoCtrl.play();
-                    }
-                  },
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 8.w),
-          // 总时长
-          Text(
-            _formatDuration(duration),
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: Offset(0, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        SizedBox(width: 8.w),
+        
+        // 总时长
+        Text(
+          _formatDuration(duration),
+          style: TextStyle(fontSize: 12.sp, color: Colors.white),
+        ),
+      ],
     );
   }
 
-  /// 构建收藏按钮
-  Widget _buildCollectButton(int index, ShortVideoBean video) {
-    return Positioned(
-      right: 16.w,
-      bottom: 180.w,
-      child: GestureDetector(
-        onTap: () async {
-          // 确保当前视频是这个
-          controller.state.curVideo = video;
-          controller.state.curVideoId = video.id ?? -1;
-          await controller.toggleCollect();
-          setState(() {});
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              video.isCollect == true 
-                  ? 'ely_collect.png'.icon 
-                  : 'ely_collect_cancle.png'.icon,
-              width: 40.w,
-              height: 40.w,
+  /// 底部控制条
+  Widget _buildBottomControls(
+    VideoPlayerController? controller,
+    EpisodeList episode,
+  ) {
+    return Column(
+      children: [
+        // 集数信息和向上箭头
+        GestureDetector(
+          onTap: _showEpisodeSelector,
+          child: Container(
+            width: 341.w,
+            height: 24.w,
+            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12.w),
             ),
-            SizedBox(height: 4.w),
-            Text(
-              '${video.collectTotal ?? 0}',
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withOpacity(0.5),
-                    offset: Offset(0, 1),
-                    blurRadius: 2,
+            child: Row(
+              children: [
+                Text(
+                  'Ep.${logic.currentIndex + 1}/Ep.${logic.state.episodeList.length}',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.white,
                   ),
-                ],
+                ),
+                Spacer(),
+                Image.asset(
+                  'ely_top_arrow.png'.icon,
+                  width: 16.w,
+                  height: 16.w,
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 10.w),
+        
+        // 选集和倍速按钮
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 选集按钮
+            GestureDetector(
+              onTap: _showEpisodeSelector,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50.w),
+                  color: Color(0xFF949494).withOpacity(0.4),
+                ),
+                child: Row(
+                  children: [
+                    // Image.asset('ely_episode.png'.icon, width: 14.w),
+                    SizedBox(width: 6.w),
+                    Text(
+                      'EP.${logic.currentIndex + 1}',
+                      style: TextStyle(fontSize: 13.sp, color: Colors.white),
+                    ),
+                    SizedBox(width: 10.w),
+                    Text(
+                      'All ${logic.state.detailBean?.shortPlayInfo?.episodeTotal ?? 0} Episodes',
+                      style: TextStyle(fontSize: 13.sp, color: Color(0xFFBEBEBE)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            // 倍速按钮
+            GestureDetector(
+              onTap: _showSpeedSelector,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50.w),
+                  color: Color(0xFF949494).withOpacity(0.4),
+                ),
+                child: Text(
+                  '${logic.state.curSpeed}x',
+                  style: TextStyle(fontSize: 13.sp, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// 顶部导航栏
+  Widget _buildTopBar() {
+    return Positioned(
+      top: ScreenUtil().statusBarHeight,
+      left: 0,
+      right: 0,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 返回按钮
+            GestureDetector(
+              onTap: () => Get.back(),
+              child: Container(
+                padding: EdgeInsets.all(8.w),
+                child: Image.asset('ely_back.png'.icon, width: 24.w),
+              ),
+            ),
+            
+            // 收藏按钮
+            GestureDetector(
+              onTap: logic.toggleCollect,
+              child: Container(
+                padding: EdgeInsets.all(8.w),
+                child: Image.asset(
+                  logic.state.detailBean?.shortPlayInfo?.isCollect == true
+                      ? 'ely_collect.png'.icon
+                      : 'ely_collect_cancle.png'.icon,
+                  width: 24.w,
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// 显示选集弹窗
+  void _showEpisodeSelector() {
+    Get.bottomSheet(
+      SelectEpisodePage(
+        totalEpisodes: logic.state.episodeList.length,
+        initialEpisode: logic.currentIndex + 1,
+        shortPlayInfo: logic.state.detailBean?.shortPlayInfo,
+        episodeList: logic.state.episodeList,
+        onEpisodeSelected: (episode) {
+          Get.back();
+          logic.onEpisodeChanged(episode - 1, isToggle: true);
+        },
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  /// 显示倍速选择弹窗
+  void _showSpeedSelector() {
+    Get.bottomSheet(
+      Container(
+        height: 165.w,
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.w)),
+          gradient: LinearGradient(
+            colors: [Colors.white, ColorEnum.mainColor.withOpacity(0.08)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Speed',
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Image.asset('ely_close.png'.icon, width: 24.w),
+                ),
+              ],
+            ),
+            SizedBox(height: 15.w),
+            SizedBox(
+              height: 60.w,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  final speed = logic.state.speeds[index];
+                  final isSelected = speed == logic.state.curSpeed;
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      logic.changeSpeed(speed);
+                      Get.back();
+                    },
+                    child: Container(
+                      width: 70.w,
+                      height: 54.w,
+                      alignment: Alignment.center,
+                      decoration: isSelected
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  ColorEnum.mainColor,
+                                  ColorEnum.mainColor.withOpacity(0.8),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(6.w),
+                              border: Border.all(
+                                color: ColorEnum.mainColor,
+                                width: 1.5,
+                              ),
+                            )
+                          : BoxDecoration(
+                              borderRadius: BorderRadius.circular(6.w),
+                              color: ColorEnum.mainColor.withOpacity(0.12),
+                            ),
+                      child: Text(
+                        '${speed}x',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: isSelected ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                itemCount: logic.state.speeds.length,
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 
@@ -747,13 +630,10 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
-    
+
     if (hours > 0) {
       return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
     }
     return '${twoDigits(minutes)}:${twoDigits(seconds)}';
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

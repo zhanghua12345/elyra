@@ -149,66 +149,74 @@ class _PopularPageState extends State<PopularPage> {
 
   /// Banner 卡片单个 item
   Widget _buildBannerCard(ShortVideoBean item) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10.w),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(61.r),
-            // 背景图片 - 从网络加载
-            child: Image.network(
-              item.imageUrl ?? '',
-              width: 270.w,
-              height: 360.h,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: Icon(Icons.error, color: Colors.white54),
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 10.w),
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(61.r),
+              // 背景图片 - 从网络加载
+              child: Image.network(
+                item.imageUrl ?? '',
+                width: 270.w,
+                height: 360.h,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey[800],
+                  child: Icon(Icons.error, color: Colors.white54),
+                ),
               ),
             ),
-          ),
-          // 底部背景装饰图片
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0.h,
-            child: Image.asset(
-              'ely_popular_banner_item_bg.png'.icon,
-              height: 44.h, // 背景图片高度
-            ),
-          ),
-          // 底部 Watch 按钮（文字 + 箭头）
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0.h,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 66.w,
-                right: 66.w,
-                top: 8.h,
-                bottom: 8.h,
+            // 底部背景装饰图片
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0.h,
+              child: Image.asset(
+                'ely_popular_banner_item_bg.png'.icon,
+                height: 44.h, // 背景图片高度
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min, // 让行宽度由内容 + padding 决定（保证居中）
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Watch',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: 'PingFang SC',
-                      fontWeight: FontWeight.w600,
+            ),
+            // 底部 Watch 按钮（文字 + 箭头）
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0.h,
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 66.w,
+                  right: 66.w,
+                  top: 8.h,
+                  bottom: 8.h,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min, // 让行宽度由内容 + padding 决定（保证居中）
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Watch',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 8.w), // 文本与箭头之间的间距
-                  Image.asset('ely_right.png'.icon, width: 16.w, height: 16.h),
-                ],
+                    SizedBox(width: 8.w), // 文本与箭头之间的间距
+                    Image.asset('ely_right.png'.icon, width: 16.w, height: 16.h),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -274,65 +282,73 @@ class _PopularPageState extends State<PopularPage> {
 
   /// Popular 单个 item 卡片
   Widget _buildPopularCard(ShortVideoBean item) {
-    return Container(
-      margin: EdgeInsets.only(right: 10.w), // item 之间的间距
-      child: Stack(
-        children: [
-          // 封面图片
-          ClipRRect(
-            borderRadius: BorderRadius.circular(27.r), // 圆角 16
-            child: Image.network(
-              item.imageUrl ?? '',
-              width: 124.w,
-              height: 158.h,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: Icon(Icons.error, color: Colors.white54),
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 10.w), // item 之间的间距
+        child: Stack(
+          children: [
+            // 封面图片
+            ClipRRect(
+              borderRadius: BorderRadius.circular(27.r), // 圆角 16
+              child: Image.network(
+                item.imageUrl ?? '',
+                width: 124.w,
+                height: 158.h,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey[800],
+                  child: Icon(Icons.error, color: Colors.white54),
+                ),
               ),
             ),
-          ),
-          // 底部 Watch 按钮（双层结构）
-          Positioned(
-            left: 15.w,
-            right: 15.w,
-            bottom: 0.h,
-            child: Container(
-              padding: EdgeInsets.all(5), // 外层边框厚度
-              decoration: BoxDecoration(
-                color: Color(0xFF3E2076), // 外层边框颜色
-                borderRadius: BorderRadius.circular(999.r),
-              ),
+            // 底部 Watch 按钮（双层结构）
+            Positioned(
+              left: 15.w,
+              right: 15.w,
+              bottom: 0.h,
               child: Container(
-                width: 84.w,
-                height: 23.h,
+                padding: EdgeInsets.all(5), // 外层边框厚度
                 decoration: BoxDecoration(
-                  // 内层渐变背景：从左到右 #E424AE -> #6018E6
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFFE424AE), // 渐变起点颜色
-                      Color(0xFF6018E6), // 渐变终点颜色
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(999.r), // 大圆角（完全圆润）
+                  color: Color(0xFF3E2076), // 外层边框颜色
+                  borderRadius: BorderRadius.circular(999.r),
                 ),
-                child: Center(
-                  child: Text(
-                    'Watch',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontFamily: 'PingFang SC',
-                      fontWeight: FontWeight.w600,
+                child: Container(
+                  width: 84.w,
+                  height: 23.h,
+                  decoration: BoxDecoration(
+                    // 内层渐变背景：从左到右 #E424AE -> #6018E6
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFE424AE), // 渐变起点颜色
+                        Color(0xFF6018E6), // 渐变终点颜色
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(999.r), // 大圆角（完全圆润）
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Watch',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -381,85 +397,93 @@ class _PopularPageState extends State<PopularPage> {
   /// - 底部渐变遮罩
   /// - 标题两行居中显示
   Widget _buildTrendingLargeCard(ShortVideoBean item, String number) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(32.r), // 圆角 32
-      child: SizedBox(
-        height: 224.h, // 卡片高度
-        width: 168.w,
-        child: Stack(
-          children: [
-            // 背景图片（优先使用横版图）
-            Image.network(
-              item.horizontallyImg ?? item.imageUrl ?? '',
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: Icon(Icons.error, color: Colors.white54),
-              ),
-            ),
-            // 渐变遮罩（从上到下，透明 -> 黑色 80%）
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(0.50, 0.16),
-                  end: Alignment(0.50, 0.95),
-                  colors: [
-                    Colors.black.withValues(alpha: 0),
-                    const Color(0xFFD20AA4),
-                  ],
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32.r), // 圆角 32
+        child: SizedBox(
+          height: 224.h, // 卡片高度
+          width: 168.w,
+          child: Stack(
+            children: [
+              // 背景图片（优先使用横版图）
+              Image.network(
+                item.horizontallyImg ?? item.imageUrl ?? '',
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey[800],
+                  child: Icon(Icons.error, color: Colors.white54),
                 ),
               ),
-            ),
-            // 右上角数字（如 "01"）
-            Positioned(
-              top: 0.h,
-              left: 0.w,
-              child: Container(
-                width: 39,
-                height: 36,
-                padding: EdgeInsets.only(left: 7.h),
-                decoration: ShapeDecoration(
-                  color: const Color(0xFFFF20CB),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(5),
-                    ),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    number,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: 'DDinPro',
-                      fontWeight: FontWeight.w900,
-                    ),
+              // 渐变遮罩（从上到下，透明 -> 黑色 80%）
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment(0.50, 0.16),
+                    end: Alignment(0.50, 0.95),
+                    colors: [
+                      Colors.black.withValues(alpha: 0),
+                      const Color(0xFFD20AA4),
+                    ],
                   ),
                 ),
               ),
-            ),
-            // 底部标题（两行居中显示）
-            Positioned(
-              left: 18.w,
-              right: 18.w,
-              bottom: 8.h,
-              child: Text(
-                item.name ?? '',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontFamily: 'PingFang SC',
-                  fontWeight: FontWeight.w500,
+              // 右上角数字（如 "01"）
+              Positioned(
+                top: 0.h,
+                left: 0.w,
+                child: Container(
+                  width: 39,
+                  height: 36,
+                  padding: EdgeInsets.only(left: 7.h),
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFFF20CB),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      number,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'DDinPro',
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
                 ),
-                maxLines: 2, // 最多两行
-                overflow: TextOverflow.ellipsis, // 超出显示省略号
-                textAlign: TextAlign.center, // 文本居中
               ),
-            ),
-          ],
+              // 底部标题（两行居中显示）
+              Positioned(
+                left: 18.w,
+                right: 18.w,
+                bottom: 8.h,
+                child: Text(
+                  item.name ?? '',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: 'PingFang SC',
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 2, // 最多两行
+                  overflow: TextOverflow.ellipsis, // 超出显示省略号
+                  textAlign: TextAlign.center, // 文本居中
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -472,94 +496,102 @@ class _PopularPageState extends State<PopularPage> {
   /// - 右边：标题（背景色 #1A1A2E）
   /// - 右下角：数字（如 "02", "03"）
   Widget _buildTrendingSmallCard(ShortVideoBean item, String number) {
-    return Container(
-      height: 108.h, // 卡片高度
-      decoration: BoxDecoration(
-        color: Color(0xB26018E6), // 你的背景色（示例颜色）
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        height: 108.h, // 卡片高度
+        decoration: BoxDecoration(
+          color: Color(0xB26018E6), // 你的背景色（示例颜色）
 
-        borderRadius: BorderRadius.circular(19.r), // 圆角 19
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(19.r),
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                // 左边：图片区域
-                Expanded(
-                  flex: 1,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(19.r),
-                    child: Image.network(
-                      item.imageUrl ?? '',
-                      height: double.infinity,
-                      width: 81.w,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[800],
-                        child: Icon(Icons.error, color: Colors.white54),
+          borderRadius: BorderRadius.circular(19.r), // 圆角 19
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(19.r),
+          child: Stack(
+            children: [
+              Row(
+                children: [
+                  // 左边：图片区域
+                  Expanded(
+                    flex: 1,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(19.r),
+                      child: Image.network(
+                        item.imageUrl ?? '',
+                        height: double.infinity,
+                        width: 81.w,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[800],
+                          child: Icon(Icons.error, color: Colors.white54),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 右边：标题区域（深色背景）
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 15.h,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.name ?? '',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 2, // 最多三行
+                            overflow: TextOverflow.ellipsis, // 超出显示省略号
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // 右下角数字（如 "02", "03"）
+              Positioned(
+                bottom: 0.h,
+                right: 0.w,
+                child: Container(
+                  width: 39,
+                  height: 36,
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFA16FFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      number,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'DDinPro',
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
                 ),
-                // 右边：标题区域（深色背景）
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 15.h,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.name ?? '',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontFamily: 'PingFang SC',
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 2, // 最多三行
-                          overflow: TextOverflow.ellipsis, // 超出显示省略号
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // 右下角数字（如 "02", "03"）
-            Positioned(
-              bottom: 0.h,
-              right: 0.w,
-              child: Container(
-                width: 39,
-                height: 36,
-                decoration: ShapeDecoration(
-                  color: const Color(0xFFA16FFF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                    ),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    number,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: 'DDinPro',
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -616,46 +648,25 @@ class _PopularPageState extends State<PopularPage> {
   }) {
     if (isSmall) {
       // 小卡片，只显示横图
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(32.r),
-        child: Image.network(
-          item.horizontallyImg ?? item.imageUrl ?? '',
-          width: width,
-          height: height, // 131.h
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            child: Image.network(
-              item.imageUrl ?? '',
-              width: width,
-              height: height, // 131.h
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: Icon(Icons.error, color: Colors.white54),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    return Container(
-      width: width, // 卡片宽度（动态计算）
-      height: height, // 卡片高度（131 或 266）
-      decoration: BoxDecoration(
-        color: Color(0xFF5116C1), // 背景色：紫色
-        borderRadius: BorderRadius.circular(32.r), // 圆角 32
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32.r),
-        child: Column(
-          children: [
-            // 上部：图片区域（自适应高度）
-            ClipRRect(
-              borderRadius: BorderRadius.circular(32.r),
+      return GestureDetector(
+        onTap: () {
+          Get.toNamed('/play_detail', arguments: {
+            'shortPlayId': item.shortPlayId,
+            'imageUrl': item.imageUrl ?? '',
+          });
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32.r),
+          child: Image.network(
+            item.horizontallyImg ?? item.imageUrl ?? '',
+            width: width,
+            height: height, // 131.h
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
               child: Image.network(
                 item.imageUrl ?? '',
-                width: double.infinity,
-                height: 224.h, // 固定高度
+                width: width,
+                height: height, // 131.h
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
                   color: Colors.grey[800],
@@ -663,28 +674,65 @@ class _PopularPageState extends State<PopularPage> {
                 ),
               ),
             ),
-            // 下部：标题区域
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(top: 5.h),
-                width: 94,
-                height: double.infinity,
-                child: Text(
-                  item.name ?? '',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'PingFang SC',
-                    fontWeight: FontWeight.w500,
-                    height: 1.14,
+          ),
+        ),
+      );
+    }
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        width: width, // 卡片宽度（动态计算）
+        height: height, // 卡片高度（131 或 266）
+        decoration: BoxDecoration(
+          color: Color(0xFF5116C1), // 背景色：紫色
+          borderRadius: BorderRadius.circular(32.r), // 圆角 32
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32.r),
+          child: Column(
+            children: [
+              // 上部：图片区域（自适应高度）
+              ClipRRect(
+                borderRadius: BorderRadius.circular(32.r),
+                child: Image.network(
+                  item.imageUrl ?? '',
+                  width: double.infinity,
+                  height: 224.h, // 固定高度
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey[800],
+                    child: Icon(Icons.error, color: Colors.white54),
                   ),
-                  maxLines: 2, // 最多两行
-                  overflow: TextOverflow.ellipsis, // 超出显示省略号
-                  textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
                 ),
               ),
-            ),
-          ],
+              // 下部：标题区域
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(top: 5.h),
+                  width: 94,
+                  height: double.infinity,
+                  child: Text(
+                    item.name ?? '',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w500,
+                      height: 1.14,
+                    ),
+                    maxLines: 2, // 最多两行
+                    overflow: TextOverflow.ellipsis, // 超出显示省略号
+                    textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

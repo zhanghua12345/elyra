@@ -123,6 +123,7 @@ class ShortVideoBean {
   num? _episodeTotal;
   num? _searchClickTotal;
   String? _videoUrl;
+  int? _playTime; // 播放时间(秒)
 
   ShortVideoBean copyWith({
     num? id,
@@ -200,6 +201,8 @@ class ShortVideoBean {
 
   String? get videoUrl => _videoUrl;
 
+  int? get playTime => _playTime;
+
   List<String>? get category => _category;
 
   VideoInfo? get videoInfo => _videoInfo;
@@ -224,6 +227,7 @@ class ShortVideoBean {
   set episodeTotal(num? value) => _episodeTotal = value;
   set searchClickTotal(num? value) => _searchClickTotal = value;
   set videoUrl(String? value) => _videoUrl = value;
+  set playTime(int? value) => _playTime = value;
   set category(List<String>? value) => _category = value;
   set videoInfo(VideoInfo? value) => _videoInfo = value;
   set isCollect(bool? value) => _isCollect = value;

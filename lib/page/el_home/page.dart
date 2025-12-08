@@ -4,6 +4,7 @@ import 'package:elyra/page/el_home/sub_page/genres/page.dart';
 import 'package:elyra/page/el_home/sub_page/new/page.dart';
 import 'package:elyra/page/el_home/sub_page/popular/page.dart';
 import 'package:elyra/page/el_home/sub_page/ranking/page.dart';
+import 'package:elyra/widgets/home_video_history_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -17,8 +18,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
-  final logic = Get.put(MainController());
-  final state = Get.find<MainController>().state;
+  final logic = Get.put(HomeController());
+  final state = Get.find<HomeController>().state;
 
   final List<String> tabs = ["Popular", "Rankings", "Genres", "New"];
 
@@ -161,14 +162,28 @@ class _HomePageState extends State<HomePage>
 
                   // 这里放 Tab 内容
                   Expanded(
-                    child: PageView(
-                      controller: _controller,
-                      physics: const ClampingScrollPhysics(),
-                      onPageChanged: (index) {
-                        _currentTab = index;
-                        setState(() {});
-                      },
-                      children: const [PopularPage(),RankingPage(),GenresPage(),NewPage()],
+                    child: Stack(
+                      children: [
+                        PageView(
+                          controller: _controller,
+                          physics: const ClampingScrollPhysics(),
+                          onPageChanged: (index) {
+                            _currentTab = index;
+                            setState(() {});
+                          },
+                          children: const [PopularPage(),RankingPage(),GenresPage(),NewPage()],
+                        ),
+                        
+                        // 历史记录组件 - 距离底部10.h,居中
+                        Positioned(
+                          bottom: 10.h,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: HomeVideoHistoryWidget(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -159,53 +159,61 @@ class _NewPageState extends State<NewPage> {
         ),
       );
     }
-    return Container(
-      width: width, // 卡片宽度（动态计算）
-      height: height, // 卡片高度（131 或 266）
-      decoration: BoxDecoration(
-        color: index == 0 ? null : const Color(0xFF5116C1),
-        borderRadius: BorderRadius.circular(32.r), // 圆角 32
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32.r),
-        child: Column(
-          children: [
-            // 上部：图片区域（自适应高度）
-            ClipRRect(
-              borderRadius: BorderRadius.circular(32.r),
-              child: Image.network(
-                item.imageUrl ?? '',
-                width: double.infinity,
-                height: 224.h, // 固定高度
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54),
-                ),
-              ),
-            ),
-            // 下部：标题区域
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(top: 5.h),
-                width: 94,
-                height: double.infinity,
-                child: Text(
-                  item.name ?? '',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'PingFang SC',
-                    fontWeight: FontWeight.w500,
-                    height: 1.14,
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        width: width, // 卡片宽度（动态计算）
+        height: height, // 卡片高度（131 或 266）
+        decoration: BoxDecoration(
+          color: index == 0 ? null : const Color(0xFF5116C1),
+          borderRadius: BorderRadius.circular(32.r), // 圆角 32
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32.r),
+          child: Column(
+            children: [
+              // 上部：图片区域（自适应高度）
+              ClipRRect(
+                borderRadius: BorderRadius.circular(32.r),
+                child: Image.network(
+                  item.imageUrl ?? '',
+                  width: double.infinity,
+                  height: 224.h, // 固定高度
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey[800],
+                    child: Icon(Icons.error, color: Colors.white54),
                   ),
-                  maxLines: 2, // 最多两行
-                  overflow: TextOverflow.ellipsis, // 超出显示省略号
-                  textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
                 ),
               ),
-            ),
-          ],
+              // 下部：标题区域
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(top: 5.h),
+                  width: 94,
+                  height: double.infinity,
+                  child: Text(
+                    item.name ?? '',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w500,
+                      height: 1.14,
+                    ),
+                    maxLines: 2, // 最多两行
+                    overflow: TextOverflow.ellipsis, // 超出显示省略号
+                    textAlign: TextAlign.center, // 文本居中（单行和多行都居中）
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:elyra/page/el_feedback/feedback_detail/page.dart';
 import 'package:elyra/page/el_feedback/feedback_index/page.dart';
 import 'package:elyra/page/el_feedback/feedback_list/page.dart';
 import 'package:elyra/page/el_language/page.dart';
+import 'package:elyra/page/el_play/page.dart';
 import 'package:elyra/page/el_setting/page.dart';
 import 'package:elyra/page/history/page.dart';
 import 'package:elyra/page/main_page.dart';
@@ -24,9 +25,10 @@ class AppRoutes {
   static const String feedback = '/feedback';
   static const String feedbackList = '/feedback_list';
   static const String feedbackDetail = '/feedback_detail';
-    static const String about = '/about';
+  static const String about = '/about';
   static const String setting = '/setting';
   static const String test = '/test';
+  static const String playDetail = '/play_detail';
 
   static final routes = [
     GetPage(name: splash, page: () => const SplashPage()),
@@ -42,5 +44,6 @@ class AppRoutes {
     GetPage(name: about, page: () => const AboutPage()),
     GetPage(name: setting, page: () => const SettingPage()),
     GetPage(name: test, page: () => const TestPage()),
+    GetPage(name: playDetail, page: () => const PlayDetailPage()),
   ];
 }

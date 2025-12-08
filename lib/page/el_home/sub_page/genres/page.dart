@@ -149,27 +149,36 @@ class _GenresPageState extends State<GenresPage> {
   }
 
   Widget _buildVideoItem(ShortVideoBean? video) {
-    return Container(
-      width: 84.w,
-      height: 112.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.r),
-        image: video != null
-            ? DecorationImage(
-                image: NetworkImage(video.imageUrl ?? ''),
-                fit: BoxFit.cover,
-              )
-            : null,
+    if (video == null) {
+      return Container(
+        width: 84.w,
+        height: 112.h,
+        decoration: BoxDecoration(
+          color: Colors.grey[800],
+          borderRadius: BorderRadius.circular(15.r),
+        ),
+        child: Icon(Icons.error, color: Colors.white54),
+      );
+    }
+    
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': video.shortPlayId,
+          'imageUrl': video.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        width: 84.w,
+        height: 112.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.r),
+          image: DecorationImage(
+            image: NetworkImage(video.imageUrl ?? ''),
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
-      child: video == null
-          ? Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[800],
-                borderRadius: BorderRadius.circular(15.r),
-              ),
-              child: Icon(Icons.error, color: Colors.white54),
-            )
-          : null,
     );
   }
 }

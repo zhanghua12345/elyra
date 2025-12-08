@@ -116,64 +116,72 @@ class _RankingPageState extends State<RankingPage> {
     final badgeSize = isLarge ? 31.w : 28.w;
     final borderRadius = isLarge ? 25.r : 20.r;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: cardWidth,
-          height: cardHeight,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(borderRadius),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF6018E6), Color(0xFFFFFFFF), Color(0xFFDC23B1)],
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: cardWidth,
+            height: cardHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF6018E6), Color(0xFFFFFFFF), Color(0xFFDC23B1)],
+              ),
             ),
-          ),
-          padding: EdgeInsets.all(3.w),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(borderRadius - 3.r),
-            child: Image.network(
-              item.imageUrl ?? '',
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: Icon(Icons.error, color: Colors.white54),
+            padding: EdgeInsets.all(3.w),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(borderRadius - 3.r),
+              child: Image.network(
+                item.imageUrl ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey[800],
+                  child: Icon(Icons.error, color: Colors.white54),
+                ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Transform.translate(
-            offset: Offset(0, badgeSize / 2),
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Image.asset(
-                    'ely_ranking_star.png'.icon,
-                    width: badgeSize,
-                    height: badgeSize,
-                  ),
-                  Text(
-                    '0$rank',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: 'DDinPro',
-                      fontWeight: FontWeight.w900,
-                      height: 0.88,
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Transform.translate(
+              offset: Offset(0, badgeSize / 2),
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.asset(
+                      'ely_ranking_star.png'.icon,
+                      width: badgeSize,
+                      height: badgeSize,
                     ),
-                  ),
-                ],
+                    Text(
+                      '0$rank',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'DDinPro',
+                        fontWeight: FontWeight.w900,
+                        height: 0.88,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -208,106 +216,114 @@ class _RankingPageState extends State<RankingPage> {
   }
 
   Widget _buildRankingItem(ShortVideoBean item, int rank, bool isFirst) {
-    return Container(
-      padding: EdgeInsets.only(
-        left: 12.w,
-        right: 13.w,
-        top: isFirst ? 18.h : 15.h,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            rank < 10 ? '0$rank' : '$rank',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.80),
-              fontSize: 22.sp,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'DDinPro',
-            ),
-          ),
-          SizedBox(width: 13.w),
-          Container(
-            width: 53.w,
-            height: 70.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              image: DecorationImage(
-                image: NetworkImage(item.imageUrl ?? ''),
-                fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed('/play_detail', arguments: {
+          'shortPlayId': item.shortPlayId,
+          'imageUrl': item.imageUrl ?? '',
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.only(
+          left: 12.w,
+          right: 13.w,
+          top: isFirst ? 18.h : 15.h,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              rank < 10 ? '0$rank' : '$rank',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.80),
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w900,
+                fontFamily: 'DDinPro',
               ),
             ),
-          ),
-          SizedBox(width: 8.w),
-          // 中间 Column 高度跟图片一致，顶部对齐
-          SizedBox(
-            height: 70.h, // 和图片一样高
-            width: 150.w,
-            child: Align(
-              alignment: Alignment.topLeft, // 顶部对齐
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    item.name ?? 'Elyra TV',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                      fontFamily: 'PingFang SC',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 6.h),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.asset(
-                        'ely_ranking_ep.png'.icon,
-                        width: 43.w,
-                        height: 11.h,
-                        fit: BoxFit.contain,
-                      ),
-                      Text(
-                        'EP ${item.episodeTotal ?? 99}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8.sp,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'DDinPro',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Spacer(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'ely_ranking_hot.png'.icon,
-                width: 12.w,
-                height: 12.h,
-              ),
-              SizedBox(width: 2.w),
-              Text(
-                _formatNumber(item.watchTotal ?? 0),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontFamily: 'PingFang SC',
-                  fontWeight: FontWeight.w500,
+            SizedBox(width: 13.w),
+            Container(
+              width: 53.w,
+              height: 70.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.r),
+                image: DecorationImage(
+                  image: NetworkImage(item.imageUrl ?? ''),
+                  fit: BoxFit.cover,
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(width: 8.w),
+            // 中间 Column 高度跟图片一致，顶部对齐
+            SizedBox(
+              height: 70.h, // 和图片一样高
+              width: 150.w,
+              child: Align(
+                alignment: Alignment.topLeft, // 顶部对齐
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.name ?? 'Elyra TV',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 6.h),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'ely_ranking_ep.png'.icon,
+                          width: 43.w,
+                          height: 11.h,
+                          fit: BoxFit.contain,
+                        ),
+                        Text(
+                          'EP ${item.episodeTotal ?? 99}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'DDinPro',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Spacer(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'ely_ranking_hot.png'.icon,
+                  width: 12.w,
+                  height: 12.h,
+                ),
+                SizedBox(width: 2.w),
+                Text(
+                  _formatNumber(item.watchTotal ?? 0),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontFamily: 'PingFang SC',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
