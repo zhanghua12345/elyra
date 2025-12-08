@@ -13,7 +13,7 @@ class RecommendState {
   
   // 分页参数
   int currentPage = 1;
-  int pageSize = 20;
+  int pageSize = 5;
   int totalPages = 0;
   bool isLoading = false;
   bool hasMore = true;
