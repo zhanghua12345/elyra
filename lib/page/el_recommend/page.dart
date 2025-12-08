@@ -28,6 +28,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   final Map<int, VideoPlayerController> _videoControllers = {};
   final Map<int, bool> _videoInitialized = {};
   bool _isPageVisible = true;
+  // 添加标记，记录哪些视频已经播放完成并触发了跳转
+  final Map<int, bool> _videoCompletedAndJumped = {};
 
   @override
   void initState() {
@@ -54,11 +56,31 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
 
   void _onPageChanged() {
     final page = _pageController.page?.round() ?? 0;
+    // 添加数据加载检查，防止数据未加载完成时跳转
+    if (controller.state.recommendList.isEmpty) {
+      // 数据未加载，重置回当前页面
+      if (_pageController.hasClients && _currentPageIndex < controller.state.recommendList.length) {
+        _pageController.jumpToPage(_currentPageIndex);
+      }
+      return;
+    }
+    
+    // 检查页面索引是否有效
+    if (page >= controller.state.recommendList.length || page < 0) {
+      // 索引无效，重置回当前页面
+      if (_pageController.hasClients && _currentPageIndex < controller.state.recommendList.length) {
+        _pageController.jumpToPage(_currentPageIndex);
+      }
+      return;
+    }
+    
     if (page != _currentPageIndex) {
       // 暂停之前的视频
       _pauseVideo(_currentPageIndex);
       // 更新当前页面索引
       _currentPageIndex = page;
+      // 重置新页面的播放完成标记，允许新视频播放完成后跳转
+      _videoCompletedAndJumped[page] = false;
       // 播放当前视频
       _playCurrentVideo();
       // 更新controller状态
@@ -94,6 +116,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     
     if (_videoControllers[index] != null && _videoInitialized[index] == true) {
       if (_isPageVisible && _currentPageIndex == index) {
+        // 重置播放完成标记，允许重新播放
+        _videoCompletedAndJumped[index] = false;
         _videoControllers[index]?.play();
       }
       return;
@@ -113,6 +137,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         if (mounted) {
           setState(() {
             _videoInitialized[index] = true;
+            // 初始化时重置播放完成标记
+            _videoCompletedAndJumped[index] = false;
           });
           if (_currentPageIndex == index && _isPageVisible) {
             // 确保只有当前视频播放
@@ -124,13 +150,31 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       ..setLooping(false) // 不循环播放，播放完后跳转下一个
       ..addListener(() {
         if (mounted && _currentPageIndex == index) {
-          // 检查视频是否播放完成
-          if (_videoControllers[index]?.value.position == _videoControllers[index]?.value.duration) {
-            // 播放完成，重置到0并暂停
-            _videoControllers[index]?.seekTo(Duration.zero);
-            _videoControllers[index]?.pause();
-            // 跳转到下一个视频
-            _jumpToNextVideo();
+          final ctrl = _videoControllers[index];
+          if (ctrl != null && ctrl.value.isInitialized) {
+            final position = ctrl.value.position;
+            final duration = ctrl.value.duration;
+            
+            // 检查视频是否真正播放完成：
+            // 1. duration 必须大于 0（视频已加载）
+            // 2. position 必须接近 duration（播放到结尾，允许 500ms 误差）
+            // 3. 还没有触发过跳转（防止重复触发）
+            // 4. 视频不在缓冲中
+            if (duration.inMilliseconds > 0 &&
+                position.inMilliseconds > 0 &&
+                position.inMilliseconds >= duration.inMilliseconds - 500 &&
+                _videoCompletedAndJumped[index] != true &&
+                !ctrl.value.isBuffering) {
+              // 标记为已完成并跳转，防止重复触发
+              _videoCompletedAndJumped[index] = true;
+              
+              // 播放完成，重置到0并暂停
+              ctrl.seekTo(Duration.zero);
+              ctrl.pause();
+              
+              // 播放完成后跳转到下一个视频
+              _jumpToNextVideo();
+            }
           }
           setState(() {}); // 更新进度条
         }
@@ -156,6 +200,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         if (mounted) {
           setState(() {
             _videoInitialized[index] = true;
+            // 初始化时重置播放完成标记
+            _videoCompletedAndJumped[index] = false;
           });
           // 预加载后不自动播放
         }
@@ -163,13 +209,27 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       ..setLooping(false)
       ..addListener(() {
         if (mounted && _currentPageIndex == index) {
-          // 检查视频是否播放完成
-          if (_videoControllers[index]?.value.position == _videoControllers[index]?.value.duration) {
-            // 播放完成，重置到0并暂停
-            _videoControllers[index]?.seekTo(Duration.zero);
-            _videoControllers[index]?.pause();
-            // 跳转到下一个视频
-            _jumpToNextVideo();
+          final ctrl = _videoControllers[index];
+          if (ctrl != null && ctrl.value.isInitialized) {
+            final position = ctrl.value.position;
+            final duration = ctrl.value.duration;
+            
+            // 同样的播放完成检查逻辑
+            if (duration.inMilliseconds > 0 &&
+                position.inMilliseconds > 0 &&
+                position.inMilliseconds >= duration.inMilliseconds - 500 &&
+                _videoCompletedAndJumped[index] != true &&
+                !ctrl.value.isBuffering) {
+              // 标记为已完成并跳转
+              _videoCompletedAndJumped[index] = true;
+              
+              // 播放完成，重置到0并暂停
+              ctrl.seekTo(Duration.zero);
+              ctrl.pause();
+              
+              // 播放完成后跳转到下一个视频
+              _jumpToNextVideo();
+            }
           }
           setState(() {});
         }
@@ -319,6 +379,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     }
     _videoControllers.clear();
     _videoInitialized.clear();
+    // 清空播放完成标记
+    _videoCompletedAndJumped.clear();
     
     // 重置到第一页
     _currentPageIndex = 0;
