@@ -201,11 +201,11 @@ class _MePageState extends State<MePage> {
               padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 16.w),
               child: Column(
                 children: [
-                  _buildMenuItem(
-                    'assets/ely_my_language.png',
-                    'Language',
-                    'language',
-                  ),
+                  // _buildMenuItem(
+                  //   'assets/ely_my_language.png',
+                  //   'Language',
+                  //   'language',
+                  // ),
                   _buildMenuItem(
                     'assets/ely_my_feedback.png',
                     'Feedback',

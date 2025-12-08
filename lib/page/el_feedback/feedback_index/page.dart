@@ -1,8 +1,10 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_feedback/feedback_index/controller.dart';
+import 'package:elyra/page/el_feedback/feedback_list/page.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:badges/badges.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -17,7 +19,7 @@ class FeedbackPage extends StatefulWidget {
 class _FeedbackPageState extends State<FeedbackPage> {
   late final FeedbackPageController controller;
   final TextEditingController _feedbackController = TextEditingController();
-
+  int _noticeNum = 0;
   @override
   void initState() {
     super.initState();
@@ -95,7 +97,22 @@ class _FeedbackPageState extends State<FeedbackPage> {
             ),
           ),
           // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 20.w),
+          Badge(
+            showBadge: _noticeNum > 0,
+            badgeContent: Text(
+              _noticeNum > 99 ? '99+' : '$_noticeNum',
+              style: const TextStyle(color: Colors.white, fontSize: 10),
+            ),
+            badgeStyle: BadgeStyle(badgeColor: Color(0xFFF306B9)),
+            position: BadgePosition.topEnd(top: -5, end: -5),
+            child: GestureDetector(
+              onTap: () => Get.to(() => FeedbackListPage()),
+              child: Padding(
+                padding: EdgeInsets.all(5.w),
+                child: Image.asset('ely_feedback_agreement.png'.icon, width: 24.w),
+              ),
+            ),
+          ),
         ],
       ),
     );

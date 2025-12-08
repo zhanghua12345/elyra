@@ -4,7 +4,6 @@ import 'package:elyra/page/el_home/sub_page/genres/page.dart';
 import 'package:elyra/page/el_home/sub_page/new/page.dart';
 import 'package:elyra/page/el_home/sub_page/popular/page.dart';
 import 'package:elyra/page/el_home/sub_page/ranking/page.dart';
-import 'package:elyra/page/el_home/sub_page/search/page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
