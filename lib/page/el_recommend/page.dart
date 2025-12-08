@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class RecommendPage extends StatefulWidget {
   const RecommendPage({super.key});
@@ -44,62 +46,13 @@ class _RecommendPageState extends State<RecommendPage> {
                 fit: BoxFit.fill,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildAppBar('Test Page'),
-                SizedBox(height: 6.h),
-                Expanded(
-                  child: SmartRefresher(
-                    controller: controller.refreshController,
-                    enablePullDown: true,
-                    enablePullUp: false,
-                    onRefresh: controller.onRefresh,
-                    header: ClassicHeader(
-                      height: 40,
-                      textStyle: TextStyle(color: Colors.white),
-                      idleText: 'Pull to refresh',
-                      releaseText: 'Release to refresh',
-                      refreshingText: 'Refreshing...',
-                      completeText: 'Refresh completed',
-                      failedText: 'Refresh failed',
-                    ),
-                    child: _buildContent(),
-                  ),
-                ),
-              ],
-            ),
+            child: _buildContent()
           ),
         );
       },
     );
   }
 
-  Widget _buildAppBar(String title) {
-    return Container(
-      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontFamily: 'PingFang SC',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 20.w),
-        ],
-      ),
-    );
-  }
 
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
