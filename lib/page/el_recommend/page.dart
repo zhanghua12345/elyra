@@ -21,7 +21,8 @@ class RecommendPage extends StatefulWidget {
   State<RecommendPage> createState() => _RecommendPageState();
 }
 
-class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+class _RecommendPageState extends State<RecommendPage>
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final RecommendPageController controller;
   final PageController _pageController = PageController();
   int _currentPageIndex = 0;
@@ -45,7 +46,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     // 当应用进入后台或不可见时暂停视频
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       _isPageVisible = false;
       _pauseAllVideos();
     } else if (state == AppLifecycleState.resumed) {
@@ -59,21 +61,23 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     // 添加数据加载检查，防止数据未加载完成时跳转
     if (controller.state.recommendList.isEmpty) {
       // 数据未加载，重置回当前页面
-      if (_pageController.hasClients && _currentPageIndex < controller.state.recommendList.length) {
+      if (_pageController.hasClients &&
+          _currentPageIndex < controller.state.recommendList.length) {
         _pageController.jumpToPage(_currentPageIndex);
       }
       return;
     }
-    
+
     // 检查页面索引是否有效
     if (page >= controller.state.recommendList.length || page < 0) {
       // 索引无效，重置回当前页面
-      if (_pageController.hasClients && _currentPageIndex < controller.state.recommendList.length) {
+      if (_pageController.hasClients &&
+          _currentPageIndex < controller.state.recommendList.length) {
         _pageController.jumpToPage(_currentPageIndex);
       }
       return;
     }
-    
+
     if (page != _currentPageIndex) {
       // 暂停之前的视频
       _pauseVideo(_currentPageIndex);
@@ -99,7 +103,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       _initializeAndPlayVideo(_currentPageIndex, video);
     }
   }
-  
+
   void _pauseAllVideos() {
     for (var ctrl in _videoControllers.values) {
       ctrl.pause();
@@ -113,7 +117,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   void _initializeAndPlayVideo(int index, ShortVideoBean video) {
     // 先暂停所有其他视频
     _pauseAllVideos();
-    
+
     if (_videoControllers[index] != null && _videoInitialized[index] == true) {
       if (_isPageVisible && _currentPageIndex == index) {
         // 重置播放完成标记，允许重新播放
@@ -126,59 +130,60 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     final videoUrl = video.videoInfo?.videoUrl ?? '';
     if (videoUrl.isEmpty) return;
 
-    final videoCtrl = VideoPlayerController.networkUrl(
-      Uri.parse(videoUrl),
-      formatHint: VideoFormat.hls,
-      viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
-          ? VideoViewType.platformView
-          : VideoViewType.textureView,
-    )
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _videoInitialized[index] = true;
-            // 初始化时重置播放完成标记
-            _videoCompletedAndJumped[index] = false;
-          });
-          if (_currentPageIndex == index && _isPageVisible) {
-            // 确保只有当前视频播放
-            _pauseAllVideos();
-            _videoControllers[index]?.play();
-          }
-        }
-      })
-      ..setLooping(false) // 不循环播放，播放完后跳转下一个
-      ..addListener(() {
-        if (mounted && _currentPageIndex == index) {
-          final ctrl = _videoControllers[index];
-          if (ctrl != null && ctrl.value.isInitialized) {
-            final position = ctrl.value.position;
-            final duration = ctrl.value.duration;
-            
-            // 检查视频是否真正播放完成：
-            // 1. duration 必须大于 0（视频已加载）
-            // 2. position 必须接近 duration（播放到结尾，允许 500ms 误差）
-            // 3. 还没有触发过跳转（防止重复触发）
-            // 4. 视频不在缓冲中
-            if (duration.inMilliseconds > 0 &&
-                position.inMilliseconds > 0 &&
-                position.inMilliseconds >= duration.inMilliseconds - 500 &&
-                _videoCompletedAndJumped[index] != true &&
-                !ctrl.value.isBuffering) {
-              // 标记为已完成并跳转，防止重复触发
-              _videoCompletedAndJumped[index] = true;
-              
-              // 播放完成，重置到0并暂停
-              ctrl.seekTo(Duration.zero);
-              ctrl.pause();
-              
-              // 播放完成后跳转到下一个视频
-              _jumpToNextVideo();
+    final videoCtrl =
+        VideoPlayerController.networkUrl(
+            Uri.parse(videoUrl),
+            formatHint: VideoFormat.hls,
+            viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
+                ? VideoViewType.platformView
+                : VideoViewType.textureView,
+          )
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() {
+                _videoInitialized[index] = true;
+                // 初始化时重置播放完成标记
+                _videoCompletedAndJumped[index] = false;
+              });
+              if (_currentPageIndex == index && _isPageVisible) {
+                // 确保只有当前视频播放
+                _pauseAllVideos();
+                _videoControllers[index]?.play();
+              }
             }
-          }
-          setState(() {}); // 更新进度条
-        }
-      });
+          })
+          ..setLooping(false) // 不循环播放，播放完后跳转下一个
+          ..addListener(() {
+            if (mounted && _currentPageIndex == index) {
+              final ctrl = _videoControllers[index];
+              if (ctrl != null && ctrl.value.isInitialized) {
+                final position = ctrl.value.position;
+                final duration = ctrl.value.duration;
+
+                // 检查视频是否真正播放完成：
+                // 1. duration 必须大于 0（视频已加载）
+                // 2. position 必须接近 duration（播放到结尾，允许 500ms 误差）
+                // 3. 还没有触发过跳转（防止重复触发）
+                // 4. 视频不在缓冲中
+                if (duration.inMilliseconds > 0 &&
+                    position.inMilliseconds > 0 &&
+                    position.inMilliseconds >= duration.inMilliseconds - 500 &&
+                    _videoCompletedAndJumped[index] != true &&
+                    !ctrl.value.isBuffering) {
+                  // 标记为已完成并跳转，防止重复触发
+                  _videoCompletedAndJumped[index] = true;
+
+                  // 播放完成，重置到0并暂停
+                  ctrl.seekTo(Duration.zero);
+                  ctrl.pause();
+
+                  // 播放完成后跳转到下一个视频
+                  _jumpToNextVideo();
+                }
+              }
+              setState(() {}); // 更新进度条
+            }
+          });
 
     _videoControllers[index] = videoCtrl;
   }
@@ -186,54 +191,55 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   void _preloadVideo(int index, ShortVideoBean video) {
     final videoUrl = video.videoInfo?.videoUrl ?? '';
     if (videoUrl.isEmpty) return;
-    
+
     if (_videoControllers[index] != null) return;
 
-    final videoCtrl = VideoPlayerController.networkUrl(
-      Uri.parse(videoUrl),
-      formatHint: VideoFormat.hls,
-      viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
-          ? VideoViewType.platformView
-          : VideoViewType.textureView,
-    )
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _videoInitialized[index] = true;
-            // 初始化时重置播放完成标记
-            _videoCompletedAndJumped[index] = false;
-          });
-          // 预加载后不自动播放
-        }
-      })
-      ..setLooping(false)
-      ..addListener(() {
-        if (mounted && _currentPageIndex == index) {
-          final ctrl = _videoControllers[index];
-          if (ctrl != null && ctrl.value.isInitialized) {
-            final position = ctrl.value.position;
-            final duration = ctrl.value.duration;
-            
-            // 同样的播放完成检查逻辑
-            if (duration.inMilliseconds > 0 &&
-                position.inMilliseconds > 0 &&
-                position.inMilliseconds >= duration.inMilliseconds - 500 &&
-                _videoCompletedAndJumped[index] != true &&
-                !ctrl.value.isBuffering) {
-              // 标记为已完成并跳转
-              _videoCompletedAndJumped[index] = true;
-              
-              // 播放完成，重置到0并暂停
-              ctrl.seekTo(Duration.zero);
-              ctrl.pause();
-              
-              // 播放完成后跳转到下一个视频
-              _jumpToNextVideo();
+    final videoCtrl =
+        VideoPlayerController.networkUrl(
+            Uri.parse(videoUrl),
+            formatHint: VideoFormat.hls,
+            viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
+                ? VideoViewType.platformView
+                : VideoViewType.textureView,
+          )
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() {
+                _videoInitialized[index] = true;
+                // 初始化时重置播放完成标记
+                _videoCompletedAndJumped[index] = false;
+              });
+              // 预加载后不自动播放
             }
-          }
-          setState(() {});
-        }
-      });
+          })
+          ..setLooping(false)
+          ..addListener(() {
+            if (mounted && _currentPageIndex == index) {
+              final ctrl = _videoControllers[index];
+              if (ctrl != null && ctrl.value.isInitialized) {
+                final position = ctrl.value.position;
+                final duration = ctrl.value.duration;
+
+                // 同样的播放完成检查逻辑
+                if (duration.inMilliseconds > 0 &&
+                    position.inMilliseconds > 0 &&
+                    position.inMilliseconds >= duration.inMilliseconds - 500 &&
+                    _videoCompletedAndJumped[index] != true &&
+                    !ctrl.value.isBuffering) {
+                  // 标记为已完成并跳转
+                  _videoCompletedAndJumped[index] = true;
+
+                  // 播放完成，重置到0并暂停
+                  ctrl.seekTo(Duration.zero);
+                  ctrl.pause();
+
+                  // 播放完成后跳转到下一个视频
+                  _jumpToNextVideo();
+                }
+              }
+              setState(() {});
+            }
+          });
 
     _videoControllers[index] = videoCtrl;
   }
@@ -279,10 +285,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     super.build(context);
     return GetBuilder<RecommendPageController>(
       builder: (controller) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          body: _buildContent(),
-        );
+        return Scaffold(backgroundColor: Colors.black, body: _buildContent());
       },
     );
   }
@@ -320,7 +323,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
 
   Widget _buildMainContent() {
     // 初始化第一个视频
-    if (controller.state.recommendList.isNotEmpty && _videoControllers.isEmpty) {
+    if (controller.state.recommendList.isNotEmpty &&
+        _videoControllers.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _playCurrentVideo();
       });
@@ -337,7 +341,8 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         onNotification: (ScrollNotification notification) {
           // 检测是否到达底部
           if (notification is ScrollEndNotification) {
-            if (_currentPageIndex == controller.state.recommendList.length - 1) {
+            if (_currentPageIndex ==
+                controller.state.recommendList.length - 1) {
               // 到达最后一个，加载更多
               if (controller.state.hasMore && !controller.state.isLoading) {
                 _handleLoadMore();
@@ -372,7 +377,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   Future<void> _handleRefresh() async {
     // 暂停所有视频
     _pauseAllVideos();
-    
+
     // 清空所有视频控制器
     for (var ctrl in _videoControllers.values) {
       ctrl.dispose();
@@ -381,13 +386,13 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     _videoInitialized.clear();
     // 清空播放完成标记
     _videoCompletedAndJumped.clear();
-    
+
     // 重置到第一页
     _currentPageIndex = 0;
-    
+
     // 调用controller刷新数据
     await controller.getRecommendData();
-    
+
     // 刷新后自动播放第一个视频
     if (controller.state.recommendList.isNotEmpty) {
       // 跳转到第一页
@@ -400,7 +405,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       }
       _playCurrentVideo();
     }
-    
+
     setState(() {});
   }
 
@@ -422,19 +427,21 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         children: [
           // 视频播放器
           _buildVideoPlayer(index, video, videoCtrl, isInitialized),
-          
+
           // 底部信息栏
           _buildBottomInfo(index, video, videoCtrl, isInitialized),
-          
-          // 右侧收藏按钮
-          _buildCollectButton(index, video),
         ],
       ),
     );
   }
 
   /// 构建视频播放器
-  Widget _buildVideoPlayer(int index, ShortVideoBean video, VideoPlayerController? videoCtrl, bool isInitialized) {
+  Widget _buildVideoPlayer(
+    int index,
+    ShortVideoBean video,
+    VideoPlayerController? videoCtrl,
+    bool isInitialized,
+  ) {
     return GestureDetector(
       onTap: () {
         // 点击视频区域：跳转到详情页
@@ -457,10 +464,12 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
                         onVisibilityChanged: (VisibilityInfo info) {
                           var visiblePercentage = info.visibleFraction * 100;
                           // 当可见度小于20%时暂停
-                          if (visiblePercentage < 20 && _currentPageIndex == index) {
+                          if (visiblePercentage < 20 &&
+                              _currentPageIndex == index) {
                             videoCtrl.pause();
                             _isPageVisible = false;
-                          } else if (visiblePercentage > 20 && _currentPageIndex == index) {
+                          } else if (visiblePercentage > 20 &&
+                              _currentPageIndex == index) {
                             _isPageVisible = true;
                             videoCtrl.play();
                           }
@@ -473,7 +482,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
                       ),
                     ),
                   ),
-                  
+
                   // 缓冲指示器
                   if (videoCtrl.value.isBuffering)
                     CircularProgressIndicator(color: ColorEnum.mainColor),
@@ -494,9 +503,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
                     ),
                   BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.3),
-                    ),
+                    child: Container(color: Colors.black.withOpacity(0.3)),
                   ),
                   CircularProgressIndicator(color: ColorEnum.mainColor),
                 ],
@@ -506,11 +513,14 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   }
 
   // 跳转到详情页
-  void _navigateToDetail(ShortVideoBean video, VideoPlayerController? videoCtrl) {
+  void _navigateToDetail(
+    ShortVideoBean video,
+    VideoPlayerController? videoCtrl,
+  ) {
     // 暂停当前视频
     videoCtrl?.pause();
     _isPageVisible = false;
-    
+
     // TODO: 跳转到视频详情页（需要实现短视频详情页路由）
     // Get.toNamed(
     //   AppRoutes.shortVideo,
@@ -525,7 +535,7 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
     //     videoCtrl?.play();
     //   }
     // });
-    
+
     print('跳转到详情页: ${video.name}');
     // 临时处理：延迟后恢复播放
     Future.delayed(Duration(milliseconds: 100), () {
@@ -537,11 +547,16 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   }
 
   /// 构建底部信息栏（标题、描述、进度条）
-  Widget _buildBottomInfo(int index, ShortVideoBean video, VideoPlayerController? videoCtrl, bool isInitialized) {
+  Widget _buildBottomInfo(
+    int index,
+    ShortVideoBean video,
+    VideoPlayerController? videoCtrl,
+    bool isInitialized,
+  ) {
     return Positioned(
       left: 0,
-      right: 70.w, // 留出右侧收藏按钮的空间
-      bottom: 0,
+      right: 0, // 留出右侧收藏按钮的空间
+      bottom: 11.h,
       child: GestureDetector(
         // 阻止事件冒泡到视频播放器
         behavior: HitTestBehavior.opaque,
@@ -551,47 +566,70 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
         },
         child: Container(
           color: Colors.transparent,
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // 收藏按钮
+                  GestureDetector(
+                    onTap: () async {
+                      // 确保当前视频是这个
+                      controller.state.curVideo = video;
+                      controller.state.curVideoId = video.id ?? -1;
+                      await controller.toggleCollect();
+                      setState(() {});
+                    },
+                    child: Container(
+                      child: Image.asset(
+                        video.isCollect == true
+                            ? 'ely_collect.png'.icon
+                            : 'ely_collect_cancle.png'.icon,
+                        width: 36.w,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 30.h),
               // 标题
-              Text(
-                video.name ?? '',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.5),
-                      offset: Offset(0, 2),
-                      blurRadius: 4,
+              SizedBox(
+                width: 273.w,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      video.name ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 5.h),
+                    // 描述
+                    Text(
+                      video.description ?? '',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.80),
+                        fontSize: 12,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 8.w),
-              // 描述
-              Text(
-                video.description ?? '',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.white.withOpacity(0.8),
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.5),
-                      offset: Offset(0, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
+
               SizedBox(height: 12.w),
               // 进度条
               _buildProgressBar(index, videoCtrl, isInitialized),
@@ -603,15 +641,18 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
   }
 
   /// 构建进度条
-  Widget _buildProgressBar(int index, VideoPlayerController? videoCtrl, bool isInitialized) {
+  Widget _buildProgressBar(
+    int index,
+    VideoPlayerController? videoCtrl,
+    bool isInitialized,
+  ) {
     if (videoCtrl == null || !isInitialized) {
       return SizedBox.shrink();
     }
-
     final duration = videoCtrl.value.duration;
     final position = videoCtrl.value.position;
-    final progress = duration.inMilliseconds > 0 
-        ? position.inMilliseconds / duration.inMilliseconds 
+    final progress = duration.inMilliseconds > 0
+        ? position.inMilliseconds / duration.inMilliseconds
         : 0.0;
 
     return GestureDetector(
@@ -622,22 +663,6 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
       },
       child: Row(
         children: [
-          // 当前时间
-          Text(
-            _formatDuration(position),
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: Offset(0, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 8.w),
           // 进度条
           Expanded(
             child: GestureDetector(
@@ -647,12 +672,10 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
               child: SliderTheme(
                 data: SliderThemeData(
                   trackHeight: 3.w,
-                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.w),
-                  overlayShape: RoundSliderOverlayShape(overlayRadius: 12.w),
-                  activeTrackColor: ColorEnum.mainColor,
-                  inactiveTrackColor: Colors.white.withOpacity(0.3),
-                  thumbColor: ColorEnum.mainColor,
-                  overlayColor: ColorEnum.mainColor.withOpacity(0.3),
+                  thumbShape: SliderComponentShape.noThumb,
+                  overlayShape: SliderComponentShape.noOverlay,
+                  activeTrackColor: Color(0xFFDC23B1),
+                  inactiveTrackColor: Colors.white.withOpacity(0.2),
                 ),
                 child: Slider(
                   value: progress.clamp(0.0, 1.0),
@@ -675,83 +698,9 @@ class _RecommendPageState extends State<RecommendPage> with AutomaticKeepAliveCl
               ),
             ),
           ),
-          SizedBox(width: 8.w),
-          // 总时长
-          Text(
-            _formatDuration(duration),
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: Offset(0, 1),
-                  blurRadius: 2,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
-  }
-
-  /// 构建收藏按钮
-  Widget _buildCollectButton(int index, ShortVideoBean video) {
-    return Positioned(
-      right: 16.w,
-      bottom: 180.w,
-      child: GestureDetector(
-        onTap: () async {
-          // 确保当前视频是这个
-          controller.state.curVideo = video;
-          controller.state.curVideoId = video.id ?? -1;
-          await controller.toggleCollect();
-          setState(() {});
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              video.isCollect == true 
-                  ? 'ely_collect.png'.icon 
-                  : 'ely_collect_cancle.png'.icon,
-              width: 40.w,
-              height: 40.w,
-            ),
-            SizedBox(height: 4.w),
-            Text(
-              '${video.collectTotal ?? 0}',
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withOpacity(0.5),
-                    offset: Offset(0, 1),
-                    blurRadius: 2,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 格式化时长
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-    
-    if (hours > 0) {
-      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
-    }
-    return '${twoDigits(minutes)}:${twoDigits(seconds)}';
   }
 
   @override

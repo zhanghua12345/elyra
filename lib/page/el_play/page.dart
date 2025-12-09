@@ -26,9 +26,11 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   @override
   void dispose() {
     // 上传最后的播放进度
-    if (logic.controllers.isNotEmpty && logic.currentIndex < logic.controllers.length) {
+    if (logic.controllers.isNotEmpty &&
+        logic.currentIndex < logic.controllers.length) {
       logic.uploadHistorySeconds(
-        logic.controllers[logic.currentIndex]?.value.position.inMilliseconds ?? 0,
+        logic.controllers[logic.currentIndex]?.value.position.inMilliseconds ??
+            0,
       );
     }
     super.dispose();
@@ -39,9 +41,15 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (logic.controllers.isNotEmpty && logic.currentIndex < logic.controllers.length) {
+        if (logic.controllers.isNotEmpty &&
+            logic.currentIndex < logic.controllers.length) {
           logic.uploadHistorySeconds(
-            logic.controllers[logic.currentIndex]?.value.position.inMilliseconds ?? 0,
+            logic
+                    .controllers[logic.currentIndex]
+                    ?.value
+                    .position
+                    .inMilliseconds ??
+                0,
           );
         }
       },
@@ -80,7 +88,11 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('ely_error.png'.icon, width: 180.w, height: 180.w),
+                  Image.asset(
+                    'ely_error.png'.icon,
+                    width: 180.w,
+                    height: 180.w,
+                  ),
                   SizedBox(height: 20.h),
                   Text(
                     'No connection',
@@ -93,17 +105,17 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
                   SizedBox(height: 8.h),
                   Text(
                     'Please check your network',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14.sp, color: Colors.grey),
                   ),
                   SizedBox(height: 30.h),
                   ElevatedButton(
                     onPressed: logic.getVideoDetails,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorEnum.mainColor,
-                      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 40.w,
+                        vertical: 12.h,
+                      ),
                     ),
                     child: Text(
                       'Try again',
@@ -134,7 +146,8 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             width: ScreenUtil().screenWidth,
             height: ScreenUtil().screenHeight,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(color: Colors.black),
+            errorBuilder: (context, error, stackTrace) =>
+                Container(color: Colors.black),
           ),
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -144,12 +157,10 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             height: ScreenUtil().screenHeight,
           ),
         ),
-        
+
         // 加载指示器
         if (logic.state.detailBean == null)
-          Center(
-            child: CircularProgressIndicator(color: ColorEnum.mainColor),
-          ),
+          Center(child: CircularProgressIndicator(color: ColorEnum.mainColor)),
 
         // 视频列表
         PageView.builder(
@@ -176,10 +187,10 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       children: [
         // 视频播放器
         _buildVideoPlayer(index, controller, episode),
-        
+
         // 底部信息栏
         _buildBottomBar(index, controller, episode),
-        
+
         // 顶部导航栏
         _buildTopBar(),
       ],
@@ -231,18 +242,14 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
               ),
             ),
           ),
-          
+
           // 缓冲指示器
           if (controller.value.isBuffering)
             CircularProgressIndicator(color: ColorEnum.mainColor),
-            
+
           // 播放/暂停按钮
           if (!controller.value.isPlaying && !controller.value.isBuffering)
-            Icon(
-              Icons.play_circle_outline,
-              color: Colors.white,
-              size: 60.w,
-            ),
+            Icon(Icons.play_circle_outline, color: Colors.white, size: 60.w),
         ],
       ),
     );
@@ -262,11 +269,10 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             width: ScreenUtil().screenWidth,
             height: ScreenUtil().screenHeight,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(color: Colors.black),
+            errorBuilder: (context, error, stackTrace) =>
+                Container(color: Colors.black),
           ),
-        Center(
-          child: CircularProgressIndicator(color: ColorEnum.mainColor),
-        ),
+        Center(child: CircularProgressIndicator(color: ColorEnum.mainColor)),
       ],
     );
   }
@@ -281,9 +287,10 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       bottom: 0,
       left: 0,
       right: 0,
-      child: Platform.isAndroid
-          ? SafeArea(child: _buildBottomContent(controller, episode))
-          : _buildBottomContent(controller, episode),
+      child: SafeArea(
+        minimum: EdgeInsets.only(bottom: 16.h), // 只加你自己的 padding
+        child: _buildBottomContent(controller, episode),
+      ),
     );
   }
 
@@ -293,41 +300,47 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     EpisodeList episode,
   ) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.w),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0),
-            Colors.black.withOpacity(0.3),
-            Colors.black.withOpacity(0.6),
-          ],
-        ),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // 收藏按钮
+              GestureDetector(
+                onTap: logic.toggleCollect,
+                child: Container(
+                  child: Image.asset(
+                    logic.state.detailBean?.shortPlayInfo?.isCollect == true
+                        ? 'ely_collect.png'.icon
+                        : 'ely_collect_cancle.png'.icon,
+                    width: 36.w,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 50.h),
           // 标题
           Text(
             logic.state.detailBean?.shortPlayInfo?.name ?? '',
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14.sp,
+              fontSize: 16,
+              fontFamily: 'PingFang SC',
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 10.w),
-          
+          SizedBox(height: 5.h),
           // 进度条
           if (controller != null && controller.value.isInitialized)
             _buildProgressBar(controller),
-          SizedBox(height: 10.w),
-          
-          // 底部控制条（集数选择和倍速）
+          SizedBox(height: 15.w),
+          // 底部集数
           _buildBottomControls(controller, episode),
         ],
       ),
@@ -341,27 +354,16 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     final progress = duration.inMilliseconds > 0
         ? position.inMilliseconds / duration.inMilliseconds
         : 0.0;
-
     return Row(
       children: [
-        // 当前时间
-        Text(
-          _formatDuration(position),
-          style: TextStyle(fontSize: 12.sp, color: Colors.white),
-        ),
-        SizedBox(width: 8.w),
-        
-        // 进度条
         Expanded(
           child: SliderTheme(
             data: SliderThemeData(
               trackHeight: 3.w,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.w),
-              overlayShape: RoundSliderOverlayShape(overlayRadius: 12.w),
-              activeTrackColor: ColorEnum.mainColor,
-              inactiveTrackColor: Colors.white.withOpacity(0.3),
-              thumbColor: ColorEnum.mainColor,
-              overlayColor: ColorEnum.mainColor.withOpacity(0.3),
+              thumbShape: SliderComponentShape.noThumb,
+              overlayShape: SliderComponentShape.noOverlay,
+              activeTrackColor: Color(0xFFDC23B1),
+              inactiveTrackColor: Colors.white.withOpacity(0.2),
             ),
             child: Slider(
               value: progress.clamp(0.0, 1.0),
@@ -372,13 +374,6 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
               },
             ),
           ),
-        ),
-        SizedBox(width: 8.w),
-        
-        // 总时长
-        Text(
-          _formatDuration(duration),
-          style: TextStyle(fontSize: 12.sp, color: Colors.white),
         ),
       ],
     );
@@ -391,32 +386,33 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   ) {
     return Column(
       children: [
-        // 集数信息和向上箭头
         GestureDetector(
           onTap: _showEpisodeSelector,
           child: Container(
             width: 341.w,
             height: 24.w,
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(12.w),
+            decoration: ShapeDecoration(
+              color: Colors.white.withValues(alpha: 0.20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(68.w), // 设计稿的 "pill" 圆角
+              ),
             ),
+
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+
             child: Row(
               children: [
                 Text(
                   'Ep.${logic.currentIndex + 1}/Ep.${logic.state.episodeList.length}',
                   style: TextStyle(
-                    fontSize: 12.sp,
                     color: Colors.white,
+                    fontSize: 12,
+                    fontFamily: 'PingFang SC',
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 Spacer(),
-                Image.asset(
-                  'ely_top_arrow.png'.icon,
-                  width: 16.w,
-                  height: 16.w,
-                ),
+                Image.asset('ely_top_arrow.png'.icon, width: 14.w),
               ],
             ),
           ),
@@ -432,30 +428,24 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       left: 0,
       right: 0,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // 返回按钮
             GestureDetector(
               onTap: () => Get.back(),
-              child: Container(
-                padding: EdgeInsets.all(8.w),
-                child: Image.asset('ely_back.png'.icon, width: 24.w),
-              ),
+              child: Image.asset('ely_back.png'.icon, width: 20.w),
             ),
-            
-            // 收藏按钮
-            GestureDetector(
-              onTap: logic.toggleCollect,
-              child: Container(
-                padding: EdgeInsets.all(8.w),
-                child: Image.asset(
-                  logic.state.detailBean?.shortPlayInfo?.isCollect == true
-                      ? 'ely_collect.png'.icon
-                      : 'ely_collect_cancle.png'.icon,
-                  width: 24.w,
-                ),
+            SizedBox(width: 6.w),
+            Text(
+              'Ep.${logic.currentIndex + 1}',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontFamily: 'PingFang SC',
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0,
               ),
             ),
           ],
@@ -480,18 +470,5 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
-  }
-
-  /// 格式化时长
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-
-    if (hours > 0) {
-      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
-    }
-    return '${twoDigits(minutes)}:${twoDigits(seconds)}';
   }
 }
