@@ -323,7 +323,7 @@ class _RecommendPageState extends State<RecommendPage>
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
-        child: CircularProgressIndicator(color: ColorEnum.mainColor),
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
       );
     }
 
