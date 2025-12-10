@@ -515,7 +515,7 @@ class _RecommendPageState extends State<RecommendPage>
 
                   // 缓冲指示器
                   if (videoCtrl.value.isBuffering)
-                    CircularProgressIndicator(color: ColorEnum.mainColor),
+                      Image.asset('loading.gif'.icon, width: 120, height: 120),
                 ],
               )
             : Stack(
@@ -535,7 +535,7 @@ class _RecommendPageState extends State<RecommendPage>
                     filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                     child: Container(color: Colors.black.withOpacity(0.3)),
                   ),
-                  CircularProgressIndicator(color: ColorEnum.mainColor),
+                  Image.asset('loading.gif'.icon, width: 120, height: 120),
                 ],
               ),
       ),
