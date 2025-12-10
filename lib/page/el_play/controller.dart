@@ -192,14 +192,16 @@ class PlayDetailController extends GetxController {
   /// 切换集数
   Future<void> onEpisodeChanged(int index, {bool isToggle = false}) async {
     if (index < 0 || index >= state.episodeList.length) return;
-    if (index == currentIndex) return;
+    if (index == currentIndex && !isToggle) return;
 
     // 暂停当前视频并上传播放进度
-    if (controllers[currentIndex]?.value.isPlaying ?? false) {
+    if (controllers[currentIndex] != null) {
       await controllers[currentIndex]?.pause();
-      uploadHistorySeconds(
-        controllers[currentIndex]?.value.position.inMilliseconds ?? 0,
-      );
+      if (controllers[currentIndex]?.value.isPlaying == false) {
+        uploadHistorySeconds(
+          controllers[currentIndex]?.value.position.inMilliseconds ?? 0,
+        );
+      }
     }
 
     // 更新当前集数
@@ -209,12 +211,13 @@ class PlayDetailController extends GetxController {
     // 初始化并播放新视频
     if (controllers[index] == null) {
       await _initializeController(index);
+    } else {
+      // 如果已经初始化，直接播放
+      controllers[index]?.play();
     }
-    
-    controllers[index]?.play();
 
     // 跳转到对应页面
-    if (isToggle) {
+    if (isToggle && pageController.hasClients) {
       pageController.jumpToPage(index);
     }
 

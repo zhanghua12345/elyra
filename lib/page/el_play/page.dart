@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/extend/el_string.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 /// 自定义垂直方向扩展的Slider Overlay Shape
 class VerticalSliderOverlayShape extends SliderComponentShape {
@@ -51,7 +49,6 @@ class PlayDetailPage extends StatefulWidget {
 
 class _PlayDetailPageState extends State<PlayDetailPage> {
   final controller = Get.put(PlayDetailController());
-  bool _isPageVisible = true;
 
   @override
   void dispose() {
@@ -217,25 +214,17 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         }
         setState(() {});
       },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned.fill(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: VisibilityDetector(
-                key: Key('video-$index'),
-                onVisibilityChanged: (VisibilityInfo info) {
-                  var visiblePercentage = info.visibleFraction * 100;
-                  if (visiblePercentage > 20 &&
-                      controller.currentIndex == index) {
-                    _isPageVisible = true;
-                    videoController.play();
-                  } else {
-                    _isPageVisible = false;
-                    videoController.pause();
-                  }
-                },
+      child: Container(
+        width: ScreenUtil().screenWidth,
+        height: ScreenUtil().screenHeight,
+        color: Colors.black,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 视频内容 - 使用SizedBox.expand铺满全屏幕并裁切
+            SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
                 child: SizedBox(
                   width: videoController.value.size.width,
                   height: videoController.value.size.height,
@@ -243,17 +232,17 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
                 ),
               ),
             ),
-          ),
 
-          // 缓冲指示器
-          if (videoController.value.isBuffering)
-            Image.asset('loading.gif'.icon, width: 120, height: 120),
+            // 缓冲指示器
+            if (videoController.value.isBuffering)
+              Image.asset('loading.gif'.icon, width: 120, height: 120),
 
-          // 播放/暂停按钮
-          if (!videoController.value.isPlaying &&
-              !videoController.value.isBuffering)
-            Icon(Icons.play_circle_outline, color: Colors.white, size: 60.w),
-        ],
+            // 播放/暂停按钮
+            if (!videoController.value.isPlaying &&
+                !videoController.value.isBuffering)
+              Icon(Icons.play_circle_outline, color: Colors.white, size: 60.w),
+          ],
+        ),
       ),
     );
   }
@@ -328,17 +317,43 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
           ),
           SizedBox(height: 50.h),
           // 标题
-          Text(
-            controller.state.detailBean?.shortPlayInfo?.name ?? '',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontFamily: 'PingFang SC',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+              SizedBox(
+                width: 273.w,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.state.detailBean?.shortPlayInfo?.name ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 5.h),
+                    // 描述
+                    if (controller.state.detailBean?.shortPlayInfo?.description?.isNotEmpty == true) ...[
+                      Text(
+                        controller.state.detailBean!.shortPlayInfo!.description!,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.80),
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 5.h),
+                    ],
+                  ],
+                ),
+              ),
+          
           // 进度条
           if (videoController != null && videoController.value.isInitialized)
             _buildProgressBar(videoController),
