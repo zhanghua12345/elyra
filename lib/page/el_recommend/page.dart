@@ -643,19 +643,21 @@ class _RecommendPageState extends State<RecommendPage>
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 5.h),
                     // 描述
-                    Text(
-                      video.description ?? '',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.80),
-                        fontSize: 12,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w400,
+                    if (video.description != null && video.description!.isNotEmpty) ...[
+                      SizedBox(height: 5.h),
+                      Text(
+                        video.description!,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.80),
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ],
                   ],
                 ),
               ),
