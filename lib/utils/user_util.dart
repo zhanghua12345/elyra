@@ -32,8 +32,8 @@ class UserUtil {
         if (toHome) Get.offNamed(AppRoutes.main);
         // UserUtil().enterAppPost();
         // FirebaseCommon.reportFirebaseToken();
-        Get.put(MyPageController());
-        Get.find<MyPageController>().getUserInfo();
+        Get.put(MePageController());
+        Get.find<MePageController>().getUserInfo();
 
         return Future.value(true);
       }
@@ -58,7 +58,7 @@ class UserUtil {
     Map<String, dynamic>? extendData,
     Map<String, dynamic>? payData,
   }) async {
-    String? userId = Get.put(MyPageController()).state.customerInfo.customerId;
+    String? userId = Get.put(MePageController()).state.customerInfo?.customerId;
 
     Map<String, dynamic> params = {
       "event_name": eventName,

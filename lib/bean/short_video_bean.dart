@@ -90,7 +90,18 @@ class ShortVideoBean {
     _videoInfo = json['video_info'] != null
         ? VideoInfo.fromJson(json['video_info'])
         : null;
-    _isCollect = json['is_collect'];
+    // 处理 is_collect 可能是 int(0/1) 或 bool 的情况
+    if (json['is_collect'] != null) {
+      if (json['is_collect'] is bool) {
+        _isCollect = json['is_collect'];
+      } else if (json['is_collect'] is int) {
+        _isCollect = json['is_collect'] == 1;
+      } else {
+        _isCollect = false;
+      }
+    } else {
+      _isCollect = false;
+    }
     _watchTotal = json['watch_total'];
     _episodeTotal = json['episode_total'];
     _searchClickTotal = json['search_click_total'];

@@ -133,11 +133,56 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget _buildContentArea() {
-    return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 40.h),
+          Image.asset('el_logo.png'.icon, width: 100.w, height: 100.h),
+          SizedBox(height: 20.h),
+          Text(
+            'ElyraTV',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            'Version 1.0.1',
+            style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          ),
+          SizedBox(height: 40.h),
+          _buildListTile('Privacy Policy', () {
+            // Navigate to Privacy Policy page
+          }),
+          _buildListTile('User Agreement', () {
+            // Navigate to User Agreement page
+          }),
+          _buildListTile('Visit Website', () {
+            // Open website URL
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: Colors.white, fontSize: 16.sp),
+            ),
+            Spacer(),
+            Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+          ],
         ),
       ),
     );

@@ -2,12 +2,13 @@ import 'package:elyra/bean/user_info.dart';
 import 'package:elyra/page/el_me/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
+import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:elyra/widgets/bad_status_widget.dart';
 
-class MyPageController extends GetxController {
-  final state = MyState();
+class MePageController extends GetxController {
+  final state = MePageState();
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );
@@ -15,23 +16,7 @@ class MyPageController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    // 页面准备完成后执行的操作
     getUserInfo();
-
-  }
-
-  getUserInfo() async {
-    try {
-      ApiResponse response = await HttpClient().request(Apis.customerInfo, method: HttpMethod.get);
-      refreshController.refreshCompleted();
-
-      if (response.success) {
-        state.customerInfo = UserInfo.fromJson(response.data);
-        update();
-      }
-    } catch (e) {
-      refreshController.refreshCompleted();
-    }
   }
 
   @override
@@ -40,32 +25,35 @@ class MyPageController extends GetxController {
     super.onClose();
   }
 
-  // 加载数据的方法
-  void loadData() async {
-    if (state.isLoading) return;
-    state.isLoading = true;
+  /// 获取用户信息
+  Future<void> getUserInfo() async {
     try {
-      // 模拟加载数据
-      await Future.delayed(Duration(seconds: 2));
-
-      // 加载成功
-      state.loadStatus = LoadStatusType.loadSuccess;
+      state.loadStatus = LoadStatusType.loading;
       update();
-    } catch (err) {
-      // 错误处理
+
+      ApiResponse response = await HttpClient().request(
+        Apis.customerInfo,
+        method: HttpMethod.get,
+      );
+
+      if (response.success) {
+        state.customerInfo = UserInfo.fromJson(response.data);
+        state.loadStatus = LoadStatusType.loadSuccess;
+      } else {
+        state.loadStatus = LoadStatusType.loadFailed;
+      }
+    } catch (e) {
       state.loadStatus = LoadStatusType.loadFailed;
-      update();
+      debugPrint('获取用户信息失败: $e');
     } finally {
-      state.isLoading = false;
-
       // 确保刷新控制器正确完成
       refreshController.refreshCompleted();
       update();
     }
   }
 
-  // 下拉刷新
+  /// 刷新
   void onRefresh() {
-    loadData();
+    getUserInfo();
   }
 }
