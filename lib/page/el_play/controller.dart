@@ -19,7 +19,6 @@ class PlayDetailController extends GetxController {
   
   late final PageController pageController;
   List<VideoPlayerController?> controllers = [];
-  LoadStatusType videoStatus = LoadStatusType.loading;
   int currentIndex = 0;
 
   @override
@@ -74,7 +73,7 @@ class PlayDetailController extends GetxController {
       );
 
       if (res.success) {
-        videoStatus = LoadStatusType.loadSuccess;
+        state.loadStatus  = LoadStatusType.loadSuccess;
         state.detailBean = ShortPlayDetailBean.fromJson(res.data);
         
         if (state.videoId <= 0) {
@@ -98,11 +97,11 @@ class PlayDetailController extends GetxController {
         
         update();
       } else {
-        videoStatus = LoadStatusType.loadFailed;
+        state.loadStatus  = LoadStatusType.loadFailed;
         update();
       }
     } catch (e) {
-      videoStatus = LoadStatusType.loadFailed;
+      state.loadStatus  = LoadStatusType.loadFailed;
       update();
       debugPrint('获取视频详情失败: $e');
     }
@@ -347,5 +346,14 @@ class PlayDetailController extends GetxController {
     state.curSpeed = speed;
     controllers[currentIndex]?.setPlaybackSpeed(speed);
     update();
+  }
+
+
+  void onRefresh() {
+    state.shortPlayId = Get.arguments['shortPlayId'] ?? -1;
+    state.videoId = Get.arguments['videoId'] ?? 0;
+    state.activityId = Get.arguments['activityId'];
+    state.imageUrl = Get.arguments['imageUrl'] ?? '';
+    getVideoDetails();
   }
 }

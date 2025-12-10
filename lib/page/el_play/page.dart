@@ -4,8 +4,8 @@ import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_play/controller.dart';
 import 'package:elyra/page/el_play/sub_page/select/select_episode_page.dart';
-import 'package:elyra/utils/el_color.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -50,16 +50,20 @@ class PlayDetailPage extends StatefulWidget {
 }
 
 class _PlayDetailPageState extends State<PlayDetailPage> {
-  final logic = Get.put(PlayDetailController());
+  final controller = Get.put(PlayDetailController());
   bool _isPageVisible = true;
 
   @override
   void dispose() {
     // 上传最后的播放进度
-    if (logic.controllers.isNotEmpty &&
-        logic.currentIndex < logic.controllers.length) {
-      logic.uploadHistorySeconds(
-        logic.controllers[logic.currentIndex]?.value.position.inMilliseconds ??
+    if (controller.controllers.isNotEmpty &&
+        controller.currentIndex < controller.controllers.length) {
+      controller.uploadHistorySeconds(
+        controller
+                .controllers[controller.currentIndex]
+                ?.value
+                .position
+                .inMilliseconds ??
             0,
       );
     }
@@ -71,11 +75,11 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (logic.controllers.isNotEmpty &&
-            logic.currentIndex < logic.controllers.length) {
-          logic.uploadHistorySeconds(
-            logic
-                    .controllers[logic.currentIndex]
+        if (controller.controllers.isNotEmpty &&
+            controller.currentIndex < controller.controllers.length) {
+          controller.uploadHistorySeconds(
+            controller
+                    .controllers[controller.currentIndex]
                     ?.value
                     .position
                     .inMilliseconds ??
@@ -87,85 +91,49 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         backgroundColor: Colors.black,
         body: GetBuilder<PlayDetailController>(
           builder: (ctrl) {
-            if (logic.videoStatus == LoadStatusType.loadFailed) {
-              return _buildErrorPage();
-            }
-            return _buildMainContent();
+            return _buildContent();
           },
         ),
       ),
     );
   }
 
-  /// 错误页面
-  Widget _buildErrorPage() {
-    return Container(
-      width: ScreenUtil().screenWidth,
-      height: ScreenUtil().screenHeight,
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: kToolbarHeight + 20.w),
-            child: IconButton(
-              onPressed: () => Get.back(),
-              icon: Icon(Icons.arrow_back_outlined, size: 28),
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'ely_error.png'.icon,
-                    width: 180.w,
-                    height: 180.w,
-                  ),
-                  SizedBox(height: 20.h),
-                  Text(
-                    'No connection',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'Please check your network',
-                    style: TextStyle(fontSize: 14.sp, color: Colors.grey),
-                  ),
-                  SizedBox(height: 30.h),
-                  ElevatedButton(
-                    onPressed: logic.getVideoDetails,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorEnum.mainColor,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 40.w,
-                        vertical: 12.h,
-                      ),
-                    ),
-                    child: Text(
-                      'Try again',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  Widget _buildContent() {
+    if (controller.state.loadStatus == LoadStatusType.loading) {
+      return Center(
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
+      return ElNoDataWidget(
+        imagePath: 'ely_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        title: null,
+        description: 'There is no data for the moment.',
+        buttonText: null,
+      );
+    }
+
+    return _buildMainContent();
   }
 
   /// 主要内容
   Widget _buildMainContent() {
-    String bgImageUrl = logic.state.imageUrl.isNotEmpty
-        ? logic.state.imageUrl
-        : (logic.state.detailBean?.shortPlayInfo?.imageUrl ?? '');
+    String bgImageUrl = controller.state.imageUrl.isNotEmpty
+        ? controller.state.imageUrl
+        : (controller.state.detailBean?.shortPlayInfo?.imageUrl ?? '');
 
     return Stack(
       children: [
@@ -189,15 +157,17 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         ),
 
         // 加载指示器
-        if (logic.state.detailBean == null)
-          Center(child: CircularProgressIndicator(color: ColorEnum.mainColor)),
+        if (controller.state.detailBean == null)
+          Center(
+            child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+          ),
 
         // 视频列表
         PageView.builder(
-          controller: logic.pageController,
+          controller: controller.pageController,
           scrollDirection: Axis.vertical,
-          onPageChanged: (index) => logic.onEpisodeChanged(index),
-          itemCount: logic.state.episodeList.length,
+          onPageChanged: (index) => controller.onEpisodeChanged(index),
+          itemCount: controller.state.episodeList.length,
           itemBuilder: (context, index) => _buildVideoPage(index),
         ),
       ],
@@ -206,20 +176,21 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
 
   /// 单个视频页面
   Widget _buildVideoPage(int index) {
-    if (logic.controllers.isEmpty || index >= logic.controllers.length) {
+    if (controller.controllers.isEmpty ||
+        index >= controller.controllers.length) {
       return Container();
     }
 
-    final controller = logic.controllers[index];
-    final episode = logic.state.episodeList[index];
+    final videoController = controller.controllers[index];
+    final episode = controller.state.episodeList[index];
 
     return Stack(
       children: [
         // 视频播放器
-        _buildVideoPlayer(index, controller, episode),
+        _buildVideoPlayer(index, videoController, episode),
 
         // 底部信息栏
-        _buildBottomBar(index, controller, episode),
+        _buildBottomBar(index, videoController, episode),
 
         // 顶部导航栏
         _buildTopBar(),
@@ -230,19 +201,19 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   /// 视频播放器
   Widget _buildVideoPlayer(
     int index,
-    VideoPlayerController? controller,
+    VideoPlayerController? videoController,
     EpisodeList episode,
   ) {
-    if (controller == null || !controller.value.isInitialized) {
+    if (videoController == null || !videoController.value.isInitialized) {
       return _buildLoadingPlaceholder();
     }
 
     return GestureDetector(
       onTap: () {
-        if (controller.value.isPlaying) {
-          controller.pause();
+        if (videoController.value.isPlaying) {
+          videoController.pause();
         } else {
-          controller.play();
+          videoController.play();
         }
         setState(() {});
       },
@@ -256,29 +227,31 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
                 key: Key('video-$index'),
                 onVisibilityChanged: (VisibilityInfo info) {
                   var visiblePercentage = info.visibleFraction * 100;
-                  if (visiblePercentage > 20 && logic.currentIndex == index) {
+                  if (visiblePercentage > 20 &&
+                      controller.currentIndex == index) {
                     _isPageVisible = true;
-                    controller.play();
+                    videoController.play();
                   } else {
                     _isPageVisible = false;
-                    controller.pause();
+                    videoController.pause();
                   }
                 },
                 child: SizedBox(
-                  width: controller.value.size.width,
-                  height: controller.value.size.height,
-                  child: VideoPlayer(controller),
+                  width: videoController.value.size.width,
+                  height: videoController.value.size.height,
+                  child: VideoPlayer(videoController),
                 ),
               ),
             ),
           ),
 
           // 缓冲指示器
-          if (controller.value.isBuffering)
-            CircularProgressIndicator(color: ColorEnum.mainColor),
+          if (videoController.value.isBuffering)
+            Image.asset('loading.gif'.icon, width: 120, height: 120),
 
           // 播放/暂停按钮
-          if (!controller.value.isPlaying && !controller.value.isBuffering)
+          if (!videoController.value.isPlaying &&
+              !videoController.value.isBuffering)
             Icon(Icons.play_circle_outline, color: Colors.white, size: 60.w),
         ],
       ),
@@ -287,9 +260,9 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
 
   /// 加载占位符
   Widget _buildLoadingPlaceholder() {
-    String bgImageUrl = logic.state.imageUrl.isNotEmpty
-        ? logic.state.imageUrl
-        : (logic.state.detailBean?.shortPlayInfo?.imageUrl ?? '');
+    String bgImageUrl = controller.state.imageUrl.isNotEmpty
+        ? controller.state.imageUrl
+        : (controller.state.detailBean?.shortPlayInfo?.imageUrl ?? '');
 
     return Stack(
       children: [
@@ -302,7 +275,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             errorBuilder: (context, error, stackTrace) =>
                 Container(color: Colors.black),
           ),
-        Center(child: CircularProgressIndicator(color: ColorEnum.mainColor)),
+        Center(child: Image.asset('loading.gif'.icon, width: 120, height: 120)),
       ],
     );
   }
@@ -310,7 +283,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   /// 底部信息栏
   Widget _buildBottomBar(
     int index,
-    VideoPlayerController? controller,
+    VideoPlayerController? videoController,
     EpisodeList episode,
   ) {
     return Positioned(
@@ -319,14 +292,14 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       right: 0,
       child: SafeArea(
         minimum: EdgeInsets.only(bottom: 16.h), // 只加你自己的 padding
-        child: _buildBottomContent(controller, episode),
+        child: _buildBottomContent(videoController, episode),
       ),
     );
   }
 
   /// 底部内容
   Widget _buildBottomContent(
-    VideoPlayerController? controller,
+    VideoPlayerController? videoController,
     EpisodeList episode,
   ) {
     return Container(
@@ -340,10 +313,11 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             children: [
               // 收藏按钮
               GestureDetector(
-                onTap: logic.toggleCollect,
+                onTap: controller.toggleCollect,
                 child: Container(
                   child: Image.asset(
-                    logic.state.detailBean?.shortPlayInfo?.isCollect == true
+                    controller.state.detailBean?.shortPlayInfo?.isCollect ==
+                            true
                         ? 'ely_collect.png'.icon
                         : 'ely_collect_cancle.png'.icon,
                     width: 36.w,
@@ -355,7 +329,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
           SizedBox(height: 50.h),
           // 标题
           Text(
-            logic.state.detailBean?.shortPlayInfo?.name ?? '',
+            controller.state.detailBean?.shortPlayInfo?.name ?? '',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -366,20 +340,20 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             ),
           ),
           // 进度条
-          if (controller != null && controller.value.isInitialized)
-            _buildProgressBar(controller),
+          if (videoController != null && videoController.value.isInitialized)
+            _buildProgressBar(videoController),
           SizedBox(height: 9.w),
           // 底部集数
-          _buildBottomControls(controller, episode),
+          _buildBottomControls(videoController, episode),
         ],
       ),
     );
   }
 
   /// 进度条
-  Widget _buildProgressBar(VideoPlayerController controller) {
-    final duration = controller.value.duration;
-    final position = controller.value.position;
+  Widget _buildProgressBar(VideoPlayerController videoController) {
+    final duration = videoController.value.duration;
+    final position = videoController.value.position;
     final progress = duration.inMilliseconds > 0
         ? position.inMilliseconds / duration.inMilliseconds
         : 0.0;
@@ -400,7 +374,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
               value: progress.clamp(0.0, 1.0),
               onChanged: (value) {
                 final seekPosition = duration * value;
-                controller.seekTo(seekPosition);
+                videoController.seekTo(seekPosition);
                 setState(() {});
               },
             ),
@@ -412,7 +386,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
 
   /// 底部控制条
   Widget _buildBottomControls(
-    VideoPlayerController? controller,
+    VideoPlayerController? videoController,
     EpisodeList episode,
   ) {
     return Column(
@@ -434,7 +408,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             child: Row(
               children: [
                 Text(
-                  'Ep.${logic.currentIndex + 1}/Ep.${logic.state.episodeList.length}',
+                  'Ep.${controller.currentIndex + 1}/Ep.${controller.state.episodeList.length}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -470,7 +444,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             ),
             SizedBox(width: 6.w),
             Text(
-              'Ep.${logic.currentIndex + 1}',
+              'Ep.${controller.currentIndex + 1}',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -489,13 +463,13 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   void _showEpisodeSelector() {
     Get.bottomSheet(
       SelectEpisodePage(
-        totalEpisodes: logic.state.episodeList.length,
-        initialEpisode: logic.currentIndex + 1,
-        shortPlayInfo: logic.state.detailBean?.shortPlayInfo,
-        episodeList: logic.state.episodeList,
+        totalEpisodes: controller.state.episodeList.length,
+        initialEpisode: controller.currentIndex + 1,
+        shortPlayInfo: controller.state.detailBean?.shortPlayInfo,
+        episodeList: controller.state.episodeList,
         onEpisodeSelected: (episode) {
           Get.back();
-          logic.onEpisodeChanged(episode - 1, isToggle: true);
+          controller.onEpisodeChanged(episode - 1, isToggle: true);
         },
       ),
       isScrollControlled: true,
