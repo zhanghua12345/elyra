@@ -139,51 +139,74 @@ class _AboutPageState extends State<AboutPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: 40.h),
-          Image.asset('el_logo.png'.icon, width: 100.w, height: 100.h),
-          SizedBox(height: 20.h),
+          Image.asset('el_logo.png'.icon, width: 84.w, height: 84.w),
+          SizedBox(height: 13.h),
           Text(
             'ElyraTV',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+              height: 1,
             ),
           ),
           SizedBox(height: 6.h),
           Text(
             'Version 1.0.1',
-            style: TextStyle(color: Colors.white, fontSize: 16.sp),
+            style: TextStyle(
+              color: const Color(0xFF999999) /* 9灰 */,
+              fontSize: 12,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w400,
+              height: 1.25,
+            ),
           ),
-          SizedBox(height: 40.h),
-          _buildListTile('Privacy Policy', () {
-            // Navigate to Privacy Policy page
-          }),
-          _buildListTile('User Agreement', () {
-            // Navigate to User Agreement page
-          }),
-          _buildListTile('Visit Website', () {
-            // Open website URL
-          }),
+          SizedBox(height: 20.h),
+          // 菜单列表
+          _buildMenuList(),
         ],
       ),
     );
   }
 
-  Widget _buildListTile(String title, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12.h),
-        child: Row(
-          children: [
-            Text(
-              title,
-              style: TextStyle(color: Colors.white, fontSize: 16.sp),
-            ),
-            Spacer(),
-            Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
-          ],
+  /// 菜单列表
+  Widget _buildMenuList() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        children: [
+          _buildMenuItem('Privacy Policy', 'feedback'),
+          _buildMenuItem('User Agreement', 'about'),
+          _buildMenuItem('Visit Website', 'setting'),
+        ],
+      ),
+    );
+  }
+
+  /// 菜单项
+  Widget _buildMenuItem(String title, String id) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: const Color(0x75777777), width: 0.5),
         ),
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0.w),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w700,
+            height: 0.83,
+          ),
+        ),
+        onTap: () {
+          // Get.toNamed('/$id');
+        },
       ),
     );
   }
