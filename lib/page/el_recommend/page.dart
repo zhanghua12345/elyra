@@ -14,6 +14,36 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+/// 自定义垂直方向扩展的Slider Overlay Shape
+class VerticalSliderOverlayShape extends SliderComponentShape {
+  final double verticalPadding;
+
+  const VerticalSliderOverlayShape({this.verticalPadding = 6.0});
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size(0, verticalPadding * 2);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
+  }) {
+    // 不绘制任何内容，只是扩展触摸区域
+  }
+}
+
 class RecommendPage extends StatefulWidget {
   const RecommendPage({super.key});
 
@@ -556,7 +586,7 @@ class _RecommendPageState extends State<RecommendPage>
     return Positioned(
       left: 0,
       right: 0, // 留出右侧收藏按钮的空间
-      bottom: 11.h,
+      bottom: 6.h,
       child: GestureDetector(
         // 阻止事件冒泡到视频播放器
         behavior: HitTestBehavior.opaque,
@@ -630,7 +660,7 @@ class _RecommendPageState extends State<RecommendPage>
                 ),
               ),
 
-              SizedBox(height: 12.w),
+              SizedBox(height: 6.w),
               // 进度条
               _buildProgressBar(index, videoCtrl, isInitialized),
             ],
@@ -673,9 +703,11 @@ class _RecommendPageState extends State<RecommendPage>
                 data: SliderThemeData(
                   trackHeight: 3.w,
                   thumbShape: SliderComponentShape.noThumb,
-                  overlayShape: SliderComponentShape.noOverlay,
+                  // 使用自定义的垂直扩展overlay shape
+                  overlayShape: VerticalSliderOverlayShape(verticalPadding: 6.h),
                   activeTrackColor: Color(0xFFDC23B1),
                   inactiveTrackColor: Colors.white.withOpacity(0.2),
+                  overlayColor: Colors.transparent,
                 ),
                 child: Slider(
                   value: progress.clamp(0.0, 1.0),
