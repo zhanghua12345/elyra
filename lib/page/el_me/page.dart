@@ -286,6 +286,11 @@ class _MePageState extends State<MePage> {
             'Feedback',
             'feedback',
           ),
+           _buildMenuItem(
+            'assets/ely_my_language.png',
+            'Language',
+            'language',
+          ),
           _buildMenuItem(
             'assets/ely_my_about.png',
             'About',

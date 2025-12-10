@@ -134,10 +134,49 @@ class _LanguagePageState extends State<LanguagePage> {
 
   Widget _buildContentArea() {
     return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 20.h),
+          // Account Deletion
+          _buildListTile('English', () {
+            // Implement Account Deletion functionality here
+            // Get.to(() => AccountDeletionPage());
+          }),
+          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        margin: EdgeInsets.symmetric(horizontal: 16.h),
+        decoration: ShapeDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'PingFang SC',
+                fontWeight: FontWeight.w600,
+                height: 1.50,
+              ),
+            ),
+            Image.asset('ely_language_select.png'.icon, width: 18.w, ),
+          ],
         ),
       ),
     );

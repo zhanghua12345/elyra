@@ -134,10 +134,86 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildContentArea() {
     return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 20.h),
+          // Account Deletion
+          _buildListTile('Account Deletion', () {
+            // Implement Account Deletion functionality here
+            // Get.to(() => AccountDeletionPage());
+          }),
+          SizedBox(height: 12.h),
+          // Log out button
+          _buildLogOutButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        margin: EdgeInsets.symmetric(horizontal: 16.h),
+        decoration: ShapeDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'PingFang SC',
+                fontWeight: FontWeight.w600,
+                height: 1.50,
+              ),
+            ),
+            Image.asset('ely_right.png'.icon, width: 10.w, height: 10.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogOutButton() {
+    return GestureDetector(
+      onTap: () {
+        // Implement logout functionality here
+        // controller.logOut();
+      },
+      child: Container(
+        height: 48.h,
+        margin: EdgeInsets.only(left: 16.w, right: 16.w),
+        decoration: ShapeDecoration(
+          gradient: LinearGradient(
+            begin: Alignment(-.8, 0.5),
+            end: Alignment(1, 0),
+            colors: [const Color(0xFFE424AD), const Color(0xFF6018E6)],
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(34),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            'Log out',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+              height: 1.17,
+            ),
+          ),
         ),
       ),
     );
