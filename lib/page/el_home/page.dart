@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage>
                         
                         // 历史记录组件 - 距离底部10.h,居中
                         Positioned(
-                          bottom: 10.h,
+                          bottom: 12.h,
                           left: 0,
                           right: 0,
                           child: Center(
