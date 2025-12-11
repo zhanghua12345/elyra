@@ -1,10 +1,10 @@
+import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/page/el_home/sub_page/search/state.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
-import 'package:elyra/bean/hot_search_bean.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:elyra/utils/el_store.dart';
 
@@ -111,14 +111,14 @@ class SearchPageController extends GetxController {
       );
       
       if (response.success && response.data != null) {
-        List<HotSearchBean> hotList = [];
+        List<ShortVideoBean> hotList = [];
         if (response.data is List) {
           hotList = (response.data as List)
-              .map((item) => HotSearchBean.fromJson(item as Map<String, dynamic>))
+              .map((item) => ShortVideoBean.fromJson(item as Map<String, dynamic>))
               .toList();
         } else if (response.data is Map<String, dynamic> && response.data['list'] != null) {
           hotList = (response.data['list'] as List)
-              .map((item) => HotSearchBean.fromJson(item as Map<String, dynamic>))
+              .map((item) => ShortVideoBean.fromJson(item as Map<String, dynamic>))
               .toList();
         }
         state.hotSearchList = hotList;

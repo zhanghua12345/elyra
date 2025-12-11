@@ -2,6 +2,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/popular/controller.dart';
+import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -150,12 +151,13 @@ class _PopularPageState extends State<PopularPage> {
   /// Banner 卡片单个 item
   Widget _buildBannerCard(ShortVideoBean item) {
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10.w),
         child: Stack(
@@ -210,7 +212,11 @@ class _PopularPageState extends State<PopularPage> {
                       ),
                     ),
                     SizedBox(width: 8.w), // 文本与箭头之间的间距
-                    Image.asset('ely_right.png'.icon, width: 16.w, height: 16.h),
+                    Image.asset(
+                      'ely_right.png'.icon,
+                      width: 16.w,
+                      height: 16.h,
+                    ),
                   ],
                 ),
               ),
@@ -283,12 +289,13 @@ class _PopularPageState extends State<PopularPage> {
   /// Popular 单个 item 卡片
   Widget _buildPopularCard(ShortVideoBean item) {
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Container(
         margin: EdgeInsets.only(right: 10.w), // item 之间的间距
         child: Stack(
@@ -398,12 +405,13 @@ class _PopularPageState extends State<PopularPage> {
   /// - 标题两行居中显示
   Widget _buildTrendingLargeCard(ShortVideoBean item, String number) {
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32.r), // 圆角 32
         child: SizedBox(
@@ -497,12 +505,13 @@ class _PopularPageState extends State<PopularPage> {
   /// - 右下角：数字（如 "02", "03"）
   Widget _buildTrendingSmallCard(ShortVideoBean item, String number) {
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Container(
         height: 108.h, // 卡片高度
         decoration: BoxDecoration(
@@ -649,12 +658,13 @@ class _PopularPageState extends State<PopularPage> {
     if (isSmall) {
       // 小卡片，只显示横图
       return GestureDetector(
-        onTap: () {
-          Get.toNamed('/play_detail', arguments: {
+        onTap: () => JumpService.toDetail(
+          video: {
             'shortPlayId': item.shortPlayId,
+            'videoId': item.shortPlayVideoId ?? 0,
             'imageUrl': item.imageUrl ?? '',
-          });
-        },
+          },
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(32.r),
           child: Image.network(
@@ -679,12 +689,13 @@ class _PopularPageState extends State<PopularPage> {
       );
     }
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Container(
         width: width, // 卡片宽度（动态计算）
         height: height, // 卡片高度（131 或 266）

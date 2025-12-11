@@ -32,6 +32,7 @@ class ShortVideoBean {
     String? description,
     num? process,
     num? shortId,
+    num? shortPlayVideoId,
     String? name,
     num? shortPlayId,
     String? imageUrl,
@@ -53,6 +54,7 @@ class ShortVideoBean {
     _description = description;
     _process = process;
     _shortId = shortId;
+    _shortPlayVideoId = shortPlayVideoId;
     _shortPlayId = shortPlayId;
     _name = name;
     _imageUrl = imageUrl;
@@ -75,7 +77,7 @@ class ShortVideoBean {
     _id = json['id'];
     _shortId = json['short_id'];
     _shortPlayId = json['short_play_id'];
-
+    _shortPlayVideoId = json['short_play_video_id'];
     _imageUrl = json['image_url'];
     _horizontallyImg = json['horizontally_img'];
     _buyType = json['buy_type'];
@@ -122,6 +124,7 @@ class ShortVideoBean {
   num? _buyType;
   String? _tagType;
   num? _shortId;
+  num? _shortPlayVideoId;
   num? _shortPlayId;
   String? _name;
   num? _allCoins;
@@ -139,6 +142,7 @@ class ShortVideoBean {
   ShortVideoBean copyWith({
     num? id,
     num? shortId,
+    num? shortPlayVideoId,
     num? shortPlayId,
     String? name,
     String? description,
@@ -160,6 +164,7 @@ class ShortVideoBean {
   }) => ShortVideoBean(
     id: id ?? _id,
     shortId: shortId ?? _shortId,
+    shortPlayVideoId: shortPlayVideoId ?? _shortPlayVideoId,
     shortPlayId: shortPlayId ?? _shortPlayId,
     name: name ?? _name,
     description: description ?? _description,
@@ -183,6 +188,8 @@ class ShortVideoBean {
   num? get id => _id;
 
   num? get shortId => _shortId;
+  
+  num? get shortPlayVideoId => _shortPlayVideoId;
 
   num? get shortPlayId => _shortPlayId;
 
@@ -224,6 +231,7 @@ class ShortVideoBean {
 
   set id(num? value) => _id = value;
   set shortId(num? value) => _shortId = value;
+  set shortPlayVideoId(num? value) => _shortPlayVideoId = value;
   set shortPlayId(num? value) => _shortPlayId = value;
   set name(String? value) => _name = value;
   set description(String? value) => _description = value;
@@ -248,6 +256,7 @@ class ShortVideoBean {
     final map = <String, dynamic>{};
     map['id'] = _id;
     map['short_id'] = _shortId;
+    map['short_play_video_id'] = _shortPlayVideoId;
     map['short_play_id'] = _shortPlayId;
     map['name'] = _name;
     map['description'] = _description;

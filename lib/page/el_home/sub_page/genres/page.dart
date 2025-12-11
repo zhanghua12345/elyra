@@ -2,6 +2,7 @@ import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/genres/controller.dart';
 import 'package:elyra/page/el_home/sub_page/genres/state.dart';
+import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -160,14 +161,15 @@ class _GenresPageState extends State<GenresPage> {
         child: Icon(Icons.error, color: Colors.white54),
       );
     }
-    
+
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': video.shortPlayId,
+          'videoId': video.shortPlayVideoId ?? 0,
           'imageUrl': video.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Container(
         width: 84.w,
         height: 112.h,

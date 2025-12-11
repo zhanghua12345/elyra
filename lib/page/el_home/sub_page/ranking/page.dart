@@ -1,6 +1,7 @@
 import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/ranking/controller.dart';
+import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -117,12 +118,13 @@ class _RankingPageState extends State<RankingPage> {
     final borderRadius = isLarge ? 25.r : 20.r;
 
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -134,7 +136,11 @@ class _RankingPageState extends State<RankingPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF6018E6), Color(0xFFFFFFFF), Color(0xFFDC23B1)],
+                colors: [
+                  Color(0xFF6018E6),
+                  Color(0xFFFFFFFF),
+                  Color(0xFFDC23B1),
+                ],
               ),
             ),
             padding: EdgeInsets.all(3.w),
@@ -217,12 +223,13 @@ class _RankingPageState extends State<RankingPage> {
 
   Widget _buildRankingItem(ShortVideoBean item, int rank, bool isFirst) {
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/play_detail', arguments: {
+      onTap: () => JumpService.toDetail(
+        video: {
           'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
           'imageUrl': item.imageUrl ?? '',
-        });
-      },
+        },
+      ),
       child: Container(
         padding: EdgeInsets.only(
           left: 12.w,
