@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/bean/short_video_bean.dart';
+import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/page/el_home/controller.dart';
 import 'package:elyra/page/el_play/state.dart';
 import 'package:elyra/request/http.dart';
@@ -259,6 +260,9 @@ class PlayDetailController extends GetxController {
 
       spInfo.isCollect = !(spInfo.isCollect ?? false);
       update();
+      
+      // 通知收藏页面刷新数据
+      _refreshCollectPage();
     } catch (e) {
       debugPrint('收藏操作失败: $e');
     }
@@ -358,5 +362,19 @@ class PlayDetailController extends GetxController {
     state.activityId = Get.arguments['activityId'];
     state.imageUrl = Get.arguments['imageUrl'] ?? '';
     getVideoDetails();
+  }
+
+  /// 刷新收藏页面数据
+  void _refreshCollectPage() {
+    try {
+      // 尝试获取收藏页面的controller，如果存在则刷新数据
+      if (Get.isRegistered<CollectController>()) {
+        final collectController = Get.find<CollectController>();
+        collectController.onRefresh();
+      }
+    } catch (e) {
+      // 如果收藏页面未初始化，忽略错误
+      debugPrint('收藏页面未初始化: $e');
+    }
   }
 }

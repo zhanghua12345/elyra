@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/page/el_recommend/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
@@ -226,6 +227,10 @@ class RecommendPageController extends GetxController {
         state.curVideo.isCollect = true;
         state.curVideo.collectTotal = (state.curVideo.collectTotal ?? 0) + 1;
         update();
+        
+        // 通知收藏页面刷新数据
+        _refreshCollectPage();
+        
         return true;
       } else {
         return false;
@@ -260,6 +265,10 @@ class RecommendPageController extends GetxController {
         state.curVideo.isCollect = false;
         state.curVideo.collectTotal = (state.curVideo.collectTotal ?? 1) - 1;
         update();
+        
+        // 通知收藏页面刷新数据
+        _refreshCollectPage();
+        
         return true;
       } else {
         return false;
@@ -328,5 +337,19 @@ class RecommendPageController extends GetxController {
     );
 
     return result;
+  }
+
+  /// 刷新收藏页面数据
+  void _refreshCollectPage() {
+    try {
+      // 尝试获取收藏页面的controller，如果存在则刷新数据
+      if (Get.isRegistered<CollectController>()) {
+        final collectController = Get.find<CollectController>();
+        collectController.onRefresh();
+      }
+    } catch (e) {
+      // 如果收藏页面未初始化，忽略错误
+      debugPrint('收藏页面未初始化: $e');
+    }
   }
 }
