@@ -21,7 +21,7 @@ class CollectController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    getVampireData();
+    getCollectData();
   }
 
   @override
@@ -30,7 +30,7 @@ class CollectController extends GetxController {
     super.onClose();
   }
 
-  getVampireData({
+  getCollectData({
     RefreshController? refreshCtrl,
     bool loadMore = false,
   }) async {
@@ -52,7 +52,7 @@ class CollectController extends GetxController {
       };
 
       ApiResponse response = await HttpClient().request(
-        Apis.videoList, // 使用收藏列表接口
+        Apis.myCollections, // 使用收藏列表接口
         method: HttpMethod.get,
         queryParameters: params,
       );
@@ -128,12 +128,12 @@ class CollectController extends GetxController {
   }
 
   void onRefresh() {
-    getVampireData();
+    getCollectData();
   }
 
   void onLoadMore() {
     if (state.hasMore) {
-      getVampireData(loadMore: true);
+      getCollectData(loadMore: true);
     } else {
       refreshController.loadNoData(); // 没有更多数据
     }

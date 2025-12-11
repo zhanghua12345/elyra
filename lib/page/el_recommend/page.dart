@@ -515,7 +515,7 @@ class _RecommendPageState extends State<RecommendPage>
 
                   // 缓冲指示器
                   if (videoCtrl.value.isBuffering)
-                      Image.asset('loading.gif'.icon, width: 120, height: 120),
+                    Image.asset('loading.gif'.icon, width: 120, height: 120),
                 ],
               )
             : Stack(
@@ -609,9 +609,11 @@ class _RecommendPageState extends State<RecommendPage>
                     onTap: () async {
                       // 确保当前视频是这个
                       controller.state.curVideo = video;
-                      controller.state.curVideoId = video.id ?? -1;
-                      await controller.toggleCollect();
-                      setState(() {});
+                      controller.state.curVideoId = video.id ?? 0;
+                      final success = await controller.toggleCollect(context);
+                      if (success) {
+                        setState(() {});
+                      }
                     },
                     child: Container(
                       child: Image.asset(
@@ -644,7 +646,8 @@ class _RecommendPageState extends State<RecommendPage>
                       ),
                     ),
                     // 描述
-                    if (video.description != null && video.description!.isNotEmpty) ...[
+                    if (video.description != null &&
+                        video.description!.isNotEmpty) ...[
                       SizedBox(height: 5.h),
                       Text(
                         video.description!,
@@ -706,7 +709,9 @@ class _RecommendPageState extends State<RecommendPage>
                   trackHeight: 3.w,
                   thumbShape: SliderComponentShape.noThumb,
                   // 使用自定义的垂直扩展overlay shape
-                  overlayShape: VerticalSliderOverlayShape(verticalPadding: 6.h),
+                  overlayShape: VerticalSliderOverlayShape(
+                    verticalPadding: 6.h,
+                  ),
                   activeTrackColor: Color(0xFFDC23B1),
                   inactiveTrackColor: Colors.white.withOpacity(0.2),
                   overlayColor: Colors.transparent,

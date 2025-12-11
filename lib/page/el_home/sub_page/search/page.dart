@@ -211,9 +211,9 @@ class _SearchPageState extends State<SearchPage> {
                     moduleWidth: 304,
                     moduleHeight: 277,
                     titleOffset: 121,
-                    title: 'Delete Series',
+                    title: 'Clear historical search',
                     child: Text(
-                      'Confirm to \n delete series from My List',
+                      'Confirm clear search history',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
@@ -224,7 +224,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                     ),
                     cancelText: '',
-                    confirmText: 'Go',
+                    confirmText: 'Confirm',
                     onCancel: () {
                       Navigator.of(context).pop();
                     },

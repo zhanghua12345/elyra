@@ -1,6 +1,7 @@
 import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/search_result/controller.dart';
+import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -225,10 +226,13 @@ class _SearchResultPageState extends State<SearchResultPage> {
     double height,
   ) {
     return GestureDetector(
-      onTap: () {
-        // TODO: 导航到详情页
-        // Get.toNamed('/detail', arguments: {'id': item.shortPlayId});
-      },
+      onTap: () => JumpService.toDetail(
+        video: {
+          'shortPlayId': item.shortPlayId,
+          'videoId': item.shortPlayVideoId ?? 0,
+          'imageUrl': item.imageUrl ?? '',
+        },
+      ),
       child: Container(
         width: width, // 卡片宽度（动态计算）
         height: height, // 卡片高度（131 或 266）

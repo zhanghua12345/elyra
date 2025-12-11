@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:elyra/bean/short_video_bean.dart';
+import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_recommend/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/user_util.dart';
+import 'package:elyra/widgets/el_confirm_modal.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -144,7 +147,8 @@ class RecommendPageController extends GetxController {
           VideoPlayerController.networkUrl(
               Uri.parse(url),
               formatHint: VideoFormat.hls,
-              viewType: Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
+              viewType:
+                  Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
                   ? VideoViewType.platformView
                   : VideoViewType.textureView,
             )
@@ -160,7 +164,10 @@ class RecommendPageController extends GetxController {
                   ShortVideoBean video = state.recommendList[index + 1];
                   state.curVideoId = video.id ?? -1;
                   state.curVideo = video;
-                  setVideoUrl(video.videoInfo?.videoUrl ?? '', index: index + 1);
+                  setVideoUrl(
+                    video.videoInfo?.videoUrl ?? '',
+                    index: index + 1,
+                  );
                   update();
                 }
               }
@@ -177,7 +184,6 @@ class RecommendPageController extends GetxController {
     }
   }
 
-
   void onRefresh() {
     state.recommendList.clear();
     getRecommendData();
@@ -190,7 +196,7 @@ class RecommendPageController extends GetxController {
       refreshController.loadNoData(); // 没有更多数据
     }
   }
-  
+
   /// 收藏视频
   Future<bool> collectVideo() async {
     try {
@@ -198,23 +204,23 @@ class RecommendPageController extends GetxController {
       if (state.curVideo.shortPlayId == null) {
         return false;
       }
-      
+
       // 构造请求参数
       Map<String, dynamic> params = {
         'short_play_id': state.curVideo.shortPlayId,
       };
-      
+
       // 如果视频信息存在，添加 video_id
       if (state.curVideo.videoInfo?.id != null) {
         params['video_id'] = state.curVideo.videoInfo?.id;
       }
-      
+
       ApiResponse response = await HttpClient().request(
         Apis.collect,
         method: HttpMethod.post,
         data: params,
       );
-      
+
       if (response.success) {
         // 更新本地状态
         state.curVideo.isCollect = true;
@@ -229,7 +235,7 @@ class RecommendPageController extends GetxController {
       return false;
     }
   }
-  
+
   /// 取消收藏视频
   Future<bool> cancelCollectVideo() async {
     try {
@@ -237,18 +243,18 @@ class RecommendPageController extends GetxController {
       if (state.curVideo.shortPlayId == null) {
         return false;
       }
-      
+
       // 构造请求参数
       Map<String, dynamic> params = {
         'short_play_id': state.curVideo.shortPlayId,
       };
-      
+
       ApiResponse response = await HttpClient().request(
         Apis.cancelCollect,
         method: HttpMethod.post,
         data: params,
       );
-      
+
       if (response.success) {
         // 更新本地状态
         state.curVideo.isCollect = false;
@@ -263,18 +269,64 @@ class RecommendPageController extends GetxController {
       return false;
     }
   }
-  
-  /// 切换收藏状态
-  Future<void> toggleCollect() async {
-    bool success = false;
-    if (state.curVideo.isCollect == true) {
-      success = await cancelCollectVideo();
-    } else {
-      success = await collectVideo();
+
+  /// 切换收藏状态，返回是否成功
+  Future<bool> toggleCollect(BuildContext context) async {
+    final video = state.curVideo;
+
+    // 未收藏 → 直接收藏
+    if (video.isCollect != true) {
+      final success = await collectVideo();
+      if (success) {
+        state.curVideo.isCollect = true;
+        update();
+      }
+      return success;
     }
-    
-    if (success) {
-      // 更新成功后的回调可以在UI层处理
-    }
+
+    // 已收藏 → 弹窗确认取消收藏
+    return await _showCancelCollectModal(context);
+  }
+
+  /// 弹出取消收藏确认弹窗，并在接口成功后更新状态
+  Future<bool> _showCancelCollectModal(BuildContext context) async {
+    final video = state.curVideo;
+    bool result = false;
+
+    await showElConfirmModal(
+      context,
+      image: AssetImage('el_model_cancel_collect.png'.icon),
+      title: 'Remove from Favorites?',
+      child: Text(
+        'This drama will be removed from\n your favorites.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontFamily: 'PingFang SC',
+          fontWeight: FontWeight.w400,
+          height: 1.50,
+          letterSpacing: -0.01,
+        ),
+      ),
+      cancelText: 'Cancel',
+      confirmText: 'Remove',
+      onCancel: () {
+        Navigator.of(context).pop();
+        result = false;
+      },
+      onConfirm: () async {
+        Navigator.of(context).pop();
+
+        final success = await cancelCollectVideo();
+        if (success) {
+          state.curVideo.isCollect = false;
+          update();
+        }
+        result = success;
+      },
+    );
+
+    return result;
   }
 }
