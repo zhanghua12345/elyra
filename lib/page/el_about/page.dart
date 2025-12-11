@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -178,7 +179,7 @@ class _AboutPageState extends State<AboutPage> {
         children: [
           _buildMenuItem('Privacy Policy', 'feedback'),
           _buildMenuItem('User Agreement', 'about'),
-          _buildMenuItem('Visit Website', 'setting'),
+          _buildMenuItem('Visit Website', 'website'),
         ],
       ),
     );
@@ -198,7 +199,7 @@ class _AboutPageState extends State<AboutPage> {
           title,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 12,
+            fontSize: 14,
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
             height: 0.83,
@@ -206,8 +207,22 @@ class _AboutPageState extends State<AboutPage> {
         ),
         onTap: () {
           // Get.toNamed('/$id');
+          if (id == 'website') {
+            openExternalUrl("https://www.csyib.com");
+          } else {
+            Get.toNamed('/web_view', arguments: {'url': '', 'title': title});
+          }
         },
       ),
     );
+  }
+
+  Future<void> openExternalUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw '无法打开链接: $url';
+    }
   }
 }

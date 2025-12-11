@@ -12,6 +12,7 @@ import 'package:elyra/page/el_home/sub_page/vampire/page.dart';
 import 'package:elyra/page/el_home/sub_page/search/page.dart';
 import 'package:elyra/page/el_home/sub_page/search_result/page.dart';
 import 'package:elyra/page/test/page.dart';
+import 'package:elyra/page/el_web_view/page.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -29,6 +30,7 @@ class AppRoutes {
   static const String setting = '/setting';
   static const String test = '/test';
   static const String playDetail = '/play_detail';
+  static const String webView = '/web_view';
 
   static final routes = [
     GetPage(name: splash, page: () => const SplashPage()),
@@ -45,5 +47,6 @@ class AppRoutes {
     GetPage(name: setting, page: () => const SettingPage()),
     GetPage(name: test, page: () => const TestPage()),
     GetPage(name: playDetail, page: () => const PlayDetailPage()),
+    GetPage(name: webView, page: () => const WebViewPage()),
   ];
 }
