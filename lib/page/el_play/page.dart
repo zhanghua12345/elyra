@@ -461,26 +461,27 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       right: 0,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            // 返回按钮
-            GestureDetector(
-              onTap: () => Get.back(),
-              child: Image.asset('ely_back.png'.icon, width: 20.w),
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              'Ep.${controller.currentIndex + 1}',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontFamily: 'PingFang SC',
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0,
+
+        child: GestureDetector(
+          onTap: () => Get.back(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // 返回按钮
+              Image.asset('ely_back.png'.icon, width: 20.w),
+              SizedBox(width: 6.w),
+              Text(
+                'Ep.${controller.currentIndex + 1}',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontFamily: 'PingFang SC',
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
