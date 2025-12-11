@@ -201,36 +201,26 @@ class RecommendPageController extends GetxController {
   /// 收藏视频
   Future<bool> collectVideo() async {
     try {
-      // 检查当前视频是否存在
       if (state.curVideo.shortPlayId == null) {
         return false;
       }
-
-      // 构造请求参数
       Map<String, dynamic> params = {
         'short_play_id': state.curVideo.shortPlayId,
       };
-
-      // 如果视频信息存在，添加 video_id
       if (state.curVideo.videoInfo?.id != null) {
         params['video_id'] = state.curVideo.videoInfo?.id;
       }
-
       ApiResponse response = await HttpClient().request(
         Apis.collect,
         method: HttpMethod.post,
         data: params,
       );
-
       if (response.success) {
         // 更新本地状态
         state.curVideo.isCollect = true;
         state.curVideo.collectTotal = (state.curVideo.collectTotal ?? 0) + 1;
         update();
-        
-        // 通知收藏页面刷新数据
         _refreshCollectPage();
-        
         return true;
       } else {
         return false;
@@ -244,31 +234,22 @@ class RecommendPageController extends GetxController {
   /// 取消收藏视频
   Future<bool> cancelCollectVideo() async {
     try {
-      // 检查当前视频是否存在
       if (state.curVideo.shortPlayId == null) {
         return false;
       }
-
-      // 构造请求参数
       Map<String, dynamic> params = {
         'short_play_id': state.curVideo.shortPlayId,
       };
-
       ApiResponse response = await HttpClient().request(
         Apis.cancelCollect,
         method: HttpMethod.post,
         data: params,
       );
-
       if (response.success) {
-        // 更新本地状态
         state.curVideo.isCollect = false;
         state.curVideo.collectTotal = (state.curVideo.collectTotal ?? 1) - 1;
         update();
-        
-        // 通知收藏页面刷新数据
         _refreshCollectPage();
-        
         return true;
       } else {
         return false;

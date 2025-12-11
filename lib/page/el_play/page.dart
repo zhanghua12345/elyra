@@ -302,7 +302,13 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             children: [
               // 收藏按钮
               GestureDetector(
-                onTap: controller.toggleCollect,
+                onTap: () async {
+                  // 确保当前视频是这个
+                  final success = await controller.toggleCollect(context);
+                  if (success) {
+                    setState(() {});
+                  }
+                },
                 child: Container(
                   child: Image.asset(
                     controller.state.detailBean?.shortPlayInfo?.isCollect ==
@@ -317,43 +323,49 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
           ),
           SizedBox(height: 50.h),
           // 标题
-              SizedBox(
-                width: 273.w,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      controller.state.detailBean?.shortPlayInfo?.name ?? '',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 5.h),
-                    // 描述
-                    if (controller.state.detailBean?.shortPlayInfo?.description?.isNotEmpty == true) ...[
-                      Text(
-                        controller.state.detailBean!.shortPlayInfo!.description!,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.80),
-                          fontSize: 12,
-                          fontFamily: 'PingFang SC',
-                          fontWeight: FontWeight.w400,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 5.h),
-                    ],
-                  ],
+          SizedBox(
+            width: 273.w,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  controller.state.detailBean?.shortPlayInfo?.name ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: 'PingFang SC',
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-          
+                SizedBox(height: 5.h),
+                // 描述
+                if (controller
+                        .state
+                        .detailBean
+                        ?.shortPlayInfo
+                        ?.description
+                        ?.isNotEmpty ==
+                    true) ...[
+                  Text(
+                    controller.state.detailBean!.shortPlayInfo!.description!,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.80),
+                      fontSize: 12,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5.h),
+                ],
+              ],
+            ),
+          ),
+
           // 进度条
           if (videoController != null && videoController.value.isInitialized)
             _buildProgressBar(videoController),

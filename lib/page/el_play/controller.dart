@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/bean/short_video_bean.dart';
+import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/page/el_home/controller.dart';
 import 'package:elyra/page/el_play/state.dart';
@@ -11,13 +12,14 @@ import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_confirm_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 class PlayDetailController extends GetxController {
   final state = PlayDetailState();
-  
+
   late final PageController pageController;
   List<VideoPlayerController?> controllers = [];
   int currentIndex = 0;
@@ -35,7 +37,7 @@ class PlayDetailController extends GetxController {
     state.videoId = Get.arguments['videoId'] ?? 0;
     state.activityId = Get.arguments['activityId'];
     state.imageUrl = Get.arguments['imageUrl'] ?? '';
-    
+
     getVideoDetails();
   }
 
@@ -62,7 +64,7 @@ class PlayDetailController extends GetxController {
         'short_play_id': state.shortPlayId,
         "video_id": state.videoId,
       };
-      
+
       if (state.activityId != null) {
         params['activity_id'] = state.activityId;
       }
@@ -74,35 +76,35 @@ class PlayDetailController extends GetxController {
       );
 
       if (res.success) {
-        state.loadStatus  = LoadStatusType.loadSuccess;
+        state.loadStatus = LoadStatusType.loadSuccess;
         state.detailBean = ShortPlayDetailBean.fromJson(res.data);
-        
+
         if (state.videoId <= 0) {
           state.videoId = state.detailBean?.videoInfo?.id ?? 0;
         }
-        
+
         state.episodeList = state.detailBean?.episodeList ?? [];
         currentIndex = (state.detailBean?.videoInfo?.episode ?? 1) - 1;
         state.currentEpisode = currentIndex;
-        
+
         // 初始化视频控制器列表
         controllers = List<VideoPlayerController?>.filled(
           state.episodeList.length,
           null,
           growable: true,
         );
-        
+
         // 初始化当前视频
         await _initializeController(currentIndex);
         _preloadAdjacentVideos();
-        
+
         update();
       } else {
-        state.loadStatus  = LoadStatusType.loadFailed;
+        state.loadStatus = LoadStatusType.loadFailed;
         update();
       }
     } catch (e) {
-      state.loadStatus  = LoadStatusType.loadFailed;
+      state.loadStatus = LoadStatusType.loadFailed;
       update();
       debugPrint('获取视频详情失败: $e');
     }
@@ -116,8 +118,8 @@ class PlayDetailController extends GetxController {
     final episode = state.episodeList[index];
     if (episode.videoUrl == null || episode.videoUrl!.isEmpty) return;
 
-    VideoPlayerController controller = Platform.isAndroid &&
-            DeviceInfoUtils().osVersion == '10'
+    VideoPlayerController controller =
+        Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
         ? VideoPlayerController.networkUrl(
             Uri.parse(episode.videoUrl!),
             formatHint: VideoFormat.hls,
@@ -133,7 +135,7 @@ class PlayDetailController extends GetxController {
     try {
       await controller.initialize();
       controller.setPlaybackSpeed(state.curSpeed);
-      
+
       // 如果有历史播放记录，跳转到指定位置
       if (episode.playSeconds != null && episode.playSeconds!.isNotEmpty) {
         try {
@@ -145,13 +147,13 @@ class PlayDetailController extends GetxController {
           debugPrint('解析播放进度失败: $e');
         }
       }
-      
+
       // 添加监听器
       controller.addListener(() {
         if (currentIndex == index && !isClosed) {
           update();
         }
-        
+
         // 视频播放完成，自动播放下一集
         if (controller.value.isCompleted && !controller.value.isBuffering) {
           _playNextEpisode();
@@ -162,7 +164,7 @@ class PlayDetailController extends GetxController {
       if (index == currentIndex) {
         controller.play();
       }
-      
+
       update();
     } catch (e) {
       debugPrint('视频初始化失败: $e');
@@ -224,10 +226,10 @@ class PlayDetailController extends GetxController {
 
     // 预加载相邻视频
     _preloadAdjacentVideos();
-    
+
     // 创建历史记录
     createHistory();
-    
+
     // 更新首页历史记录
     updateHomeVideo();
 
@@ -241,57 +243,30 @@ class PlayDetailController extends GetxController {
     }
   }
 
-  /// 收藏/取消收藏视频
-  Future<void> toggleCollect() async {
-    ShortPlayInfo? spInfo = state.detailBean?.shortPlayInfo;
-    if (spInfo == null) return;
-
-    try {
-      Map<String, dynamic> params = {
-        "short_play_id": spInfo.shortPlayId,
-        "video_id": state.episodeList[currentIndex].id
-      };
-
-      if (spInfo.isCollect ?? false) {
-        await HttpClient().request(Apis.cancelCollectVideo, data: params);
-      } else {
-        await HttpClient().request(Apis.collectVideo, data: params);
-      }
-
-      spInfo.isCollect = !(spInfo.isCollect ?? false);
-      update();
-      
-      // 通知收藏页面刷新数据
-      _refreshCollectPage();
-    } catch (e) {
-      debugPrint('收藏操作失败: $e');
-    }
-  }
-
   /// 创建历史记录
   void createHistory() {
     if (currentIndex < 0 || currentIndex >= state.episodeList.length) return;
-    
+
     Map<String, dynamic> params = {
       "short_play_id": state.shortPlayId,
-      "video_id": state.episodeList[currentIndex].id
+      "video_id": state.episodeList[currentIndex].id,
     };
-    
+
     HttpClient().request(Apis.createHistory, data: params);
   }
 
   /// 上传播放进度
   void uploadHistorySeconds(int playSeconds) {
     if (currentIndex < 0 || currentIndex >= state.episodeList.length) return;
-    
+
     Map<String, dynamic> params = {
       "short_play_id": state.shortPlayId,
       "video_id": state.episodeList[currentIndex].id,
       "play_seconds": playSeconds > 0 ? playSeconds : 0,
     };
-    
+
     HttpClient().request(Apis.uploadHistorySeconds, data: params);
-    
+
     // 同时保存到本地
     _saveToLocalHistory(playSeconds);
   }
@@ -308,7 +283,7 @@ class PlayDetailController extends GetxController {
         'play_seconds': playSeconds,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
       };
-      
+
       SpUtils().setString(ElStoreKeys.videoHistory, jsonEncode(historyData));
     } catch (e) {
       debugPrint('保存本地历史记录失败: $e');
@@ -319,13 +294,13 @@ class PlayDetailController extends GetxController {
   void reportActivity() {
     if (state.activityId == null) return;
     if (currentIndex < 0 || currentIndex >= state.episodeList.length) return;
-    
+
     Map<String, dynamic> params = {
       'short_play_id': state.shortPlayId,
       "short_play_video_id": state.episodeList[currentIndex].shortPlayVideoId,
       "activity_id": state.activityId,
     };
-    
+
     HttpClient().request(Apis.reportActivity, data: params);
   }
 
@@ -334,14 +309,14 @@ class PlayDetailController extends GetxController {
     try {
       final homeLogic = Get.put(HomeController());
       int playTime = controllers[currentIndex]?.value.position.inSeconds ?? 0;
-      
+
       homeLogic.state.curVideo = ShortVideoBean()
         ..shortPlayId = state.shortPlayId
         ..imageUrl = state.detailBean?.shortPlayInfo?.imageUrl
         ..name = state.detailBean?.shortPlayInfo?.name
         ..playTime = playTime
         ..process = currentIndex + 1;
-      
+
       homeLogic.update();
     } catch (e) {
       debugPrint('更新首页历史失败: $e');
@@ -355,13 +330,155 @@ class PlayDetailController extends GetxController {
     update();
   }
 
-
   void onRefresh() {
     state.shortPlayId = Get.arguments['shortPlayId'] ?? -1;
     state.videoId = Get.arguments['videoId'] ?? 0;
     state.activityId = Get.arguments['activityId'];
     state.imageUrl = Get.arguments['imageUrl'] ?? '';
     getVideoDetails();
+  }
+
+  /// 收藏视频
+  Future<bool> collectVideo() async {
+    ShortPlayInfo? spInfo = state.detailBean?.shortPlayInfo;
+
+    try {
+      if (spInfo?.shortPlayId == null) {
+        return false;
+      }
+      
+      // 使用当前集的video_id
+      if (currentIndex < 0 || currentIndex >= state.episodeList.length) {
+        return false;
+      }
+      
+      Map<String, dynamic> params = {
+        'short_play_id': spInfo?.shortPlayId,
+        'video_id': state.episodeList[currentIndex].id,  // 使用当前集的id
+      };
+      
+      ApiResponse response = await HttpClient().request(
+        Apis.collect,
+        method: HttpMethod.post,
+        data: params,
+      );
+      
+      if (response.success) {
+        // 更新本地状态
+        spInfo?.isCollect = true;
+        spInfo?.collectTotal = (spInfo.collectTotal ?? 0) + 1;
+        update();
+        _refreshCollectPage();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('收藏视频异常: $e');
+      return false;
+    }
+  }
+
+  /// 取消收藏视频
+  Future<bool> cancelCollectVideo() async {
+    ShortPlayInfo? spInfo = state.detailBean?.shortPlayInfo;
+    try {
+      if (spInfo?.shortPlayId == null) {
+        return false;
+      }
+      
+      // 使用当前集的video_id
+      if (currentIndex < 0 || currentIndex >= state.episodeList.length) {
+        return false;
+      }
+      
+      Map<String, dynamic> params = {
+        'short_play_id': spInfo?.shortPlayId,
+        'video_id': state.episodeList[currentIndex].id,  // 使用当前集的id
+      };
+      
+      ApiResponse response = await HttpClient().request(
+        Apis.cancelCollect,
+        method: HttpMethod.post,
+        data: params,
+      );
+      
+      if (response.success) {
+        spInfo?.isCollect = false;
+        spInfo?.collectTotal = (spInfo.collectTotal ?? 1) - 1;
+        update();
+        _refreshCollectPage();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('取消收藏视频异常: $e');
+      return false;
+    }
+  }
+
+  /// 切换收藏状态，返回是否成功
+  Future<bool> toggleCollect(BuildContext context) async {
+    ShortPlayInfo? spInfo = state.detailBean?.shortPlayInfo;
+
+    if (spInfo == null) return false;
+
+    // 未收藏 → 直接收藏
+    if (spInfo.isCollect != true) {
+      final success = await collectVideo();
+      if (success) {
+        spInfo.isCollect = true;
+        update();
+      }
+      return success;
+    }
+
+    // 已收藏 → 弹窗确认取消收藏
+    return await _showCancelCollectModal(context);
+  }
+
+  /// 弹出取消收藏确认弹窗，并在接口成功后更新状态
+  Future<bool> _showCancelCollectModal(BuildContext context) async {
+    ShortPlayInfo? spInfo = state.detailBean?.shortPlayInfo;
+
+    bool result = false;
+
+    await showElConfirmModal(
+      context,
+      image: AssetImage('el_model_cancel_collect.png'.icon),
+      title: 'Remove from Favorites?',
+      child: Text(
+        'This drama will be removed from\n your favorites.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontFamily: 'PingFang SC',
+          fontWeight: FontWeight.w400,
+          height: 1.50,
+          letterSpacing: -0.01,
+        ),
+      ),
+      cancelText: 'Cancel',
+      confirmText: 'Remove',
+      onCancel: () {
+        Navigator.of(context).pop();
+        result = false;
+      },
+      onConfirm: () async {
+        Navigator.of(context).pop();
+
+        final success = await cancelCollectVideo();
+        if (success) {
+          spInfo?.isCollect = false;
+          update();
+        }
+        result = success;
+      },
+    );
+
+    return result;
   }
 
   /// 刷新收藏页面数据
