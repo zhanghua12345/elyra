@@ -177,16 +177,16 @@ class _AboutPageState extends State<AboutPage> {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         children: [
-          _buildMenuItem('Privacy Policy', 'feedback'),
-          _buildMenuItem('User Agreement', 'about'),
-          _buildMenuItem('Visit Website', 'website'),
+          _buildMenuItem('private','Privacy Policy', 'https://www.csyib.com/private'),
+          _buildMenuItem( 'agreement','User Agreement','https://www.csyib.com//user_policy'),
+          _buildMenuItem('website','Visit Website', 'https://www.csyib.com'),
         ],
       ),
     );
   }
 
   /// 菜单项
-  Widget _buildMenuItem(String title, String id) {
+  Widget _buildMenuItem(String id,String title,  String url) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -208,9 +208,9 @@ class _AboutPageState extends State<AboutPage> {
         onTap: () {
           // Get.toNamed('/$id');
           if (id == 'website') {
-            openExternalUrl("https://www.csyib.com");
+            openExternalUrl(url);
           } else {
-            Get.toNamed('/web_view', arguments: {'url': '', 'title': title});
+            Get.toNamed('/web_view', arguments: {'title': title,'url': url, });
           }
         },
       ),
