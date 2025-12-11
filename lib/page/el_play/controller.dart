@@ -20,7 +20,7 @@ import 'package:video_player/video_player.dart';
 class PlayDetailController extends GetxController {
   final state = PlayDetailState();
 
-  late final PageController pageController;
+  late PageController pageController;
   List<VideoPlayerController?> controllers = [];
   int currentIndex = 0;
 
@@ -102,9 +102,11 @@ class PlayDetailController extends GetxController {
         
         // 重新初始化PageController为正确的集数
         if (pageController.hasClients) {
+          pageController.jumpToPage(currentIndex);
+        } else {
           pageController.dispose();
+          pageController = PageController(initialPage: currentIndex);
         }
-        pageController = PageController(initialPage: currentIndex);
 
         // 初始化视频控制器列表
         controllers = List<VideoPlayerController?>.filled(
