@@ -6,6 +6,7 @@ import 'package:elyra/page/el_recommend/controller.dart';
 import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_color.dart';
+import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -565,6 +566,14 @@ class _RecommendPageState extends State<RecommendPage>
     //     videoCtrl?.play();
     //   }
     // });
+
+    JumpService.toDetail(
+      video: {
+        'shortPlayId': video.shortPlayId,
+        'videoId': video.shortPlayVideoId ?? 0,
+        'imageUrl': video.imageUrl ?? '',
+      },
+    );
 
     print('跳转到详情页: ${video.name}');
     // 临时处理：延迟后恢复播放
