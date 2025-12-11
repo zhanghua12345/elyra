@@ -42,6 +42,7 @@ class ShortVideoBean {
     num? searchClickTotal,
     num? collectTotal,
     num? episodeTotal,
+    num? currentEpisode,
     bool? isCollect,
     List<Category>? categoryList,
     String? videoUrl,
@@ -61,6 +62,7 @@ class ShortVideoBean {
     _horizontallyImg = horizontallyImg;
     _watchTotal = watchTotal;
     _episodeTotal = episodeTotal;
+    _currentEpisode = currentEpisode;
     _collectTotal = collectTotal;
     _videoUrl = videoUrl;
     _isCollect = isCollect;
@@ -106,6 +108,7 @@ class ShortVideoBean {
     }
     _watchTotal = json['watch_total'];
     _episodeTotal = json['episode_total'];
+    _currentEpisode = json['current_episode'];
     _searchClickTotal = json['search_click_total'];
     if (json['categoryList'] != null) {
       _categoryList = [];
@@ -135,6 +138,7 @@ class ShortVideoBean {
   num? _collectTotal;
   num? _watchTotal;
   num? _episodeTotal;
+  num? _currentEpisode;
   num? _searchClickTotal;
   String? _videoUrl;
   int? _playTime; // 播放时间(秒)
@@ -155,6 +159,7 @@ class ShortVideoBean {
     num? collectTotal,
     num? watchTotal,
     num? episodeTotal,
+    num? currentEpisode,
     num? searchClickTotal,
     String? videoUrl,
     List<String>? category,
@@ -177,6 +182,7 @@ class ShortVideoBean {
     collectTotal: collectTotal ?? _collectTotal,
     watchTotal: watchTotal ?? _watchTotal,
     episodeTotal: episodeTotal ?? _episodeTotal,
+    currentEpisode: currentEpisode ?? _currentEpisode,
     searchClickTotal: searchClickTotal ?? _searchClickTotal,
     videoUrl: videoUrl ?? _videoUrl,
     category: category ?? _category,
@@ -188,7 +194,7 @@ class ShortVideoBean {
   num? get id => _id;
 
   num? get shortId => _shortId;
-  
+
   num? get shortPlayVideoId => _shortPlayVideoId;
 
   num? get shortPlayId => _shortPlayId;
@@ -214,6 +220,8 @@ class ShortVideoBean {
   num? get watchTotal => _watchTotal;
 
   num? get episodeTotal => _episodeTotal;
+
+  num? get currentEpisode => _currentEpisode;
 
   num? get searchClickTotal => _searchClickTotal;
 
@@ -244,6 +252,7 @@ class ShortVideoBean {
   set collectTotal(num? value) => _collectTotal = value;
   set watchTotal(num? value) => _watchTotal = value;
   set episodeTotal(num? value) => _episodeTotal = value;
+  set currentEpisode(num? value) => _currentEpisode = value;
   set searchClickTotal(num? value) => _searchClickTotal = value;
   set videoUrl(String? value) => _videoUrl = value;
   set playTime(int? value) => _playTime = value;
@@ -269,6 +278,7 @@ class ShortVideoBean {
     map['collect_total'] = _collectTotal;
     map['watch_total'] = _watchTotal;
     map['episode_total'] = _episodeTotal;
+    map['current_episode'] = _currentEpisode;
     map['search_click_total'] = _searchClickTotal;
     map['video_url'] = _videoUrl;
     map['category'] = _category;
