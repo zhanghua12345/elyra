@@ -84,8 +84,27 @@ class PlayDetailController extends GetxController {
         }
 
         state.episodeList = state.detailBean?.episodeList ?? [];
-        currentIndex = (state.detailBean?.videoInfo?.episode ?? 1) - 1;
+        
+        // 根据传入的videoId确定初始集数索引
+        if (state.videoId > 0) {
+          // 查找对应的集数索引
+          currentIndex = state.episodeList.indexWhere((episode) => episode.id == state.videoId);
+          if (currentIndex == -1) {
+            // 如果没找到，使用默认的第一集
+            currentIndex = (state.detailBean?.videoInfo?.episode ?? 1) - 1;
+          }
+        } else {
+          // 使用默认的第一集
+          currentIndex = (state.detailBean?.videoInfo?.episode ?? 1) - 1;
+        }
+        
         state.currentEpisode = currentIndex;
+        
+        // 重新初始化PageController为正确的集数
+        if (pageController.hasClients) {
+          pageController.dispose();
+        }
+        pageController = PageController(initialPage: currentIndex);
 
         // 初始化视频控制器列表
         controllers = List<VideoPlayerController?>.filled(
@@ -155,7 +174,10 @@ class PlayDetailController extends GetxController {
         }
 
         // 视频播放完成，自动播放下一集
-        if (controller.value.isCompleted && !controller.value.isBuffering) {
+        // 注意：只有当前正在播放的视频才能触发自动播放
+        if (controller.value.isCompleted && 
+            !controller.value.isBuffering && 
+            index == currentIndex) {  // 关键修复：只有当前集才能触发
           _playNextEpisode();
         }
       });
