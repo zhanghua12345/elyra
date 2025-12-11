@@ -178,7 +178,7 @@ class _AboutPageState extends State<AboutPage> {
       child: Column(
         children: [
           _buildMenuItem('private','Privacy Policy', 'https://www.csyib.com/private'),
-          _buildMenuItem( 'agreement','User Agreement','https://www.csyib.com//user_policy'),
+          _buildMenuItem( 'agreement','User Agreement','https://www.csyib.com/user_policy'),
           _buildMenuItem('website','Visit Website', 'https://www.csyib.com'),
         ],
       ),

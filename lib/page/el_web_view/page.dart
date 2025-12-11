@@ -2,11 +2,10 @@ import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_web_view/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
-import 'package:badges/badges.dart';
-import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatefulWidget {
   const WebViewPage({super.key});
@@ -17,18 +16,11 @@ class WebViewPage extends StatefulWidget {
 
 class _WebViewPageState extends State<WebViewPage> {
   late final WebViewPageController controller;
-  final TextEditingController _webViewController = TextEditingController();
-  int _noticeNum = 0;
+
   @override
   void initState() {
     super.initState();
     controller = Get.put(WebViewPageController());
-  }
-
-  @override
-  void dispose() {
-    _webViewController.dispose();
-    super.dispose();
   }
 
   @override
@@ -69,46 +61,38 @@ class _WebViewPageState extends State<WebViewPage> {
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontFamily: 'PingFang SC',
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Text(
+              controller.state.title,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontFamily: 'PingFang SC',
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          SizedBox(width: 20.w),
+          // 刷新按钮
+          GestureDetector(
+            onTap: () => controller.reload(),
+            child: Icon(Icons.refresh, color: Colors.white, size: 20.h),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(
-        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
-      );
-    }
-
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return ElNoDataWidget(
         imagePath: 'ely_error.png',
         title: 'No connection',
         description: 'Please check your network',
         buttonText: 'Try again',
-        onButtonPressed: controller.onRefresh,
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return ElNoDataWidget(
-        imagePath: 'ely_nodata.png',
-        imageWidth: 180,
-        imageHeight: 223,
-        title: null,
-        description: 'There is no data for the moment.',
-        buttonText: null,
+        onButtonPressed: () => controller.reload(),
       );
     }
 
@@ -116,13 +100,25 @@ class _WebViewPageState extends State<WebViewPage> {
   }
 
   Widget _buildContentArea() {
-    return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
-        ),
-      ),
+    return Stack(
+      children: [
+        // WebView
+        WebViewWidget(controller: controller.webViewController),
+        
+        // 加载进度条
+        if (controller.state.loadStatus == LoadStatusType.loading)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: LinearProgressIndicator(
+              value: controller.state.loadingProgress / 100,
+              backgroundColor: Colors.transparent,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              minHeight: 2.h,
+            ),
+          ),
+      ],
     );
   }
 }

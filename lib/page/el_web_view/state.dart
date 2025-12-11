@@ -4,11 +4,11 @@ class WebViewState {
   WebViewState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
-  bool isLoading = false;
   
-  // 添加你需要的其他状态变量
-  // 示例：
-  // List<YourModel> dataList = [];
-  // int currentPage = 1;
-  // bool hasMore = true;
+  // WebView 相关状态
+  String url = '';
+  String title = '';
+  int loadingProgress = 0;
+  bool canGoBack = false;
+  bool canGoForward = false;
 }
