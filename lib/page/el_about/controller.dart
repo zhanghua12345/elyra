@@ -27,9 +27,6 @@ class AboutPageController extends GetxController {
     if (state.isLoading) return;
     state.isLoading = true;
     try {
-      // 模拟加载数据
-      await Future.delayed(Duration(seconds: 2));
-
       // 加载成功
       state.loadStatus = LoadStatusType.loadSuccess;
       update();

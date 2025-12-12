@@ -50,24 +50,7 @@ class _AboutPageState extends State<AboutPage> {
               children: [
                 _buildAppBar('About'),
                 SizedBox(height: 6.h),
-                Expanded(
-                  child: SmartRefresher(
-                    controller: controller.refreshController,
-                    enablePullDown: true,
-                    enablePullUp: false,
-                    onRefresh: controller.onRefresh,
-                    header: ClassicHeader(
-                      height: 40,
-                      textStyle: TextStyle(color: Colors.white),
-                      idleText: 'Pull to refresh',
-                      releaseText: 'Release to refresh',
-                      refreshingText: 'Refreshing...',
-                      completeText: 'Refresh completed',
-                      failedText: 'Refresh failed',
-                    ),
-                    child: _buildContent(),
-                  ),
-                ),
+                Expanded(child: _buildContent()),
               ],
             ),
           ),
@@ -177,16 +160,24 @@ class _AboutPageState extends State<AboutPage> {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         children: [
-          _buildMenuItem('private','Privacy Policy', 'https://www.csyib.com/private'),
-          _buildMenuItem( 'agreement','User Agreement','https://www.csyib.com/user_policy'),
-          _buildMenuItem('website','Visit Website', 'https://www.csyib.com'),
+          _buildMenuItem(
+            'private',
+            'Privacy Policy',
+            'https://www.csyib.com/private',
+          ),
+          _buildMenuItem(
+            'agreement',
+            'User Agreement',
+            'https://www.csyib.com/user_policy',
+          ),
+          _buildMenuItem('website', 'Visit Website', 'https://www.csyib.com'),
         ],
       ),
     );
   }
 
   /// 菜单项
-  Widget _buildMenuItem(String id,String title,  String url) {
+  Widget _buildMenuItem(String id, String title, String url) {
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -210,7 +201,7 @@ class _AboutPageState extends State<AboutPage> {
           if (id == 'website') {
             openExternalUrl(url);
           } else {
-            Get.toNamed('/web_view', arguments: {'title': title,'url': url, });
+            Get.toNamed('/web_view', arguments: {'title': title, 'url': url});
           }
         },
       ),

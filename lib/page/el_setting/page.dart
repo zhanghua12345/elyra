@@ -49,24 +49,7 @@ class _SettingPageState extends State<SettingPage> {
               children: [
                 _buildAppBar('Settings'),
                 SizedBox(height: 6.h),
-                Expanded(
-                  child: SmartRefresher(
-                    controller: controller.refreshController,
-                    enablePullDown: true,
-                    enablePullUp: false,
-                    onRefresh: controller.onRefresh,
-                    header: ClassicHeader(
-                      height: 40,
-                      textStyle: TextStyle(color: Colors.white),
-                      idleText: 'Pull to refresh',
-                      releaseText: 'Release to refresh',
-                      refreshingText: 'Refreshing...',
-                      completeText: 'Refresh completed',
-                      failedText: 'Refresh failed',
-                    ),
-                    child: _buildContent(),
-                  ),
-                ),
+                Expanded(child: _buildContent()),
               ],
             ),
           ),
