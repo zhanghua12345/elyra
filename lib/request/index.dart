@@ -22,5 +22,6 @@ class Apis {
   
   static const String customerInfo = "/customer/info";
   static const String reportEvent = "/event/add";
+  static const String getNoticeNum = "/noticeNum";  // 获取反馈通知数量
   
 }

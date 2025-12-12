@@ -1,85 +1,53 @@
 import 'package:elyra/page/el_setting/sub_page/account_delete/state.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class AccountDeletePageController extends GetxController {
   final state = AccountDeleteState();
-  late WebViewController webViewController;
+  final RefreshController refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   @override
-  void onInit() {
-    super.onInit();
-    
-    // 获取传入的参数
-    final arguments = Get.arguments as Map<String, dynamic>?;
-    state.url = arguments?['url'] ?? '';
-    state.title = arguments?['title'] ?? 'WebView';
-    
-    // 初始化 WebViewController
-    webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            state.loadingProgress = progress;
-            update();
-          },
-          onPageStarted: (String url) {
-            state.loadStatus = LoadStatusType.loading;
-            update();
-          },
-          onPageFinished: (String url) {
-            state.loadStatus = LoadStatusType.loadSuccess;
-            _updateNavigationState();
-            update();
-          },
-          onWebResourceError: (WebResourceError error) {
-            debugPrint('WebView error: ${error.description}');
-            state.loadStatus = LoadStatusType.loadFailed;
-            update();
-          },
-        ),
-      );
-    
-    // 加载 URL
-    if (state.url.isNotEmpty) {
-      webViewController.loadRequest(Uri.parse(state.url));
-    } else {
-      state.loadStatus = LoadStatusType.loadFailed;
-      update();
-    }
+  void onReady() {
+    super.onReady();
+    // 页面准备完成后执行的操作
+    loadData();
   }
 
   @override
   void onClose() {
+    refreshController.dispose();
     super.onClose();
   }
 
-  /// 更新导航状态
-  Future<void> _updateNavigationState() async {
-    state.canGoBack = await webViewController.canGoBack();
-    state.canGoForward = await webViewController.canGoForward();
-    update();
-  }
+  // 加载数据的方法
+  void loadData() async {
+    if (state.isLoading) return;
+    state.isLoading = true;
+    try {
+      // 模拟加载数据
+      await Future.delayed(Duration(seconds: 2));
 
-  /// 后退
-  Future<void> goBack() async {
-    if (await webViewController.canGoBack()) {
-      await webViewController.goBack();
+      // 加载成功
+      state.loadStatus = LoadStatusType.loadSuccess;
+      update();
+    } catch (err) {
+      // 错误处理
+      state.loadStatus = LoadStatusType.loadFailed;
+      update();
+    } finally {
+      state.isLoading = false;
+
+      // 确保刷新控制器正确完成
+      refreshController.refreshCompleted();
+      update();
     }
   }
 
-  /// 前进
-  Future<void> goForward() async {
-    if (await webViewController.canGoForward()) {
-      await webViewController.goForward();
-    }
-  }
-
-  /// 刷新
-  Future<void> reload() async {
-    await webViewController.reload();
+  // 下拉刷新
+  void onRefresh() {
+    loadData();
   }
 }

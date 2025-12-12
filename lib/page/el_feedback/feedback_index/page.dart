@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_feedback/feedback_index/controller.dart';
 import 'package:elyra/page/el_feedback/feedback_list/page.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class FeedbackPage extends StatefulWidget {
   const FeedbackPage({super.key});
@@ -18,8 +21,8 @@ class FeedbackPage extends StatefulWidget {
 
 class _FeedbackPageState extends State<FeedbackPage> {
   late final FeedbackPageController controller;
-  final TextEditingController _feedbackController = TextEditingController();
-  int _noticeNum = 0;
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +31,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
   @override
   void dispose() {
-    _feedbackController.dispose();
+    _refreshController.dispose();
     super.dispose();
   }
 
@@ -53,10 +56,18 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
-                    controller: controller.refreshController,
+                    controller: _refreshController,
                     enablePullDown: true,
                     enablePullUp: false,
-                    onRefresh: controller.onRefresh,
+                    onRefresh: () {
+                      controller.onRefresh();
+                      // 手动完成刷新
+                      Future.delayed(const Duration(milliseconds: 500)).then((_) {
+                        if (mounted) {
+                          _refreshController.refreshCompleted();
+                        }
+                      });
+                    },
                     header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
@@ -98,9 +109,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
           ),
           // 右侧可以放置其他操作按钮，暂时留空
           Badge(
-            showBadge: _noticeNum > 0,
+            showBadge: controller.state.noticeNum > 0,
             badgeContent: Text(
-              _noticeNum > 99 ? '99+' : '$_noticeNum',
+              controller.state.noticeNum > 99 ? '99+' : '${controller.state.noticeNum}',
               style: const TextStyle(color: Colors.white, fontSize: 10),
             ),
             badgeStyle: BadgeStyle(badgeColor: Color(0xFFF306B9)),
@@ -119,30 +130,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(
-        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
-      );
-    }
-
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return ElNoDataWidget(
         imagePath: 'ely_error.png',
         title: 'No connection',
         description: 'Please check your network',
         buttonText: 'Try again',
-        onButtonPressed: controller.onRefresh,
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return ElNoDataWidget(
-        imagePath: 'ely_nodata.png',
-        imageWidth: 180,
-        imageHeight: 223,
-        title: null,
-        description: 'There is no data for the moment.',
-        buttonText: null,
+        onButtonPressed: controller.retry,
       );
     }
 
@@ -150,13 +144,38 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Widget _buildContentArea() {
-    return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+    return Stack(
+      children: [
+        // WebView
+        InAppWebView(
+          initialSettings: InAppWebViewSettings(
+            javaScriptEnabled: true,
+            mediaPlaybackRequiresUserGesture: false,
+            allowsInlineMediaPlayback: true,
+            cacheEnabled: false,
+            clearCache: true,
+            domStorageEnabled: false,
+            transparentBackground: true,
+          ),
+          initialUserScripts: UnmodifiableListView<UserScript>([
+            UserScript(
+              source: FeedbackPageController.androidInterfaceJs,
+              injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            ),
+          ]),
+          onWebViewCreated: controller.onWebViewCreated,
+          onLoadStop: controller.onLoadStop,
+          onLoadStart: controller.onLoadStart,
+          onReceivedError: controller.onReceivedError,
+          onPageCommitVisible: controller.onPageCommitVisible,
         ),
-      ),
+        
+        // 加载指示器
+        if (controller.state.loadStatus == LoadStatusType.loading)
+          Center(
+            child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+          ),
+      ],
     );
   }
 }

@@ -1,12 +1,12 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_setting/sub_page/account_delete/controller.dart';
-import 'package:elyra/page/el_web_view/controller.dart';
+import 'package:elyra/page/test/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class AccountDeletePage extends StatefulWidget {
   const AccountDeletePage({super.key});
@@ -17,6 +17,7 @@ class AccountDeletePage extends StatefulWidget {
 
 class _AccountDeletePageState extends State<AccountDeletePage> {
   late final AccountDeletePageController controller;
+  final TextEditingController _accountDeleteController = TextEditingController();
 
   @override
   void initState() {
@@ -25,8 +26,14 @@ class _AccountDeletePageState extends State<AccountDeletePage> {
   }
 
   @override
+  void dispose() {
+    _accountDeleteController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GetBuilder<AccountDeletePageController>(
+    return GetBuilder<TestPageController>(
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -41,9 +48,26 @@ class _AccountDeletePageState extends State<AccountDeletePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('WebView'),
+                _buildAppBar('Test Page'),
                 SizedBox(height: 6.h),
-                Expanded(child: _buildContent()),
+                Expanded(
+                  child: SmartRefresher(
+                    controller: controller.refreshController,
+                    enablePullDown: true,
+                    enablePullUp: false,
+                    onRefresh: controller.onRefresh,
+                    header: ClassicHeader(
+                      height: 40,
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull to refresh',
+                      releaseText: 'Release to refresh',
+                      refreshingText: 'Refreshing...',
+                      completeText: 'Refresh completed',
+                      failedText: 'Refresh failed',
+                    ),
+                    child: _buildContent(),
+                  ),
+                ),
               ],
             ),
           ),
@@ -62,38 +86,47 @@ class _AccountDeletePageState extends State<AccountDeletePage> {
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
-          Expanded(
-            child: Text(
-              controller.state.title,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontFamily: 'PingFang SC',
-                fontWeight: FontWeight.w600,
-              ),
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
             ),
           ),
-          // 刷新按钮
-          GestureDetector(
-            onTap: () => controller.reload(),
-            child: Icon(Icons.refresh, color: Colors.white, size: 20.h),
-          ),
+          // 右侧可以放置其他操作按钮，暂时留空
+          SizedBox(width: 20.w),
         ],
       ),
     );
   }
 
   Widget _buildContent() {
+    if (controller.state.loadStatus == LoadStatusType.loading) {
+      return Center(
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+      );
+    }
+
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return ElNoDataWidget(
         imagePath: 'ely_error.png',
         title: 'No connection',
         description: 'Please check your network',
         buttonText: 'Try again',
-        onButtonPressed: () => controller.reload(),
+        onButtonPressed: controller.onRefresh,
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
+      return ElNoDataWidget(
+        imagePath: 'ely_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        title: null,
+        description: 'There is no data for the moment.',
+        buttonText: null,
       );
     }
 
@@ -101,25 +134,13 @@ class _AccountDeletePageState extends State<AccountDeletePage> {
   }
 
   Widget _buildContentArea() {
-    return Stack(
-      children: [
-        // WebView
-        WebViewWidget(controller: controller.webViewController),
-        
-        // 加载进度条
-        if (controller.state.loadStatus == LoadStatusType.loading)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: LinearProgressIndicator(
-              value: controller.state.loadingProgress / 100,
-              backgroundColor: Colors.transparent,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              minHeight: 2.h,
-            ),
-          ),
-      ],
+    return SizedBox.expand(
+      child: Center(
+        child: Text(
+          'Content goes here',
+          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+        ),
+      ),
     );
   }
 }

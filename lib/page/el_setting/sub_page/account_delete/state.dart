@@ -4,11 +4,11 @@ class AccountDeleteState {
   AccountDeleteState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
+  bool isLoading = false;
   
-  // WebView 相关状态
-  String url = '';
-  String title = '';
-  int loadingProgress = 0;
-  bool canGoBack = false;
-  bool canGoForward = false;
+  // 添加你需要的其他状态变量
+  // 示例：
+  // List<YourModel> dataList = [];
+  // int currentPage = 1;
+  // bool hasMore = true;
 }
