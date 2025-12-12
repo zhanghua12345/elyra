@@ -1,8 +1,7 @@
 import 'package:elyra/widgets/bad_status_widget.dart';
 
-class FeedbackDetailState {
-  FeedbackDetailState();
+class AccountLogoutState {
+  AccountLogoutState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
-  String feedbackId = '';
 }

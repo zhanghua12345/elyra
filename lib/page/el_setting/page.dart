@@ -1,5 +1,6 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_setting/controller.dart';
+import 'package:elyra/page/el_setting/sub_page/account_delete/page.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -123,8 +124,7 @@ class _SettingPageState extends State<SettingPage> {
           SizedBox(height: 20.h),
           // Account Deletion
           _buildListTile('Account Deletion', () {
-            // Implement Account Deletion functionality here
-            // Get.to(() => AccountDeletionPage());
+            Get.to(() => AccountDeletePage());
           }),
           SizedBox(height: 12.h),
           // Log out button

@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/page/el_feedback/feedback_list/controller.dart';
+import 'package:elyra/page/el_account_logout/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -10,21 +10,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-class FeedbackListPage extends StatefulWidget {
-  const FeedbackListPage({super.key});
+class AccountLogoutPage extends StatefulWidget {
+  const AccountLogoutPage({super.key});
 
   @override
-  State<FeedbackListPage> createState() => _FeedbackListPageState();
+  State<AccountLogoutPage> createState() => _AccountLogoutPageState();
 }
 
-class _FeedbackListPageState extends State<FeedbackListPage> {
-  late final FeedbackListPageController controller;
+class _AccountLogoutPageState extends State<AccountLogoutPage> {
+  late final AccountLogoutPageController controller;
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   @override
   void initState() {
     super.initState();
-    controller = Get.put(FeedbackListPageController());
+    controller = Get.put(AccountLogoutPageController());
   }
 
   @override
@@ -35,7 +35,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<FeedbackListPageController>(
+    return GetBuilder<AccountLogoutPageController>(
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -50,7 +50,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('Feedback'),
+                _buildAppBar('Account Logout'),
                 SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
@@ -104,7 +104,6 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // 右侧可以放置其他操作按钮，暂时留空
           SizedBox(width: 20.w),
         ],
       ),
@@ -112,8 +111,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
   }
 
   Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loadFailed ||
-        controller.state.loadStatus == LoadStatusType.loadNoData) {
+    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return ElNoDataWidget(
         imagePath: 'ely_error.png',
         title: 'No connection',
@@ -142,7 +140,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
           ),
           initialUserScripts: UnmodifiableListView<UserScript>([
             UserScript(
-              source: FeedbackListPageController.androidInterfaceJs,
+              source: AccountLogoutPageController.androidInterfaceJs,
               injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
             ),
           ]),

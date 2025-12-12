@@ -4,11 +4,4 @@ class FeedbackListState {
   FeedbackListState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
-  bool isLoading = false;
-  
-  // 添加你需要的其他状态变量
-  // 示例：
-  // List<YourModel> dataList = [];
-  // int currentPage = 1;
-  // bool hasMore = true;
 }

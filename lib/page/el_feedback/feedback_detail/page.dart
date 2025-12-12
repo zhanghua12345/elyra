@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_feedback/feedback_detail/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class FeedbackDetailPage extends StatefulWidget {
   const FeedbackDetailPage({super.key});
@@ -16,7 +19,7 @@ class FeedbackDetailPage extends StatefulWidget {
 
 class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
   late final FeedbackDetailPageController controller;
-  final TextEditingController _feedbackDetailController = TextEditingController();
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   @override
   void initState() {
@@ -26,7 +29,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
 
   @override
   void dispose() {
-    _feedbackDetailController.dispose();
+    _refreshController.dispose();
     super.dispose();
   }
 
@@ -51,10 +54,17 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
                 SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
-                    controller: controller.refreshController,
+                    controller: _refreshController,
                     enablePullDown: true,
                     enablePullUp: false,
-                    onRefresh: controller.onRefresh,
+                    onRefresh: () {
+                      controller.onRefresh();
+                      Future.delayed(const Duration(milliseconds: 500)).then((_) {
+                        if (mounted) {
+                          _refreshController.refreshCompleted();
+                        }
+                      });
+                    },
                     header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
@@ -102,30 +112,13 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
   }
 
   Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(
-        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
-      );
-    }
-
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
       return ElNoDataWidget(
         imagePath: 'ely_error.png',
         title: 'No connection',
         description: 'Please check your network',
         buttonText: 'Try again',
-        onButtonPressed: controller.onRefresh,
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return ElNoDataWidget(
-        imagePath: 'ely_nodata.png',
-        imageWidth: 180,
-        imageHeight: 223,
-        title: null,
-        description: 'There is no data for the moment.',
-        buttonText: null,
+        onButtonPressed: controller.retry,
       );
     }
 
@@ -133,13 +126,38 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
   }
 
   Widget _buildContentArea() {
-    return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+    return Stack(
+      children: [
+        // WebView
+        InAppWebView(
+          initialSettings: InAppWebViewSettings(
+            javaScriptEnabled: true,
+            mediaPlaybackRequiresUserGesture: false,
+            allowsInlineMediaPlayback: true,
+            cacheEnabled: false,
+            clearCache: true,
+            domStorageEnabled: false,
+            transparentBackground: true,
+          ),
+          initialUserScripts: UnmodifiableListView<UserScript>([
+            UserScript(
+              source: FeedbackDetailPageController.androidInterfaceJs,
+              injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+            ),
+          ]),
+          onWebViewCreated: controller.onWebViewCreated,
+          onLoadStop: controller.onLoadStop,
+          onLoadStart: controller.onLoadStart,
+          onReceivedError: controller.onReceivedError,
+          onPageCommitVisible: controller.onPageCommitVisible,
         ),
-      ),
+
+        // 加载指示器
+        if (controller.state.loadStatus == LoadStatusType.loading)
+          Center(
+            child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+          ),
+      ],
     );
   }
 }

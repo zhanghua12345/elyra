@@ -1,22 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:elyra/page/el_feedback/feedback_detail/state.dart';
+import 'package:elyra/page/el_account_logout/state.dart';
+import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
-import 'package:image_picker/image_picker.dart';
 
-class FeedbackDetailPageController extends GetxController {
-  final state = FeedbackDetailState();
+class AccountLogoutPageController extends GetxController {
+  final state = AccountLogoutState();
 
   InAppWebViewController? webViewController;
-  final ImagePicker _imgPicker = ImagePicker();
   late Map<String, String> userData;
+  final deviceInfo = DeviceInfoUtils();
 
   // Android 接口 JS
   static const String androidInterfaceJs = """
@@ -24,11 +23,8 @@ class FeedbackDetailPageController extends GetxController {
       getUserInfo: async function () {
         return window.flutter_inappwebview.callHandler('getUserInfo');
       },
-      openPhotoPicker: function () {
-        return window.flutter_inappwebview.callHandler('openPhotoPicker');
-      },
-      uploadConvertImage: function () {
-        return window.flutter_inappwebview.callHandler('uploadConvertImage');
+      accountLogout: function () {
+        return window.flutter_inappwebview.callHandler('accountLogout');
       },
     };
   """;
@@ -36,11 +32,6 @@ class FeedbackDetailPageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
-    // 获取传入的 id
-    final arguments = Get.arguments as Map<String, dynamic>?;
-    state.feedbackId = arguments?['id'] ?? '';
-    
     _initUserData();
   }
 
@@ -55,13 +46,12 @@ class FeedbackDetailPageController extends GetxController {
     String token = SpUtils().getString(ElStoreKeys.token) ?? '';
 
     userData = {
-      'id': state.feedbackId,
       'time_zone': _getTimeZoneOffset(DateTime.now()),
       'type': Platform.isAndroid ? 'android' : 'ios',
       'lang': 'en',
       'theme': 'theme_2',
       'token': token,
-      'application': 'flutter',
+      'device-id': deviceInfo.deviceId ?? 'unknown',
     };
   }
 
@@ -85,7 +75,7 @@ class FeedbackDetailPageController extends GetxController {
 
     await controller.loadUrl(
       urlRequest: URLRequest(
-        url: WebUri('https://campaign.csyib.com/pages/leave/detail'),
+        url: WebUri('https://campaign.csyib.com/pages/setting/logout'),
       ),
     );
   }
@@ -98,17 +88,8 @@ class FeedbackDetailPageController extends GetxController {
     );
 
     controller.addJavaScriptHandler(
-      handlerName: 'openPhotoPicker',
-      callback: (args) => pickImage(),
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'uploadConvertImage',
-      callback: (args) {
-        if (args.isNotEmpty && args[0] is String) {
-          uploadImage(args[0] as String);
-        }
-      },
+      handlerName: 'accountLogout',
+      callback: (args) => handleAccountLogout(),
     );
   }
 
@@ -118,13 +99,22 @@ class FeedbackDetailPageController extends GetxController {
   ) async {
     await controller.addWebMessageListener(
       WebMessageListener(
-        jsObjectName: "openPhotoPicker",
+        jsObjectName: "accountLogout",
         allowedOriginRules: {"*"},
         onPostMessage: (message, origin, isMainFrame, replyProxy) {
-          pickImage();
+          handleAccountLogout();
         },
       ),
     );
+  }
+
+  /// 处理注销回调
+  void handleAccountLogout() {
+    debugPrint('账户注销回调');
+    // 这里执行注销逻辑，比如清除token、跳转到登录页等
+    // 示例：
+    // SpUtils().remove(ElStoreKeys.token);
+    // Get.offAllNamed('/login');
   }
 
   /// WebView 加载完成
@@ -147,14 +137,6 @@ class FeedbackDetailPageController extends GetxController {
         );
       });
     }
-
-    await controller.evaluateJavascript(
-      source: '''
-        window.onImagePicked = function(data) {
-          window.flutter_inappwebview.callHandler('uploadConvertImage', data);
-        };
-      ''',
-    );
 
     state.loadStatus = LoadStatusType.loadSuccess;
     update();
@@ -185,59 +167,6 @@ class FeedbackDetailPageController extends GetxController {
     }
   }
 
-  /// 选择图片
-  Future<void> pickImage() async {
-    final XFile? image = await _imgPicker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      final compressedImage = await _compressToTargetSize(File(image.path), 1024 * 1024);
-      final bytes = await compressedImage.readAsBytes();
-      final base64Data = base64Encode(bytes);
-      final data = base64Data;
-
-      final js = '''
-        if (typeof window.onImagePicked === 'function') {
-          window.onImagePicked("$data");
-        }
-      ''';
-
-      webViewController?.evaluateJavascript(source: js);
-    }
-  }
-
-  /// 压缩图片到目标大小
-  Future<File> _compressToTargetSize(File file, int targetSize) async {
-    int quality = 90;
-    File compressed = file;
-
-    while ((await compressed.length()) > targetSize && quality > 10) {
-      final result = await FlutterImageCompress.compressWithFile(
-        file.absolute.path,
-        quality: quality,
-      );
-
-      if (result == null) break;
-
-      compressed = File('${file.parent.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg')
-        ..writeAsBytesSync(result);
-      quality -= 10;
-    }
-
-    return compressed;
-  }
-
-  /// 上传图片
-  Future<void> uploadImage(String data) async {
-    await webViewController?.evaluateJavascript(
-      source: '''
-        if (window.uploadConvertImage) {
-          window.uploadConvertImage("$data");
-        } else {
-          console.error("H5 没有定义 window.uploadConvertImage");
-        }
-      ''',
-    );
-  }
-
   /// 下拉刷新
   void onRefresh() {
     webViewController?.reload();
@@ -247,7 +176,7 @@ class FeedbackDetailPageController extends GetxController {
   void retry() {
     webViewController?.loadUrl(
       urlRequest: URLRequest(
-        url: WebUri('https://campaign.csyib.com/pages/leave/detail'),
+        url: WebUri('https://campaign.csyib.com/pages/setting/logout'),
       ),
     );
   }
