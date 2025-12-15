@@ -1,13 +1,11 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_account_logout/page.dart';
 import 'package:elyra/page/el_setting/controller.dart';
-import 'package:elyra/page/el_setting/sub_page/account_delete/page.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});

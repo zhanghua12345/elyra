@@ -8,6 +8,7 @@ import 'package:elyra/widgets/home_video_history_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final logic = Get.put(HomeController());
   final state = Get.find<HomeController>().state;
 
@@ -27,10 +28,14 @@ class _HomePageState extends State<HomePage>
 
   final PageController _controller = PageController();
   late TabController _tabController;
+  
+  // 用于强制刷新历史记录组件的Key
+  final GlobalKey<_HomeVideoHistoryWidgetRefreshState> _historyWidgetKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       _currentTab = _tabController.index;
@@ -39,21 +44,48 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _tabController.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // 当应用从后台返回前台时，刷新历史记录
+    if (state == AppLifecycleState.resumed) {
+      _historyWidgetKey.currentState?.refresh();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // 全屏背景图
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('ely_background_image.png'.icon),
-                  fit: BoxFit.fill,
+    return VisibilityDetector(
+      key: Key('home-page-visibility'),
+      onVisibilityChanged: (VisibilityInfo info) {
+        // 当页面可见度大于50%时，刷新历史记录
+        if (info.visibleFraction > 0.5) {
+          Future.delayed(Duration(milliseconds: 100), () {
+            _historyWidgetKey.currentState?.refresh();
+          });
+        }
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // 全屏背景图
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('ely_background_image.png'.icon),
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
             ),
-          ),
 
           // 页面内容
           // 页面内容
@@ -180,7 +212,9 @@ class _HomePageState extends State<HomePage>
                           left: 0,
                           right: 0,
                           child: Center(
-                            child: HomeVideoHistoryWidget(),
+                            child: _HomeVideoHistoryWidgetRefresh(
+                              key: _historyWidgetKey,
+                            ),
                           ),
                         ),
                       ],
@@ -190,8 +224,33 @@ class _HomePageState extends State<HomePage>
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+}
+
+/// 历史记录组件包装器，支持外部手动刷新
+class _HomeVideoHistoryWidgetRefresh extends StatefulWidget {
+  const _HomeVideoHistoryWidgetRefresh({Key? key}) : super(key: key);
+
+  @override
+  State<_HomeVideoHistoryWidgetRefresh> createState() => _HomeVideoHistoryWidgetRefreshState();
+}
+
+class _HomeVideoHistoryWidgetRefreshState extends State<_HomeVideoHistoryWidgetRefresh> {
+  Key _widgetKey = UniqueKey();
+
+  /// 外部调用此方法来刷新组件
+  void refresh() {
+    setState(() {
+      _widgetKey = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeVideoHistoryWidget(key: _widgetKey);
   }
 }

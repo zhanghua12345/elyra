@@ -52,18 +52,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
 
   @override
   void dispose() {
-    // 上传最后的播放进度
-    if (controller.controllers.isNotEmpty &&
-        controller.currentIndex < controller.controllers.length) {
-      controller.uploadHistorySeconds(
-        controller
-                .controllers[controller.currentIndex]
-                ?.value
-                .position
-                .inMilliseconds ??
-            0,
-      );
-    }
+    // dispose时controller可能已被清理，不在这里上传进度
     super.dispose();
   }
 
@@ -72,16 +61,22 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
-        if (controller.controllers.isNotEmpty &&
+        // 在页面退出前上传播放进度并更新本地历史记录
+        if (didPop && 
+            controller.controllers.isNotEmpty &&
             controller.currentIndex < controller.controllers.length) {
-          controller.uploadHistorySeconds(
-            controller
-                    .controllers[controller.currentIndex]
-                    ?.value
-                    .position
-                    .inMilliseconds ??
-                0,
-          );
+          final playSeconds = controller
+                  .controllers[controller.currentIndex]
+                  ?.value
+                  .position
+                  .inMilliseconds ??
+              0;
+          
+          // 上传到服务器并保存到本地
+          controller.uploadHistorySeconds(playSeconds);
+          
+          // 确保本地存储已更新（等待一小段时间确保写入完成）
+          await Future.delayed(Duration(milliseconds: 50));
         }
       },
       child: Scaffold(

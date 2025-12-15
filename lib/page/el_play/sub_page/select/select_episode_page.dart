@@ -50,6 +50,15 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
       vsync: this,
       initialIndex: (_currentEpisode - 1) ~/ _perTabEpisode,
     );
+    
+    // 监听Tab切换，确保界面更新
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          // 强制刷新界面，确保Tab高亮状态正确
+        });
+      }
+    });
   }
 
   @override
@@ -119,18 +128,25 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                     int start = index * _perTabEpisode + 1;
                     int end = (index + 1) * _perTabEpisode;
                     if (end > widget.totalEpisodes) end = widget.totalEpisodes;
+                    
+                    // 使用_tabController.index而不是局部变量
+                    bool isSelected = _tabController.index == index;
 
                     return Padding(
                       padding: EdgeInsets.only(right: 50.w), // ⑤ 两个Tab相距50
                       child: GestureDetector(
-                        onTap: () => _tabController.animateTo(index),
+                        onTap: () {
+                          if (_tabController.index != index) {
+                            _tabController.animateTo(index);
+                          }
+                        },
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               '$start-$end',
                               style: TextStyle(
-                                color: _tabController.index == index
+                                color: isSelected
                                     ? Color(0xFFFF29DF)
                                     : Color(0xFFC2C2C2),
                                 fontSize: 15.sp,
@@ -142,7 +158,7 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                               width: 10.w,
                               height: 4.h,
                               decoration: ShapeDecoration(
-                                color: _tabController.index == index
+                                color: isSelected
                                     ? Color(0xFFFF29DF)
                                     : Color(0xFFAAAAAA),
                                 shape: RoundedRectangleBorder(
