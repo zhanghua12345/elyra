@@ -48,7 +48,7 @@ class FeedbackListPageController extends GetxController {
       'time_zone': _getTimeZoneOffset(DateTime.now()),
       'type': Platform.isAndroid ? 'android' : 'ios',
       'lang': 'en',
-      'theme': 'theme_2',
+      'theme': 'theme_19',
       'token': token,
     };
   }
