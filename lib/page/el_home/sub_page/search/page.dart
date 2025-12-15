@@ -4,6 +4,7 @@ import 'package:elyra/page/el_home/sub_page/search/controller.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_confirm_modal.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -80,7 +81,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildSearchAppBar() {
     return Container(
       height: 46.h,
-      padding: EdgeInsets.only(left: 11.w,right: 16.w, top:2.h),
+      padding: EdgeInsets.only(left: 11.w, right: 16.w, top: 2.h),
       child: Row(
         children: [
           GestureDetector(
@@ -433,10 +434,12 @@ class _SearchPageState extends State<SearchPage> {
                                     width: 2.r,
                                   ),
                                   borderRadius: BorderRadius.circular(13.r),
-                                  image: DecorationImage(
-                                    image: NetworkImage(item.imageUrl ?? ''),
-                                    fit: BoxFit.cover,
-                                  ),
+                                ),
+                                child: ElNetworkImage(
+                                  imageUrl: item.imageUrl,
+                                  width: 90.w,
+                                  height: 107.h,
+                                  borderRadius: BorderRadius.circular(11.r),
                                 ),
                               ),
                             ),
@@ -458,10 +461,12 @@ class _SearchPageState extends State<SearchPage> {
                                     width: 2.r,
                                   ),
                                   borderRadius: BorderRadius.circular(13.r),
-                                  image: DecorationImage(
-                                    image: NetworkImage(item.imageUrl ?? ''),
-                                    fit: BoxFit.cover,
-                                  ),
+                                ),
+                                child: ElNetworkImage(
+                                  imageUrl: item.imageUrl,
+                                  width: 95.w,
+                                  height: 118.h,
+                                  borderRadius: BorderRadius.circular(11.r),
                                 ),
                               ),
                             ),
