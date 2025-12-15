@@ -1,18 +1,5 @@
 import 'dart:convert';
 
-/// business_model : "iap"
-/// video_info : {"id":7132,"short_play_video_id":7132,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/3f9afda335fd2616d901/3f9afda335fd2616d901.m3u8","coins":0,"vip_coins":0,"episode":1,"is_vip":2,"play_seconds":"0"}
-/// shortPlayInfo : {"id":162,"short_id":11,"short_play_id":162,"name":"Madam President, Holding Multiple Positions  ","description":"It is rumored outside that the prestigious president of Xu's Group is about to marry the daughter of the Xu family. Just because the name of the Xu family's daughter is Pearl, which is the same as his childhood sweetheart in ","process":2,"image_url":"https://static.wanmwl.com/eyJrZXkiOiJpbWFnZS80ZmRhZDg4OWIxNmM3MmQ2MjkwZC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsiZml0IjoiY292ZXIifX19?sign=$23f3feca08db05081465b3677a6f671819b85d9f18ad94cc7236f3c89aada01ebe2de98adbca00c6f0c8c5b8621c5e4f6064afb617","horizontally_img":"https://static.wanmwl.com/image/ac2f87aad3384032215c.jpg","buy_type":1,"tag_type":"","all_coins":0,"collect_total":4,"watch_total":307,"episode_total":18,"search_click_total":0,"is_collect":true,"can_share_get_coin":true,"category":["Sweet Romance "]}
-/// episodeList : [{"id":7132,"short_play_video_id":7132,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/3f9afda335fd2616d901/3f9afda335fd2616d901.m3u8","coins":0,"vip_coins":0,"episode":1,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7140,"short_play_video_id":7140,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/5c5860a67aab8fe3d89d/5c5860a67aab8fe3d89d.m3u8","coins":0,"vip_coins":0,"episode":2,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7136,"short_play_video_id":7136,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/9f7c98f9c61fdf1bf5fc/9f7c98f9c61fdf1bf5fc.m3u8","coins":0,"vip_coins":0,"episode":3,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7137,"short_play_video_id":7137,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/72c3555f90fcceb9aab4/72c3555f90fcceb9aab4.m3u8","coins":0,"vip_coins":0,"episode":4,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7133,"short_play_video_id":7133,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/171bf35b0196bdf1e839/171bf35b0196bdf1e839.m3u8","coins":0,"vip_coins":0,"episode":5,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7135,"short_play_video_id":7135,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/fff10f96153f53ddc7f6/fff10f96153f53ddc7f6.m3u8","coins":0,"vip_coins":0,"episode":6,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7134,"short_play_video_id":7134,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/9a3ac7c5924b144b6222/9a3ac7c5924b144b6222.m3u8","coins":0,"vip_coins":0,"episode":7,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7139,"short_play_video_id":7139,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/17927e0dd452d5a936d0/17927e0dd452d5a936d0.m3u8","coins":0,"vip_coins":0,"episode":8,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7138,"short_play_video_id":7138,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/1d61d46d30292d0a7269/1d61d46d30292d0a7269.m3u8","coins":0,"vip_coins":0,"episode":9,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7141,"short_play_video_id":7141,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/70ee4deb9bb176846534/70ee4deb9bb176846534.m3u8","coins":0,"vip_coins":0,"episode":10,"is_vip":2,"is_lock":false,"play_seconds":"0"},{"id":7146,"short_play_video_id":7146,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/946ec0930ff6d1f9b36e/946ec0930ff6d1f9b36e.m3u8","coins":69,"vip_coins":0,"episode":11,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7144,"short_play_video_id":7144,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/b92bed7933bbd5916f07/b92bed7933bbd5916f07.m3u8","coins":119,"vip_coins":0,"episode":12,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7142,"short_play_video_id":7142,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/9679216680a679f7e6c2/9679216680a679f7e6c2.m3u8","coins":149,"vip_coins":0,"episode":13,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7143,"short_play_video_id":7143,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/a73214d6aa17af4d639d/a73214d6aa17af4d639d.m3u8","coins":249,"vip_coins":0,"episode":14,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7147,"short_play_video_id":7147,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/3a82aab4550ddc50cfe7/3a82aab4550ddc50cfe7.m3u8","coins":199,"vip_coins":0,"episode":15,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7149,"short_play_video_id":7149,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/0b0781eefb331cc25fee/0b0781eefb331cc25fee.m3u8","coins":159,"vip_coins":0,"episode":16,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7145,"short_play_video_id":7145,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/6c2d042f669e7bdaff3d/6c2d042f669e7bdaff3d.m3u8","coins":69,"vip_coins":0,"episode":17,"is_vip":2,"is_lock":true,"play_seconds":"0"},{"id":7148,"short_play_video_id":7148,"short_play_id":162,"short_id":11,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/d6fd3ab315f161b9b980/d6fd3ab315f161b9b980.m3u8","coins":69,"vip_coins":0,"episode":18,"is_vip":2,"is_lock":true,"play_seconds":"0"}]
-/// is_collect : true
-/// show_share_coin : true
-/// share_coin : 100
-/// install_coins : 1000
-/// revolution : 720
-/// user_level : "normal"
-/// unlock_video_ad_count : 1
-/// discount : 80
-
 ShortPlayDetailBean shortPlayDetailBeanFromJson(String str) => ShortPlayDetailBean.fromJson(json.decode(str));
 
 String shortPlayDetailBeanToJson(ShortPlayDetailBean data) => json.encode(data.toJson());
@@ -201,19 +188,6 @@ class ShortPlayDetailBean {
     return map;
   }
 }
-
-/// id : 7132
-/// short_play_video_id : 7132
-/// short_play_id : 162
-/// short_id : 11
-/// promise_view_ad : 0
-/// video_url : "https://static.wanmwl.com/videom3u8/3f9afda335fd2616d901/3f9afda335fd2616d901.m3u8"
-/// coins : 0
-/// vip_coins : 0
-/// episode : 1
-/// is_vip : 2
-/// is_lock : false
-/// play_seconds : "0"
 
 EpisodeList episodeListFromJson(String str) => EpisodeList.fromJson(json.decode(str));
 

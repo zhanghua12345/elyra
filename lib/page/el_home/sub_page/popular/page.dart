@@ -717,7 +717,7 @@ class _PopularPageState extends State<PopularPage> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(32.r),
                 child: Image.network(
-                  item.imageUrl ?? '',
+                   'no-img.png',
                   width: double.infinity,
                   height: 224.h, // 固定高度
                   fit: BoxFit.cover,

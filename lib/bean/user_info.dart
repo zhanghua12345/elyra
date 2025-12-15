@@ -1,28 +1,5 @@
 import 'dart:convert';
 
-/// id : "S101810"
-/// customer_id : "S101810"
-/// is_guide_vip : false
-/// is_tourist : true
-/// family_name : "Visitor"
-/// giving_name : ""
-/// vip_end_time : 0
-/// third_access_id : ""
-/// is_vip : false
-/// coin_left_total : 0
-/// vip_type : ""
-/// email : ""
-/// third_access_platform : ""
-/// ip_address : "220.202.113.86"
-/// country_code : "CN"
-/// user_level : "normal"
-/// send_coin_left_total : 0
-/// avator : ""
-/// sign_in_status : 0
-/// registered_days : 1
-/// ln : "cf9f5896322a374004754032700aef183a879ecbf0004aa546f3810d56672155"
-/// country : "9fc4508238942e7cf40354d962db0c18c5ceec7320e0a3b9f69a0a7836efa50c"
-
 UserInfo userInfoFromJson(String str) => UserInfo.fromJson(json.decode(str));
 
 String userInfoToJson(UserInfo data) => json.encode(data.toJson());

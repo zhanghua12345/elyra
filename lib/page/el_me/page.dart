@@ -304,19 +304,19 @@ class _MePageState extends State<MePage> {
           //   isLast: true,
           // ),
           _buildMenuItemWithUrl(
-            'assets/ely_my_about.png',
+            'assets/icon_privacy.png',
             'Privacy Policy',
             'https://www.csyib.com/private',
             openInWebView: true,
           ),
           _buildMenuItemWithUrl(
-            'assets/ely_my_about.png',
+            'assets/icon_user.png',
             'User Agreement',
             'https://www.csyib.com/user_policy',
             openInWebView: true,
           ),
           _buildMenuItemWithUrl(
-            'assets/ely_my_about.png',
+            'assets/icon_visit.png',
             'Visit Website',
             'https://www.csyib.com',
             openInWebView: false,

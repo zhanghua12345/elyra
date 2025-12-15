@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-/// token : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXN0b21lcl9pZCI6NzI4NjIsImlzX3RvdXJpc3QiOnRydWUsImV4cGlyZV90aW1lIjoxNzUxNTExODYxfQ.ujSafDOgS2hYBWD2rpaQ_KhEdaTAmjRdwn7iZyALAqE"
-/// customer_id : 72862
-/// auto_login : false
 
 RegisterBean registerBeanFromJson(String str) => RegisterBean.fromJson(json.decode(str));
 String registerBeanToJson(RegisterBean data) => json.encode(data.toJson());

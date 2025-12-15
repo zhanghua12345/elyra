@@ -1,26 +1,5 @@
 import 'dart:convert';
 
-/// id : 378
-/// short_id : 150
-/// short_play_id : 378
-/// name : "Contractual Couple"
-/// description : "Shen Yuchu is Li Qian's superior. The two people who wouldn't have had any intersection originally were connected because of an unexpected one-night stand. What's more dramatic is that the ring representing the fate and predestination of the Shen family was accidentally worn on Li Qian's hand. After a series of events, Li Qian and Shen Yuchu signed a marriage agreement to be a couple in name only. But later, the appearance of the badge exposed a past event from their youth - Li Qian turned out to be the savior Shen Yuchu had been looking for all along. Can Shen Yuchu, who has already broken Li Qian's heart, win her heart back now? "
-/// process : 1
-/// image_url : "https://static3.guyantv.com/eyJrZXkiOiJpbWFnZS83MDM3MGY2OWEyMzk5MzIwMjkwNi5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsiZml0IjoiY292ZXIiLCJ3aWR0aCI6MjIwfX19?sign=$1fea5d55dfbb3e2dacc00f8176af642021904100edcd3817c226ab211418d7a1e46b75ef14919a2207c044532067a7ae3f"
-/// horizontally_img : ""
-/// buy_type : 1
-/// tag_type : ""
-/// all_coins : 0
-/// collect_total : 50
-/// watch_total : 7487
-/// episode_total : 36
-/// search_click_total : 7081
-/// video_url : "https://static3.guyantv.com/videom3u8/389609ccb06761c46544/389609ccb06761c46544.m3u8"
-/// category : ["Sadomasochism"]
-/// video_info : {"id":19136,"short_play_video_id":19136,"short_play_id":207,"short_id":133,"promise_view_ad":0,"video_url":"https://static.wanmwl.com/videom3u8/a8ec99a023b074938e86/a8ec99a023b074938e86.m3u8","coins":0,"vip_coins":0,"episode":1,"is_vip":2,"revolution":{"r540":"videom3u8/a8ec99a023b074938e86/a8ec99a023b074938e86.m3u8","r720":"videom3u8/a8ec99a023b074938e86/a8ec99a023b074938e86.m3u8","r1080":"videom3u8/a8ec99a023b074938e86/a8ec99a023b074938e86.m3u8"},"image_url":"https://static.wanmwl.com/eyJrZXkiOiJpbWFnZS9iY2U2NTkyNDUwN2FmZDQyOTdkZC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsiZml0IjoiY292ZXIifH19?sign=$13136e4e95c2a9c82971428cbd1d4f533b403890bb5a7c390b1d05a55588390cb27c74948f"}
-/// is_collect : false
-/// categoryList : [{"id":1,"name":""}]
-
 ShortVideoBean shortVideoBeanFromJson(String str) =>
     ShortVideoBean.fromJson(json.decode(str));
 
