@@ -4,6 +4,7 @@ import 'package:elyra/page/el_home/sub_page/genres/controller.dart';
 import 'package:elyra/page/el_home/sub_page/genres/state.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -171,16 +172,11 @@ class _GenresPageState extends State<GenresPage> {
           'imageUrl': video.imageUrl ?? '',
         },
       ),
-      child: Container(
+      child: ElNetworkImage(
+        imageUrl: video.imageUrl,
         width: 84.w,
         height: 112.h,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.r),
-          image: DecorationImage(
-            image: NetworkImage(video.imageUrl ?? ''),
-            fit: BoxFit.cover,
-          ),
-        ),
+        borderRadius: BorderRadius.circular(15.r),
       ),
     );
   }

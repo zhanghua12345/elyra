@@ -245,16 +245,11 @@ class _RankingPageState extends State<RankingPage> {
               ),
             ),
             SizedBox(width: 13.w),
-            Container(
+            ElNetworkImage(
+              imageUrl: item.imageUrl,
               width: 53.w,
               height: 70.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                image: DecorationImage(
-                  image: NetworkImage(item.imageUrl ?? ''),
-                  fit: BoxFit.cover,
-                ),
-              ),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             SizedBox(width: 8.w),
             // 中间 Column 高度跟图片一致，顶部对齐
