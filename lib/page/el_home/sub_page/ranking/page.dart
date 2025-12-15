@@ -3,6 +3,7 @@ import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/ranking/controller.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -145,16 +146,9 @@ class _RankingPageState extends State<RankingPage> {
               ),
             ),
             padding: EdgeInsets.all(3.w),
-            child: ClipRRect(
+            child: ElNetworkImage(
+              imageUrl: item.imageUrl,
               borderRadius: BorderRadius.circular(borderRadius - 3.r),
-              child: Image.network(
-                item.imageUrl ?? '',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54),
-                ),
-              ),
             ),
           ),
           Positioned(

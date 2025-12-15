@@ -3,6 +3,7 @@ import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/history/controller.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -75,7 +76,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 11.w, right: 11.w, top:4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -191,23 +192,12 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
         child: Row(
           children: [
-            // 左侧图片
-            ClipRRect(
+            ElNetworkImage(
+              imageUrl: item.imageUrl ?? '',
+              width: 68.w,
+              height: 91.h,
               borderRadius: BorderRadius.circular(12.r),
-              child: Image.network(
-                item.imageUrl ?? '',
-                width: 68.w,
-                height: 91.h,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 68.w,
-                  height: 91.h,
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54, size: 24),
-                ),
-              ),
             ),
-
             SizedBox(width: 12.w),
 
             // 中间内容区域

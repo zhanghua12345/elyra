@@ -3,6 +3,7 @@ import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_home/sub_page/search_result/controller.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -86,7 +87,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
   Widget _buildAppBar() {
     return Container(
       height: 46.h,
-      padding: EdgeInsets.only(left: 11.w, right: 16.w, top:2.h),
+      padding: EdgeInsets.only(left: 11.w, right: 16.w, top: 2.h),
       child: Row(
         children: [
           GestureDetector(
@@ -250,18 +251,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
           child: Column(
             children: [
               // 上部：图片区域（自适应高度）
-              ClipRRect(
+              ElNetworkImage(
+                imageUrl: item.imageUrl,
+                width: double.infinity,
+                height: 224.h, // 固
                 borderRadius: BorderRadius.circular(32.r),
-                child: Image.network(
-                  item.imageUrl ?? '',
-                  width: double.infinity,
-                  height: 224.h, // 固定高度
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[800],
-                    child: Icon(Icons.error, color: Colors.white54),
-                  ),
-                ),
               ),
               // 下部：标题区域
               Expanded(

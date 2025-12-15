@@ -3,13 +3,12 @@ import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
-import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:elyra/utils/jump_detail.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 /// 首页历史记录组件
 class HomeVideoHistoryWidget extends StatefulWidget {
@@ -158,22 +157,11 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
             Positioned(
               left: 24.w,
               bottom: 6.h, // 计算方式：60h - 41h = 溢出 19h
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(9.w),
-                child: Image.network(
-                  _historyVideo!.imageUrl ?? '',
-                  width: 45.w,
-                  height: 60.h, // 超出高度，这里保留 60
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 45.w,
-                      height: 60.h,
-                      color: Colors.grey[300],
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    );
-                  },
-                ),
+              child: ElNetworkImage(
+                imageUrl: _historyVideo!.imageUrl ?? '',
+                width: 45.w,
+                height: 60.h,
+                borderRadius: BorderRadius.circular(9.r),
               ),
             ),
             Positioned.fill(

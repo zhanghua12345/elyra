@@ -5,6 +5,7 @@ import 'package:elyra/page/el_home/sub_page/popular/controller.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -166,15 +167,10 @@ class _PopularPageState extends State<PopularPage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(61.r),
               // 背景图片 - 从网络加载
-              child: Image.network(
-                item.imageUrl ?? '',
+              child: ElNetworkImage(
+                imageUrl: item.imageUrl,
                 width: 270.w,
                 height: 360.h,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54),
-                ),
               ),
             ),
             // 底部背景装饰图片
@@ -303,18 +299,11 @@ class _PopularPageState extends State<PopularPage> {
         child: Stack(
           children: [
             // 封面图片
-            ClipRRect(
-              borderRadius: BorderRadius.circular(27.r), // 圆角 16
-              child: Image.network(
-                item.imageUrl ?? '',
-                width: 124.w,
-                height: 158.h,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54),
-                ),
-              ),
+            ElNetworkImage(
+              imageUrl: item.imageUrl,
+              width: 124.w,
+              height: 158.h,
+              borderRadius: BorderRadius.circular(27.r),
             ),
             // 底部 Watch 按钮（双层结构）
             Positioned(
@@ -423,15 +412,10 @@ class _PopularPageState extends State<PopularPage> {
           child: Stack(
             children: [
               // 背景图片（优先使用横版图）
-              Image.network(
-                item.horizontallyImg ?? item.imageUrl ?? '',
+              ElNetworkImage(
+                imageUrl: item.horizontallyImg ?? item.imageUrl,
                 width: double.infinity,
                 height: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[800],
-                  child: Icon(Icons.error, color: Colors.white54),
-                ),
               ),
               // 渐变遮罩（从上到下，透明 -> 黑色 80%）
               Container(
@@ -532,18 +516,11 @@ class _PopularPageState extends State<PopularPage> {
                   // 左边：图片区域
                   Expanded(
                     flex: 1,
-                    child: ClipRRect(
+                    child: ElNetworkImage(
+                      imageUrl: item.imageUrl,
+                      height: double.infinity,
+                      width: 81.w,
                       borderRadius: BorderRadius.circular(19.r),
-                      child: Image.network(
-                        item.imageUrl ?? '',
-                        height: double.infinity,
-                        width: 81.w,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[800],
-                          child: Icon(Icons.error, color: Colors.white54),
-                        ),
-                      ),
                     ),
                   ),
                   // 右边：标题区域（深色背景）
@@ -714,18 +691,11 @@ class _PopularPageState extends State<PopularPage> {
           child: Column(
             children: [
               // 上部：图片区域（自适应高度）
-              ClipRRect(
+              ElNetworkImage(
+                imageUrl: item.imageUrl,
+                width: double.infinity,
+                height: 224.h, // 固定高度
                 borderRadius: BorderRadius.circular(32.r),
-                child: Image.network(
-                   'no-img.png',
-                  width: double.infinity,
-                  height: 224.h, // 固定高度
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[800],
-                    child: Icon(Icons.error, color: Colors.white54),
-                  ),
-                ),
               ),
               // 下部：标题区域
               Expanded(

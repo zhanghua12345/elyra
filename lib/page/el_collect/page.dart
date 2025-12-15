@@ -4,6 +4,7 @@ import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_confirm_modal.dart';
+import 'package:elyra/widgets/el_network_image.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -219,19 +220,11 @@ class _CollectPageState extends State<CollectPage> {
               borderRadius: BorderRadius.circular(18.r),
               child: Column(
                 children: [
-                  // 上部：图片区域（自适应高度）
-                  ClipRRect(
+                  ElNetworkImage(
+                    imageUrl: item.imageUrl,
+                    width: double.infinity,
+                    height: 145.h, // 固定高度
                     borderRadius: BorderRadius.circular(18.r),
-                    child: Image.network(
-                      item.imageUrl ?? '',
-                      width: double.infinity,
-                      height: 145.h, // 固定高度
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[800],
-                        child: Icon(Icons.error, color: Colors.white54),
-                      ),
-                    ),
                   ),
                   // 下部：标题区域
                   Expanded(
