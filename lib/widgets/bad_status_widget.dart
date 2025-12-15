@@ -37,6 +37,7 @@ class BadStatusWidget extends StatelessWidget {
           ),
           if (onPressed != null)
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: onPressed,
               child: Container(
                 height: 48.h,

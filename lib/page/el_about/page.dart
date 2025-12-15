@@ -66,6 +66,7 @@ class _AboutPageState extends State<AboutPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),

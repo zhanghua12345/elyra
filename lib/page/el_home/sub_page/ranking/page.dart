@@ -118,6 +118,7 @@ class _RankingPageState extends State<RankingPage> {
     final borderRadius = isLarge ? 25.r : 20.r;
 
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,

@@ -161,6 +161,7 @@ class _NewPageState extends State<NewPage> {
       );
     }
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,

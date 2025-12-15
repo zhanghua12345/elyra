@@ -107,6 +107,7 @@ class _HomePageState extends State<HomePage>
                           children: [
                             Image.asset('ely_home_logo.png'.icon, height: 22.h),
                             GestureDetector(
+                              behavior: HitTestBehavior.translucent,
                               onTap: () {
                                 Get.toNamed('/search');
                               },
@@ -139,6 +140,7 @@ class _HomePageState extends State<HomePage>
                               tabs.length,
                               (index) => Expanded(
                                 child: GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
                                   onTap: () {
                                     setState(() => _currentTab = index);
 

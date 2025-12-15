@@ -92,7 +92,10 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
       decoration: ShapeDecoration(
         color: Colors.black.withValues(alpha: 0.9),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft:Radius.circular(16.w),topRight: Radius.circular(16.w)),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16.w),
+            topRight: Radius.circular(16.w),
+          ),
         ),
       ),
       child: Column(
@@ -133,6 +136,7 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                   return Padding(
                     padding: EdgeInsets.only(right: 50.w), // ⑤ 两个Tab相距50
                     child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () {
                         if (_tabController.index != index) {
                           _tabController.animateTo(index);
@@ -199,6 +203,7 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                     bool isCurrent = episode == _currentEpisode;
 
                     return GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () => _selectEpisode(episode),
                       child: Container(
                         decoration: isCurrent

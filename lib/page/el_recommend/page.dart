@@ -83,7 +83,8 @@ class _RecommendPageState extends State<RecommendPage>
     } else if (state == AppLifecycleState.resumed) {
       // 应用恢复时，只有当页面本身是可见的时候才播放
       // 通过 VisibilityDetector 来判断页面可见性
-      if (_isPageVisible && _currentPageIndex < controller.state.recommendList.length) {
+      if (_isPageVisible &&
+          _currentPageIndex < controller.state.recommendList.length) {
         _playCurrentVideo();
       }
     }
@@ -491,6 +492,7 @@ class _RecommendPageState extends State<RecommendPage>
     bool isInitialized,
   ) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         // 点击视频区域：跳转到详情页
         _navigateToDetail(video, videoCtrl);
@@ -594,6 +596,7 @@ class _RecommendPageState extends State<RecommendPage>
                 children: [
                   // 收藏按钮
                   GestureDetector(
+                    behavior: HitTestBehavior.translucent,
                     onTap: () async {
                       // 确保当前视频是这个
                       controller.state.curVideo = video;

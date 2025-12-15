@@ -84,6 +84,7 @@ class _SearchPageState extends State<SearchPage> {
       child: Row(
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
@@ -202,6 +203,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () => {
                   showElConfirmModal(
                     context,
@@ -250,6 +252,7 @@ class _SearchPageState extends State<SearchPage> {
             children: List.generate(
               controller.state.searchHistoryList.length,
               (index) => GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () {
                   final keyword = controller.state.searchHistoryList[index];
                   // ← 这里写跳转逻辑
@@ -329,6 +332,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildSwiperItem(ShortVideoBean item) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,

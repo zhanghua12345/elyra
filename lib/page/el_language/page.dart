@@ -82,6 +82,7 @@ class _LanguagePageState extends State<LanguagePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
@@ -143,7 +144,6 @@ class _LanguagePageState extends State<LanguagePage> {
             // Implement Account Deletion functionality here
             // Get.to(() => AccountDeletionPage());
           }),
-          
         ],
       ),
     );
@@ -151,6 +151,7 @@ class _LanguagePageState extends State<LanguagePage> {
 
   Widget _buildListTile(String title, VoidCallback onTap) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: onTap,
       child: Container(
         height: 48.h,
@@ -175,7 +176,7 @@ class _LanguagePageState extends State<LanguagePage> {
                 height: 1.50,
               ),
             ),
-            Image.asset('ely_language_select.png'.icon, width: 18.w, ),
+            Image.asset('ely_language_select.png'.icon, width: 18.w),
           ],
         ),
       ),

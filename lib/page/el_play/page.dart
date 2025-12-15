@@ -202,6 +202,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     }
 
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         if (videoController.value.isPlaying) {
           videoController.pause();
@@ -298,6 +299,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             children: [
               // 收藏按钮
               GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () async {
                   // 确保当前视频是这个
                   final success = await controller.toggleCollect(context);

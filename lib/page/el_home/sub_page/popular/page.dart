@@ -151,6 +151,7 @@ class _PopularPageState extends State<PopularPage> {
   /// Banner 卡片单个 item
   Widget _buildBannerCard(ShortVideoBean item) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,
@@ -289,6 +290,7 @@ class _PopularPageState extends State<PopularPage> {
   /// Popular 单个 item 卡片
   Widget _buildPopularCard(ShortVideoBean item) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,
@@ -405,6 +407,7 @@ class _PopularPageState extends State<PopularPage> {
   /// - 标题两行居中显示
   Widget _buildTrendingLargeCard(ShortVideoBean item, String number) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,
@@ -505,6 +508,7 @@ class _PopularPageState extends State<PopularPage> {
   /// - 右下角：数字（如 "02", "03"）
   Widget _buildTrendingSmallCard(ShortVideoBean item, String number) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,
@@ -658,6 +662,7 @@ class _PopularPageState extends State<PopularPage> {
     if (isSmall) {
       // 小卡片，只显示横图
       return GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: () => JumpService.toDetail(
           video: {
             'shortPlayId': item.shortPlayId,
@@ -689,6 +694,7 @@ class _PopularPageState extends State<PopularPage> {
       );
     }
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,

@@ -126,6 +126,7 @@ class _GenresPageState extends State<GenresPage> {
           ),
 
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               // 跳转到vampire页面，传递category id和title
               Get.toNamed(

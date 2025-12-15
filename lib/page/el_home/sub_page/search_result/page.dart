@@ -90,6 +90,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
       child: Row(
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
@@ -226,6 +227,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     double height,
   ) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,

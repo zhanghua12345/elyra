@@ -101,6 +101,7 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
     }
 
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': _historyVideo!.shortPlayId,
@@ -186,6 +187,13 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
                     // 播放按钮 —— 固定大小，不再被 Expanded 拉伸
                     Image.asset(
                       'ely_home_history_play.png'.icon,
+                      width: 28.w,
+                      height: 28.w,
+                    ),
+                    SizedBox(width: 10.w),
+                    // 播放按钮 —— 固定大小，不再被 Expanded 拉伸
+                    Image.asset(
+                      'ely_delete_history.png'.icon,
                       width: 28.w,
                       height: 28.w,
                     ),

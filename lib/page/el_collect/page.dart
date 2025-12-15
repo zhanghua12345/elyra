@@ -200,6 +200,7 @@ class _CollectPageState extends State<CollectPage> {
     return Stack(
       children: [
         GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () => JumpService.toDetail(
             video: {
               'shortPlayId': item.shortPlayId,
@@ -267,6 +268,7 @@ class _CollectPageState extends State<CollectPage> {
               ),
               child: Center(
                 child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   onTap: () {
                     // 传递 shortPlayId 到弹框
                     final shortPlayId = item.shortPlayId ?? '';

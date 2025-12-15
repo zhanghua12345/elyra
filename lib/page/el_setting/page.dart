@@ -65,6 +65,7 @@ class _SettingPageState extends State<SettingPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
@@ -135,6 +136,7 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildListTile(String title, VoidCallback onTap) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: onTap,
       child: Container(
         height: 48.h,

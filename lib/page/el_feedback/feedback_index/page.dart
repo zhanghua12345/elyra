@@ -95,6 +95,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Image.asset('ely_back.png'.icon, height: 20.h),
           ),
@@ -117,6 +118,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             badgeStyle: BadgeStyle(badgeColor: Color(0xFFF306B9)),
             position: BadgePosition.topEnd(top: -5, end: -5),
             child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: () => Get.to(() => FeedbackListPage()),
               child: Padding(
                 padding: EdgeInsets.all(5.w),

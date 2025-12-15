@@ -123,6 +123,7 @@ class ElConfirmModal extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.only(top: 20.w),
                     child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: onCancel ?? () => Navigator.pop(context),
                       child: Image(
                         image: AssetImage('ely_close.png'.icon),
