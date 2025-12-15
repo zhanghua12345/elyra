@@ -76,7 +76,7 @@ class _VampirePageState extends State<VampirePage> {
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 11.w, right: 11.w),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top:4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,

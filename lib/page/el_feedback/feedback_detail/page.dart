@@ -87,7 +87,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 11.w, right: 11.w,),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top:4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,

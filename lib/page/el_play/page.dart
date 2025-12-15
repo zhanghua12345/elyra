@@ -458,7 +458,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       left: 0,
       right: 0,
       child: Padding(
-        padding: EdgeInsets.only(left: 11.w, right: 16.w),
+        padding: EdgeInsets.only(left: 11.w, right: 16.w, top:4.h),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () => Get.back(),

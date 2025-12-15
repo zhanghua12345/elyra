@@ -85,8 +85,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
   Widget _buildAppBar() {
     return Container(
-      height: 44.h,
-      padding: EdgeInsets.only(left: 11.w, right: 16.w),
+      height: 46.h,
+      padding: EdgeInsets.only(left: 11.w, right: 16.w, top:2.h),
       child: Row(
         children: [
           GestureDetector(
