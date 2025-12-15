@@ -1,4 +1,5 @@
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_account_logout/page.dart';
 import 'package:elyra/page/el_setting/controller.dart';
 import 'package:elyra/page/el_setting/sub_page/account_delete/page.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -124,7 +125,7 @@ class _SettingPageState extends State<SettingPage> {
           SizedBox(height: 20.h),
           // Account Deletion
           _buildListTile('Account Deletion', () {
-            Get.to(() => AccountDeletePage());
+            Get.to(() => AccountLogoutPage());
           }),
           SizedBox(height: 12.h),
           // Log out button
