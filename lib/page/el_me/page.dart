@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MePage extends StatefulWidget {
   const MePage({super.key});
@@ -156,86 +157,86 @@ class _MePageState extends State<MePage> {
                 ),
               ),
               // 登录按钮
-              if (userInfo?.isTourist == true)
-                GestureDetector(
-                  onTap: () {
-                    // TODO: 跳转登录页
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 17.w,
-                      vertical: 5.w,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.w),
-                      border: Border.all(color: Colors.white, width: 1),
-                    ),
-                    child: Text(
-                      'Log in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ),
+              // if (userInfo?.isTourist == true)
+              //   GestureDetector(
+              //     onTap: () {
+              //       // TODO: 跳转登录页
+              //     },
+              //     child: Container(
+              //       padding: EdgeInsets.symmetric(
+              //         horizontal: 17.w,
+              //         vertical: 5.w,
+              //       ),
+              //       decoration: BoxDecoration(
+              //         borderRadius: BorderRadius.circular(20.w),
+              //         border: Border.all(color: Colors.white, width: 1),
+              //       ),
+              //       child: Text(
+              //         'Log in',
+              //         style: TextStyle(
+              //           color: Colors.white,
+              //           fontSize: 14.sp,
+              //           fontWeight: FontWeight.w500,
+              //           height: 1.3,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
             ],
           ),
           
           // 金币和Top Up
-          Container(
-            padding: EdgeInsets.only(top: 40.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    // 金币
-                    _buildCoinInfo(
-                      'Coins',
-                      '${userInfo?.coinLeftTotal ?? 0}',
-                    ),
-                    SizedBox(width: 30.w),
-                    // 赠送金币
-                    _buildCoinInfo(
-                      'Bonus',
-                      '${userInfo?.sendCoinLeftTotal ?? 0}',
-                    ),
-                  ],
-                ),
-                // Top Up 按钮
-                GestureDetector(
-                  onTap: () {
-                    // TODO: 跳转充值页面
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 8.w,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.w),
-                      gradient: LinearGradient(
-                        colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    child: Text(
-                      'Top Up',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Container(
+          //   padding: EdgeInsets.only(top: 40.w),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Row(
+          //         children: [
+          //           // 金币
+          //           _buildCoinInfo(
+          //             'Coins',
+          //             '${userInfo?.coinLeftTotal ?? 0}',
+          //           ),
+          //           SizedBox(width: 30.w),
+          //           // 赠送金币
+          //           _buildCoinInfo(
+          //             'Bonus',
+          //             '${userInfo?.sendCoinLeftTotal ?? 0}',
+          //           ),
+          //         ],
+          //       ),
+          //       // Top Up 按钮
+          //       GestureDetector(
+          //         onTap: () {
+          //           // TODO: 跳转充值页面
+          //         },
+          //         child: Container(
+          //           padding: EdgeInsets.symmetric(
+          //             horizontal: 16.w,
+          //             vertical: 8.w,
+          //           ),
+          //           decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(20.w),
+          //             gradient: LinearGradient(
+          //               colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
+          //               begin: Alignment.topCenter,
+          //               end: Alignment.bottomCenter,
+          //             ),
+          //           ),
+          //           child: Text(
+          //             'Top Up',
+          //             style: TextStyle(
+          //               color: Colors.white,
+          //               fontSize: 14.sp,
+          //               fontWeight: FontWeight.w600,
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
@@ -286,20 +287,39 @@ class _MePageState extends State<MePage> {
             'Feedback',
             'feedback',
           ),
-           _buildMenuItem(
-            'assets/ely_my_language.png',
-            'Language',
-            'language',
-          ),
+          //  _buildMenuItem(
+          //   'assets/ely_my_language.png',
+          //   'Language',
+          //   'language',
+          // ),
           _buildMenuItem(
             'assets/ely_my_about.png',
             'About',
             'about',
           ),
-          _buildMenuItem(
-            'assets/ely_my_setting.png',
-            'Setting',
-            'setting',
+          // _buildMenuItem(
+          //   'assets/ely_my_setting.png',
+          //   'Setting',
+          //   'setting',
+          //   isLast: true,
+          // ),
+          _buildMenuItemWithUrl(
+            'assets/ely_my_about.png',
+            'Privacy Policy',
+            'https://www.csyib.com/private',
+            openInWebView: true,
+          ),
+          _buildMenuItemWithUrl(
+            'assets/ely_my_about.png',
+            'User Agreement',
+            'https://www.csyib.com/user_policy',
+            openInWebView: true,
+          ),
+          _buildMenuItemWithUrl(
+            'assets/ely_my_about.png',
+            'Visit Website',
+            'https://www.csyib.com',
+            openInWebView: false,
             isLast: true,
           ),
         ],
@@ -347,5 +367,64 @@ class _MePageState extends State<MePage> {
         },
       ),
     );
+  }
+
+  /// 带URL的菜单项
+  Widget _buildMenuItemWithUrl(
+    dynamic icon,
+    String title,
+    String url, {
+    bool openInWebView = true,
+    bool isLast = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: isLast
+              ? BorderSide.none
+              : BorderSide(color: Colors.white.withOpacity(0.5), width: 0.5),
+        ),
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 0,
+          vertical: 1.w,
+        ),
+        leading: icon is String
+            ? Image.asset(
+                icon,
+                width: 20.w,
+              )
+            : Icon(icon, color: Colors.white),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: Icon(Icons.chevron_right, color: Colors.white70),
+        onTap: () {
+          if (openInWebView) {
+            // 在应用内WebView中打开
+            Get.toNamed('/web_view', arguments: {'title': title, 'url': url});
+          } else {
+            // 在外部浏览器打开
+            _openExternalUrl(url);
+          }
+        },
+      ),
+    );
+  }
+
+  /// 在外部浏览器打开URL
+  Future<void> _openExternalUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint('无法打开链接: $url');
+    }
   }
 }
