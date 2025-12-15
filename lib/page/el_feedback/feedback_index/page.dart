@@ -21,7 +21,9 @@ class FeedbackPage extends StatefulWidget {
 
 class _FeedbackPageState extends State<FeedbackPage> {
   late final FeedbackPageController controller;
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   @override
   void initState() {
@@ -62,7 +64,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     onRefresh: () {
                       controller.onRefresh();
                       // 手动完成刷新
-                      Future.delayed(const Duration(milliseconds: 500)).then((_) {
+                      Future.delayed(const Duration(milliseconds: 500)).then((
+                        _,
+                      ) {
                         if (mounted) {
                           _refreshController.refreshCompleted();
                         }
@@ -90,14 +94,18 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w,),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+            child: Padding(
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
           ),
           Text(
             title,
@@ -112,7 +120,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
           Badge(
             showBadge: controller.state.noticeNum > 0,
             badgeContent: Text(
-              controller.state.noticeNum > 99 ? '99+' : '${controller.state.noticeNum}',
+              controller.state.noticeNum > 99
+                  ? '99+'
+                  : '${controller.state.noticeNum}',
               style: const TextStyle(color: Colors.white, fontSize: 10),
             ),
             badgeStyle: BadgeStyle(badgeColor: Color(0xFFF306B9)),
@@ -122,7 +132,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
               onTap: () => Get.to(() => FeedbackListPage()),
               child: Padding(
                 padding: EdgeInsets.all(5.w),
-                child: Image.asset('ely_feedback_agreement.png'.icon, width: 24.w),
+                child: Image.asset(
+                  'ely_feedback_agreement.png'.icon,
+                  width: 24.w,
+                ),
               ),
             ),
           ),
@@ -171,7 +184,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           onReceivedError: controller.onReceivedError,
           onPageCommitVisible: controller.onPageCommitVisible,
         ),
-        
+
         // 加载指示器
         if (controller.state.loadStatus == LoadStatusType.loading)
           Center(

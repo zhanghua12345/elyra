@@ -22,6 +22,8 @@ class HomeVideoHistoryWidget extends StatefulWidget {
 class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
   ShortVideoBean? _historyVideo;
   bool _isLoading = true;
+  bool _isHidden = false; // 用户是否手动关闭了历史记录模块
+  String? _lastHistoryKey; // 记录最后一次显示的历史记录标识
 
   @override
   void initState() {
@@ -46,6 +48,17 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
           ..imageUrl = historyData['image_url']
           ..process = historyData['episode']
           ..playTime = historyData['play_seconds'] ?? 0;
+
+        // 生成当前历史记录的唯一标识
+        String currentHistoryKey =
+            '${historyData['short_play_id']}_${historyData['episode']}_${historyData['timestamp']}';
+
+        // 检查是否有新数据
+        if (_lastHistoryKey != currentHistoryKey) {
+          // 有新数据，重新显示模块
+          _isHidden = false;
+          _lastHistoryKey = currentHistoryKey;
+        }
 
         setState(() => _isLoading = false);
       } else {
@@ -84,6 +97,17 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
         };
         SpUtils().setString(ElStoreKeys.videoHistory, jsonEncode(historyData));
+
+        // 生成当前历史记录的唯一标识
+        String currentHistoryKey =
+            '${historyData['short_play_id']}_${historyData['episode']}_${historyData['timestamp']}';
+
+        // 检查是否有新数据
+        if (_lastHistoryKey != currentHistoryKey) {
+          // 有新数据，重新显示模块
+          _isHidden = false;
+          _lastHistoryKey = currentHistoryKey;
+        }
       }
 
       setState(() => _isLoading = false);
@@ -93,10 +117,17 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
     }
   }
 
+  /// 关闭历史记录模块
+  void _closeHistory() {
+    setState(() {
+      _isHidden = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 如果没有历史记录或正在加载,返回空Widget
-    if (_isLoading || _historyVideo == null) {
+    // 如果没有历史记录、正在加载或用户已关闭,返回空Widget
+    if (_isLoading || _historyVideo == null || _isHidden) {
       return SizedBox.shrink();
     }
 
@@ -147,14 +178,12 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
             ),
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.only(left: 80.w, right: 10.w),
+                padding: EdgeInsets.only(left: 80.w, right: 6.w),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // 剧集信息 —— 自动扩展
-                    SizedBox(
-                      width: 130.w,
+                    // 左侧：信息区，占满剩余空间
+                    Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,6 +202,8 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
                           ),
                           Text(
                             'Last Watch: Ep.${_historyVideo!.process ?? 1}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.75),
                               fontSize: 10,
@@ -184,18 +215,30 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
                         ],
                       ),
                     ),
-                    // 播放按钮 —— 固定大小，不再被 Expanded 拉伸
-                    Image.asset(
-                      'ely_home_history_play.png'.icon,
-                      width: 28.w,
-                      height: 28.w,
-                    ),
-                    SizedBox(width: 10.w),
-                    // 播放按钮 —— 固定大小，不再被 Expanded 拉伸
-                    Image.asset(
-                      'ely_delete_history.png'.icon,
-                      width: 28.w,
-                      height: 28.w,
+
+                    // 右侧：按钮组（整体右对齐）
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'ely_home_history_play.png'.icon,
+                          width: 20.w,
+                          height: 20.w,
+                        ),
+                        SizedBox(width: 6.w),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _closeHistory,
+                          child: Padding(
+                            padding: EdgeInsets.all(4.w), // 扩大点击热区
+                            child: Image.asset(
+                              'ely_delete_history.png'.icon,
+                              width: 16.w,
+                              height: 16.w,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

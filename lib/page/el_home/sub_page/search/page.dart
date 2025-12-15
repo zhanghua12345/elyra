@@ -80,15 +80,18 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildSearchAppBar() {
     return Container(
       height: 44.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.only(left: 11.w,right: 16.w),
       child: Row(
         children: [
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+            child: Padding(
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: 5.w),
           Expanded(child: _buildSearchBox()),
         ],
       ),

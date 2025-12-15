@@ -77,13 +77,18 @@ class _TestPageState extends State<TestPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 11.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+            child: Padding(
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
           ),
           Text(
             title,
@@ -95,7 +100,7 @@ class _TestPageState extends State<TestPage> {
             ),
           ),
           // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 20.w),
+          SizedBox(width: 30.w),
         ],
       ),
     );

@@ -53,13 +53,17 @@ class _WebViewPageState extends State<WebViewPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
             onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+            child: Padding(
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
           ),
           Expanded(
             child: Text(
@@ -75,10 +79,11 @@ class _WebViewPageState extends State<WebViewPage> {
               ),
             ),
           ),
+          SizedBox(width: 10.w),
           // 刷新按钮
           GestureDetector(
             onTap: () => controller.reload(),
-            child: Icon(Icons.refresh, color: Colors.white, size: 20.h),
+            child: Icon(Icons.refresh, color: Colors.white, size: 20.w),
           ),
         ],
       ),
@@ -104,7 +109,7 @@ class _WebViewPageState extends State<WebViewPage> {
       children: [
         // WebView
         WebViewWidget(controller: controller.webViewController),
-        
+
         // 加载进度条
         if (controller.state.loadStatus == LoadStatusType.loading)
           Positioned(

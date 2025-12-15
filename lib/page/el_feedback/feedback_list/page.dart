@@ -19,7 +19,9 @@ class FeedbackListPage extends StatefulWidget {
 
 class _FeedbackListPageState extends State<FeedbackListPage> {
   late final FeedbackListPageController controller;
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   @override
   void initState() {
@@ -59,7 +61,9 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                     enablePullUp: false,
                     onRefresh: () {
                       controller.onRefresh();
-                      Future.delayed(const Duration(milliseconds: 500)).then((_) {
+                      Future.delayed(const Duration(milliseconds: 500)).then((
+                        _,
+                      ) {
                         if (mounted) {
                           _refreshController.refreshCompleted();
                         }
@@ -87,14 +91,18 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+            child: Padding(
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
           ),
           Text(
             title,
@@ -106,7 +114,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
             ),
           ),
           // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 20.w),
+          SizedBox(width: 30.w),
         ],
       ),
     );
