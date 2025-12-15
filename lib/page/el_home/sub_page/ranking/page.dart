@@ -223,6 +223,7 @@ class _RankingPageState extends State<RankingPage> {
 
   Widget _buildRankingItem(ShortVideoBean item, int rank, bool isFirst) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => JumpService.toDetail(
         video: {
           'shortPlayId': item.shortPlayId,

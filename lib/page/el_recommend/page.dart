@@ -79,11 +79,13 @@ class _RecommendPageState extends State<RecommendPage>
     // 当应用进入后台或不可见时暂停视频
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      _isPageVisible = false;
       _pauseAllVideos();
     } else if (state == AppLifecycleState.resumed) {
-      _isPageVisible = true;
-      _playCurrentVideo();
+      // 应用恢复时，只有当页面本身是可见的时候才播放
+      // 通过 VisibilityDetector 来判断页面可见性
+      if (_isPageVisible && _currentPageIndex < controller.state.recommendList.length) {
+        _playCurrentVideo();
+      }
     }
   }
 
@@ -316,7 +318,22 @@ class _RecommendPageState extends State<RecommendPage>
     super.build(context);
     return GetBuilder<RecommendPageController>(
       builder: (controller) {
-        return Scaffold(backgroundColor: Colors.black, body: _buildContent());
+        return VisibilityDetector(
+          key: Key('recommend-page-visibility'),
+          onVisibilityChanged: (VisibilityInfo info) {
+            // 检测页面可见性
+            if (info.visibleFraction > 0.5) {
+              // 页面可见
+              _isPageVisible = true;
+              _playCurrentVideo();
+            } else if (info.visibleFraction < 0.2) {
+              // 页面不可见
+              _isPageVisible = false;
+              _pauseAllVideos();
+            }
+          },
+          child: Scaffold(backgroundColor: Colors.black, body: _buildContent()),
+        );
       },
     );
   }
@@ -490,26 +507,10 @@ class _RecommendPageState extends State<RecommendPage>
                   Positioned.fill(
                     child: FittedBox(
                       fit: BoxFit.cover,
-                      child: VisibilityDetector(
-                        key: Key('recommend-video-$index'),
-                        onVisibilityChanged: (VisibilityInfo info) {
-                          var visiblePercentage = info.visibleFraction * 100;
-                          // 当可见度小于20%时暂停
-                          if (visiblePercentage < 20 &&
-                              _currentPageIndex == index) {
-                            videoCtrl.pause();
-                            _isPageVisible = false;
-                          } else if (visiblePercentage > 20 &&
-                              _currentPageIndex == index) {
-                            _isPageVisible = true;
-                            videoCtrl.play();
-                          }
-                        },
-                        child: SizedBox(
-                          width: videoCtrl.value.size.width,
-                          height: videoCtrl.value.size.height,
-                          child: VideoPlayer(videoCtrl),
-                        ),
+                      child: SizedBox(
+                        width: videoCtrl.value.size.width,
+                        height: videoCtrl.value.size.height,
+                        child: VideoPlayer(videoCtrl),
                       ),
                     ),
                   ),
@@ -552,21 +553,6 @@ class _RecommendPageState extends State<RecommendPage>
     videoCtrl?.pause();
     _isPageVisible = false;
 
-    // TODO: 跳转到视频详情页（需要实现短视频详情页路由）
-    // Get.toNamed(
-    //   AppRoutes.shortVideo,
-    //   arguments: {
-    //     'shortPlayId': video.shortPlayId,
-    //     'imageUrl': video.imageUrl ?? '',
-    //   },
-    // )?.then((value) {
-    //   // 返回后检查是否是当前页面，是的话继续播放
-    //   _isPageVisible = true;
-    //   if (_currentPageIndex == controller.state.recommendList.indexOf(video)) {
-    //     videoCtrl?.play();
-    //   }
-    // });
-
     JumpService.toDetail(
       video: {
         'shortPlayId': video.shortPlayId,
@@ -576,13 +562,6 @@ class _RecommendPageState extends State<RecommendPage>
     );
 
     print('跳转到详情页: ${video.name}');
-    // 临时处理：延迟后恢复播放
-    Future.delayed(Duration(milliseconds: 100), () {
-      _isPageVisible = true;
-      if (mounted) {
-        videoCtrl?.play();
-      }
-    });
   }
 
   /// 构建底部信息栏（标题、描述、进度条）

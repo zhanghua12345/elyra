@@ -62,19 +62,20 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
         // 在页面退出前上传播放进度并更新本地历史记录
-        if (didPop && 
+        if (didPop &&
             controller.controllers.isNotEmpty &&
             controller.currentIndex < controller.controllers.length) {
-          final playSeconds = controller
+          final playSeconds =
+              controller
                   .controllers[controller.currentIndex]
                   ?.value
                   .position
                   .inMilliseconds ??
               0;
-          
+
           // 上传到服务器并保存到本地
           controller.uploadHistorySeconds(playSeconds);
-          
+
           // 确保本地存储已更新（等待一小段时间确保写入完成）
           await Future.delayed(Duration(milliseconds: 50));
         }
@@ -456,8 +457,8 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       right: 0,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
-
         child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () => Get.back(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,

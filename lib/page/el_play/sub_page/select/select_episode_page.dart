@@ -50,7 +50,7 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
       vsync: this,
       initialIndex: (_currentEpisode - 1) ~/ _perTabEpisode,
     );
-    
+
     // 监听Tab切换，确保界面更新
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
@@ -86,163 +86,160 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
   Widget build(BuildContext context) {
     final double bottomSafe = MediaQuery.of(context).padding.bottom;
 
-    return SafeArea(
-      minimum: EdgeInsets.only(bottom: 16.h),
-      child: Container(
-        height: 340.h + bottomSafe, // ② 指定高度 + 安全距离
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        decoration: ShapeDecoration(
-          color: Colors.black.withValues(alpha: 0.9),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.w),
-          ),
+    return Container(
+      height: 360.h + bottomSafe, // ② 指定高度 + 安全距离
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      decoration: ShapeDecoration(
+        color: Colors.black.withValues(alpha: 0.9),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topLeft:Radius.circular(16.w),topRight: Radius.circular(16.w)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// 标题（单行 + 限宽300 + 省略号）
-            Container(
-              margin: EdgeInsets.only(top: 18.h),
-              width: 300.w, // ① 限制宽度
-              child: Text(
-                widget.shortPlayInfo?.name ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
-                ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 标题（单行 + 限宽300 + 省略号）
+          Container(
+            margin: EdgeInsets.only(top: 18.h),
+            width: 300.w, // ① 限制宽度
+            child: Text(
+              widget.shortPlayInfo?.name ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
+          ),
 
-            SizedBox(height: 10.h),
+          SizedBox(height: 10.h),
 
-            /// TabBar（可横向滚动）
-            Align(
-              alignment: Alignment.centerLeft,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(_tabCount, (index) {
-                    int start = index * _perTabEpisode + 1;
-                    int end = (index + 1) * _perTabEpisode;
-                    if (end > widget.totalEpisodes) end = widget.totalEpisodes;
-                    
-                    // 使用_tabController.index而不是局部变量
-                    bool isSelected = _tabController.index == index;
-
-                    return Padding(
-                      padding: EdgeInsets.only(right: 50.w), // ⑤ 两个Tab相距50
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_tabController.index != index) {
-                            _tabController.animateTo(index);
-                          }
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '$start-$end',
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Color(0xFFFF29DF)
-                                    : Color(0xFFC2C2C2),
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Container(
-                              width: 10.w,
-                              height: 4.h,
-                              decoration: ShapeDecoration(
-                                color: isSelected
-                                    ? Color(0xFFFF29DF)
-                                    : Color(0xFFAAAAAA),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(36),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 12.h),
-
-            /// 选集内容（每页 24 个，6列 × 4行）
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: List.generate(_tabCount, (tabIndex) {
-                  int start = tabIndex * _perTabEpisode + 1;
-                  int end = (tabIndex + 1) * _perTabEpisode;
+          /// TabBar（可横向滚动）
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(_tabCount, (index) {
+                  int start = index * _perTabEpisode + 1;
+                  int end = (index + 1) * _perTabEpisode;
                   if (end > widget.totalEpisodes) end = widget.totalEpisodes;
 
-                  return GridView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.only(top: 12.h),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 6,
-                      mainAxisSpacing: 15.h, // ③ item宽高间距 = 15
-                      crossAxisSpacing: 15.w,
-                      childAspectRatio: 43 / 44, // item大小：43×44
-                    ),
-                    itemCount: end - start + 1,
-                    itemBuilder: (_, index) {
-                      int episode = start + index;
-                      bool isCurrent = episode == _currentEpisode;
+                  // 使用_tabController.index而不是局部变量
+                  bool isSelected = _tabController.index == index;
 
-                      return GestureDetector(
-                        onTap: () => _selectEpisode(episode),
-                        child: Container(
-                          decoration: isCurrent
-                              ? ShapeDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment(0.50, 0.00),
-                                    end: Alignment(0.50, 1.00),
-                                    colors: [
-                                      Color(0xFFDC23B1),
-                                      Color(0xFF6018E6),
-                                    ],
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                )
-                              : ShapeDecoration(
-                                  color: Colors.white.withValues(alpha: 0.25),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                ),
-                          child: Center(
-                            child: Text(
-                              '$episode',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.80),
-                                fontSize: 16,
-                                fontFamily: 'DIN Black',
-                                fontWeight: FontWeight.w900,
+                  return Padding(
+                    padding: EdgeInsets.only(right: 50.w), // ⑤ 两个Tab相距50
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_tabController.index != index) {
+                          _tabController.animateTo(index);
+                        }
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '$start-$end',
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Color(0xFFFF29DF)
+                                  : Color(0xFFC2C2C2),
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Container(
+                            width: 10.w,
+                            height: 4.h,
+                            decoration: ShapeDecoration(
+                              color: isSelected
+                                  ? Color(0xFFFF29DF)
+                                  : Color(0xFFAAAAAA),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(36),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        ],
+                      ),
+                    ),
                   );
                 }),
               ),
             ),
-          ],
-        ),
+          ),
+
+          SizedBox(height: 12.h),
+
+          /// 选集内容（每页 24 个，6列 × 4行）
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: List.generate(_tabCount, (tabIndex) {
+                int start = tabIndex * _perTabEpisode + 1;
+                int end = (tabIndex + 1) * _perTabEpisode;
+                if (end > widget.totalEpisodes) end = widget.totalEpisodes;
+
+                return GridView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(top: 12.h),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 6,
+                    mainAxisSpacing: 15.h, // ③ item宽高间距 = 15
+                    crossAxisSpacing: 15.w,
+                    childAspectRatio: 43 / 44, // item大小：43×44
+                  ),
+                  itemCount: end - start + 1,
+                  itemBuilder: (_, index) {
+                    int episode = start + index;
+                    bool isCurrent = episode == _currentEpisode;
+
+                    return GestureDetector(
+                      onTap: () => _selectEpisode(episode),
+                      child: Container(
+                        decoration: isCurrent
+                            ? ShapeDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment(0.50, 0.00),
+                                  end: Alignment(0.50, 1.00),
+                                  colors: [
+                                    Color(0xFFDC23B1),
+                                    Color(0xFF6018E6),
+                                  ],
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                              )
+                            : ShapeDecoration(
+                                color: Colors.white.withValues(alpha: 0.25),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                              ),
+                        child: Center(
+                          child: Text(
+                            '$episode',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.80),
+                              fontSize: 16,
+                              fontFamily: 'DIN Black',
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
