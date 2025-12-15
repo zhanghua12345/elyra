@@ -18,11 +18,16 @@ class GenresPage extends StatefulWidget {
   State<GenresPage> createState() => _GenresPageState();
 }
 
-class _GenresPageState extends State<GenresPage> {
+class _GenresPageState extends State<GenresPage>
+    with AutomaticKeepAliveClientMixin {
   final controller = Get.put(GenresController());
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用，保持页面存活
     return GetBuilder<GenresController>(
       builder: (controller) {
         return SmartRefresher(

@@ -18,11 +18,16 @@ class NewPage extends StatefulWidget {
   State<NewPage> createState() => _NewPageState();
 }
 
-class _NewPageState extends State<NewPage> {
+class _NewPageState extends State<NewPage>
+    with AutomaticKeepAliveClientMixin {
   final controller = Get.put(NewController());
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用，保持页面存活
     return GetBuilder<NewController>(
       builder: (controller) {
         return SmartRefresher(

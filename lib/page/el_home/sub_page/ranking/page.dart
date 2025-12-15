@@ -17,11 +17,16 @@ class RankingPage extends StatefulWidget {
   State<RankingPage> createState() => _RankingPageState();
 }
 
-class _RankingPageState extends State<RankingPage> {
+class _RankingPageState extends State<RankingPage>
+    with AutomaticKeepAliveClientMixin {
   final controller = Get.put(RankingController());
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用，保持页面存活
     return GetBuilder<RankingController>(
       builder: (controller) {
         return SmartRefresher(

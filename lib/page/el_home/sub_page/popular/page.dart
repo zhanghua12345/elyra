@@ -19,11 +19,16 @@ class PopularPage extends StatefulWidget {
   State<PopularPage> createState() => _PopularPageState();
 }
 
-class _PopularPageState extends State<PopularPage> {
+class _PopularPageState extends State<PopularPage>
+    with AutomaticKeepAliveClientMixin {
   final controller = Get.put(PopularController());
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // 必须调用，保持页面存活
     return GetBuilder<PopularController>(
       builder: (controller) {
         return SmartRefresher(
