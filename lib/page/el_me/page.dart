@@ -208,9 +208,7 @@ class _MePageState extends State<MePage> {
                 ),
                 // Top Up 按钮
                 GestureDetector(
-                  onTap: () {
-                    // TODO: 跳转充值页面
-                  },
+                  onTap: () => {Get.toNamed('/store')},
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.w,
