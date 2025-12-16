@@ -9,9 +9,9 @@ class JumpService {
 
     // Map 写法：video['xxx']
     // Model 写法：video.xxx
-    final shortPlayId = _read(video, 'shortPlayId');
     final videoId = _read(video, 'videoId') ?? _read(video, 'id') ?? 0;
     final imageUrl = _read(video, 'imageUrl') ?? '';
+    final shortPlayId = _read(video, 'shortPlayId');
 
     // shortPlayId 是强依赖，没有就不跳转
     if (shortPlayId == null || shortPlayId == 0) {

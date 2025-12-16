@@ -10,30 +10,9 @@ class SpUtils {
   // 工厂构造函数返回单例
   factory SpUtils() => _instance;
 
-  // 私有构造函数
-  SpUtils._internal();
-
-  // 存储实例
-  late SharedPreferences _prefs;
-
-  // 初始化方法
-  Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
-
   // 存储String
   Future<bool> setString(String key, String value) {
     return _prefs.setString(key, value);
-  }
-
-  // 读取String
-  String? getString(String key) {
-    return _prefs.getString(key);
-  }
-
-  // 存储int
-  Future<bool> setInt(String key, int value) {
-    return _prefs.setInt(key, value);
   }
 
   // 读取int
@@ -49,6 +28,27 @@ class SpUtils {
   // 读取bool
   bool? getBool(String key) {
     return _prefs.getBool(key);
+  }
+
+  // 私有构造函数
+  SpUtils._internal();
+
+  // 存储实例
+  late SharedPreferences _prefs;
+
+  // 初始化方法
+  Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  // 读取String
+  String? getString(String key) {
+    return _prefs.getString(key);
+  }
+
+  // 存储int
+  Future<bool> setInt(String key, int value) {
+    return _prefs.setInt(key, value);
   }
 
   // 存储double
@@ -79,12 +79,6 @@ class SpUtils {
     return _prefs.setString(key, json.encode(value));
   }
 
-  // 读取Object
-  Map<String, dynamic>? getObject(String key) {
-    String? jsonString = _prefs.getString(key);
-    return jsonString != null ? json.decode(jsonString) : null;
-  }
-
   // 存储Object列表
   Future<bool> setObjectList(String key, List<Object> value) {
     if (value.isEmpty || value.first is! Map<String, dynamic>) {
@@ -101,6 +95,12 @@ class SpUtils {
 
     List<dynamic> dynamicList = json.decode(jsonString);
     return dynamicList.cast<Map<String, dynamic>>();
+  }
+
+  // 读取Object
+  Map<String, dynamic>? getObject(String key) {
+    String? jsonString = _prefs.getString(key);
+    return jsonString != null ? json.decode(jsonString) : null;
   }
 
   // 存储时自动转换为Map的泛型方法
@@ -175,16 +175,6 @@ class SpUtils {
     }
   }
 
-  // 检查是否包含key
-  bool containsKey(String key) {
-    return _prefs.containsKey(key);
-  }
-
-  // 删除指定key
-  Future<bool> remove(String key) {
-    return _prefs.remove(key);
-  }
-
   // 清除所有存储
   Future<bool> clear() {
     return _prefs.clear();
@@ -193,6 +183,16 @@ class SpUtils {
   // 获取所有keys
   Set<String> getKeys() {
     return _prefs.getKeys();
+  }
+
+  // 检查是否包含key
+  bool containsKey(String key) {
+    return _prefs.containsKey(key);
+  }
+
+  // 删除指定key
+  Future<bool> remove(String key) {
+    return _prefs.remove(key);
   }
 }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/utils/el_color.dart';
 
 enum BadStatusType { noNetwork, loadFailed, nothingYet, notFound }
 
@@ -26,14 +25,14 @@ class BadStatusWidget extends StatelessWidget {
               Image.asset(_getIcon(type).icon, width: 290.w, height: 268.h),
               Text(
                 _getMessage(type, message),
-                style: TextStyle(fontSize: 15.sp, color: ColorEnum.mainColor, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 15.sp, color: Color(0xFF9C9EE9), fontWeight: FontWeight.w500),
               ),
             ],
           ),
 
           Text(
             _getSubMessage(type, message),
-            style: TextStyle(fontSize: 12.sp, color: ColorEnum.bg_777777),
+            style: TextStyle(fontSize: 12.sp, color: Color(0xFF777777)),
           ),
           if (onPressed != null)
             GestureDetector(
@@ -45,12 +44,12 @@ class BadStatusWidget extends StatelessWidget {
                 margin: EdgeInsets.only(top: 30.h),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  border: Border.all(color: ColorEnum.mainColor, width: 1.w),
+                  border: Border.all(color: Color(0xFF9C9EE9), width: 1.w),
                   borderRadius: BorderRadius.circular(50.w),
                 ),
                 child: Text(
                   'Try Again',
-                  style: TextStyle(fontSize: 14.sp, color: ColorEnum.mainColor),
+                  style: TextStyle(fontSize: 14.sp, color: Color(0xFF9C9EE9)),
                 ),
               ),
             ),

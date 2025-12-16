@@ -1,9 +1,6 @@
 import 'package:elyra/bean/short_play_detail_bean.dart';
-import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/utils/el_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 /// 选集弹窗页面
 class SelectEpisodePage extends StatefulWidget {

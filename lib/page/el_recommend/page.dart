@@ -3,9 +3,7 @@ import 'dart:ui';
 import 'package:elyra/bean/short_video_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_recommend/controller.dart';
-import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/device_info.dart';
-import 'package:elyra/utils/el_color.dart';
 import 'package:elyra/utils/jump_detail.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
@@ -380,7 +378,7 @@ class _RecommendPageState extends State<RecommendPage>
     }
 
     return RefreshIndicator(
-      color: ColorEnum.mainColor,
+      color: Colors.black,
       backgroundColor: Colors.white,
       onRefresh: () async {
         // 下拉刷新：重置到第一页

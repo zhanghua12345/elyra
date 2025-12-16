@@ -7,14 +7,14 @@ class Message {
   static Future<bool?> show(
     String message, {
     ToastGravity gravity = ToastGravity.CENTER,
+    TextAlign textAlign = TextAlign.center,
+    Color textColor = Colors.white,
     Color backgroundColor = Colors.black87,
     Duration duration = const Duration(seconds: 2),
-    double fontSize = 16.0,
-    TextAlign textAlign = TextAlign.center,
     bool dismissOtherToast = true,
     double? width,
     double? height,
-    Color textColor = Colors.white,
+    double fontSize = 16.0,
   }) async {
     // 转换持续时间
     final toastLength = duration.inSeconds > 3 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
@@ -28,11 +28,11 @@ class Message {
     return Fluttertoast.showToast(
       msg: message,
       toastLength: toastLength,
-      gravity: gravity,
-      timeInSecForIosWeb: duration.inSeconds,
       textColor: textColor,
       fontSize: fontSize,
       backgroundColor: backgroundColor,
+      gravity: gravity,
+      timeInSecForIosWeb: duration.inSeconds,
     );
   }
 
