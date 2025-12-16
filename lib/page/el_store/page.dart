@@ -78,7 +78,7 @@ class _StorePageState extends State<StorePage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 11.w, right: 11.w, top:4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -167,17 +167,12 @@ class _StorePageState extends State<StorePage> {
     return Column(
       children: [
         SizedBox(height: 24.h),
-        _buildSectionTitle('Coins Purchase'),
-        SizedBox(height: 16.h),
         // Big Coins
-        if (controller.state.coinsBigList.isNotEmpty)
-          _buildBigCoins(),
+        if (controller.state.coinsBigList.isNotEmpty) _buildBigCoins(),
         // Small Coins
-        if (controller.state.coinsSmallList.isNotEmpty)
-          _buildSmallCoins(),
+        if (controller.state.coinsSmallList.isNotEmpty) _buildSmallCoins(),
         // Week Coins
-        if (controller.state.coinsWeekList.isNotEmpty)
-          _buildWeekCoins(),
+        if (controller.state.coinsWeekList.isNotEmpty) _buildWeekCoins(),
       ],
     );
   }
@@ -185,7 +180,7 @@ class _StorePageState extends State<StorePage> {
   /// VIP 区块
   Widget _buildVipSection() {
     if (controller.state.subList.isEmpty) return SizedBox();
-    
+
     return Column(
       children: [
         SizedBox(height: 40.h),
@@ -208,10 +203,7 @@ class _StorePageState extends State<StorePage> {
               height: 2,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.25),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.white.withOpacity(0.25), Colors.transparent],
                 ),
               ),
             ),
@@ -233,10 +225,7 @@ class _StorePageState extends State<StorePage> {
               height: 2,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    Colors.white.withOpacity(0.25),
-                  ],
+                  colors: [Colors.transparent, Colors.white.withOpacity(0.25)],
                 ),
               ),
             ),
@@ -293,7 +282,10 @@ class _StorePageState extends State<StorePage> {
                     ),
                   ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 4.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.9),
                     border: Border.all(
@@ -453,10 +445,7 @@ class _StorePageState extends State<StorePage> {
                   ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Color(0xFF482A00),
-                        Color(0xFF5E1C00),
-                      ],
+                      colors: [Color(0xFF482A00), Color(0xFF5E1C00)],
                     ),
                     borderRadius: BorderRadius.circular(48),
                   ),
@@ -470,8 +459,8 @@ class _StorePageState extends State<StorePage> {
                           fontSize: item.price.length > 10
                               ? 12
                               : item.price.length > 8
-                                  ? 14
-                                  : 18,
+                              ? 14
+                              : 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -536,8 +525,7 @@ class _StorePageState extends State<StorePage> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                foreground: Paint()
-                  ..shader = _getVipGradient(item.vipType),
+                foreground: Paint()..shader = _getVipGradient(item.vipType),
               ),
             ),
             SizedBox(height: 15.h),
@@ -580,23 +568,23 @@ class _StorePageState extends State<StorePage> {
     List<Color> colors;
     switch (vipType) {
       case 'week':
-        colors = [Color(0xFFFFFFFF), Color(0xFF4C84C5)];
+        colors = [Color(0xFF26343A), Color(0xFF698FA0)];
         break;
       case 'month':
-        colors = [Color(0xFFDEDEDE), Color(0xFF658B75)];
+        colors = [Color(0xFF2C5289), Color(0xFF3981EE)];
         break;
       case 'three_months':
-        colors = [Color(0xFFE8E5FF), Color(0xFF875FE2)];
+        colors = [Color(0xFFD25DB8), Color(0xFFE01DB8)];
         break;
       case 'year':
-        colors = [Color(0xFF9F5300), Color(0xFF9F5300)];
+        colors = [Color(0xFFFFE652), Color(0xFFFDA71E)];
         break;
       default:
         colors = [Colors.white, Colors.white];
     }
-    return LinearGradient(colors: colors).createShader(
-      Rect.fromLTWH(0, 0, 200, 24),
-    );
+    return LinearGradient(
+      colors: colors,
+    ).createShader(Rect.fromLTWH(0, 0, 200, 24));
   }
 
   /// VIP 价格渐变
@@ -618,22 +606,22 @@ class _StorePageState extends State<StorePage> {
       default:
         colors = [Colors.white, Colors.white];
     }
-    return LinearGradient(colors: colors).createShader(
-      Rect.fromLTWH(0, 0, 200, 44),
-    );
+    return LinearGradient(
+      colors: colors,
+    ).createShader(Rect.fromLTWH(0, 0, 200, 44));
   }
 
   /// VIP 文字颜色
   Color _getVipTextColor(String vipType) {
     switch (vipType) {
       case 'week':
-        return Color(0xFFADD2FF);
+        return Color(0xFF26343A);
       case 'month':
-        return Color(0xFFCFFBDB);
+        return Color(0xFF2B5289);
       case 'three_months':
-        return Color(0xFFCAC4FF);
+        return Color(0xFFDF23B8);
       case 'year':
-        return Color(0xFF9F5300);
+        return Color(0xFFFE890E);
       default:
         return Colors.white;
     }
@@ -643,13 +631,13 @@ class _StorePageState extends State<StorePage> {
   Color _getVipDescColor(String vipType) {
     switch (vipType) {
       case 'week':
-        return Color(0xFF99B9E0);
+        return Color(0xFF26343A);
       case 'month':
-        return Color(0xFFB5DDC0);
+        return Color(0xFF2C5289);
       case 'three_months':
-        return Color(0xFFCAC4FF);
+        return Color(0xFFDF23B8);
       case 'year':
-        return Color(0xFF9F5300);
+        return Color(0xFFFE890E);
       default:
         return Colors.white.withOpacity(0.7);
     }
@@ -663,25 +651,28 @@ class _StorePageState extends State<StorePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Subscription Rules',
+            'Tips',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
-              fontSize: 14,
+              color: Colors.white,
+              fontSize: 12,
+              fontFamily: 'PingFang SC',
               fontWeight: FontWeight.w500,
+              height: 1.25,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 4.h),
           Text(
-            '1.Coins can only be used within this application.\n'
-            '2. Payment: The purchase will be charged to your iTunes account.\n'
-            '3. Renewal: Your Apple iTunes account will be charged within 24 hours before the expiration and the subscription period will be extended for another subscription cycle upon successful deduction.\n'
-            '4. Cancellation: To cancel the subscription renewal, please turn off the automatic renewal function in the iTunes/Apple ID settings at least 24 hours before the current subscription period expires. If canceled within the last 24 hours before expiration, a subscription fee will still be charged.\n'
-            '5. Payment successful but recharge not taking effect for an extended period? Click here to refresh or send an email to: moboreels@moboreader.com.\n'
-            '6. Manage your subscriptions: You can view, change, or cancel your subscriptions.',
+            '1. Coins are virtual items and cannot be refunded. Use it for this product.\n'
+            '2. Both the coins and the reward coins will never expire. \n'
+            '3. Coins will be used first when unlocking episodes. If the amount is insufficient, reward coins will automatically be used.\n'
+            '4. The purchase has not been credited, click <Restore> torefresh.\n'
+            '5. For other questions, contact us via Profile>Help &feedback.',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
-              fontSize: 12,
-              height: 1.5,
+              color: Colors.white,
+              fontSize: 10,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w400,
+              height: 1.50,
             ),
           ),
         ],
