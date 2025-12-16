@@ -186,57 +186,57 @@ class _MePageState extends State<MePage> {
           ),
           
           // 金币和Top Up
-          // Container(
-          //   padding: EdgeInsets.only(top: 40.w),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       Row(
-          //         children: [
-          //           // 金币
-          //           _buildCoinInfo(
-          //             'Coins',
-          //             '${userInfo?.coinLeftTotal ?? 0}',
-          //           ),
-          //           SizedBox(width: 30.w),
-          //           // 赠送金币
-          //           _buildCoinInfo(
-          //             'Bonus',
-          //             '${userInfo?.sendCoinLeftTotal ?? 0}',
-          //           ),
-          //         ],
-          //       ),
-          //       // Top Up 按钮
-          //       GestureDetector(
-          //         onTap: () {
-          //           // TODO: 跳转充值页面
-          //         },
-          //         child: Container(
-          //           padding: EdgeInsets.symmetric(
-          //             horizontal: 16.w,
-          //             vertical: 8.w,
-          //           ),
-          //           decoration: BoxDecoration(
-          //             borderRadius: BorderRadius.circular(20.w),
-          //             gradient: LinearGradient(
-          //               colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
-          //               begin: Alignment.topCenter,
-          //               end: Alignment.bottomCenter,
-          //             ),
-          //           ),
-          //           child: Text(
-          //             'Top Up',
-          //             style: TextStyle(
-          //               color: Colors.white,
-          //               fontSize: 14.sp,
-          //               fontWeight: FontWeight.w600,
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
+          Container(
+            padding: EdgeInsets.only(top: 40.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    // 金币
+                    _buildCoinInfo(
+                      'Coins',
+                      '${userInfo?.coinLeftTotal ?? 0}',
+                    ),
+                    SizedBox(width: 30.w),
+                    // 赠送金币
+                    _buildCoinInfo(
+                      'Bonus',
+                      '${userInfo?.sendCoinLeftTotal ?? 0}',
+                    ),
+                  ],
+                ),
+                // Top Up 按钮
+                GestureDetector(
+                  onTap: () {
+                    // TODO: 跳转充值页面
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 8.w,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.w),
+                      gradient: LinearGradient(
+                        colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    child: Text(
+                      'Top Up',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

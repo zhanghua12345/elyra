@@ -6,6 +6,7 @@ import 'package:elyra/page/el_feedback/feedback_list/page.dart';
 import 'package:elyra/page/el_language/page.dart';
 import 'package:elyra/page/el_play/page.dart';
 import 'package:elyra/page/el_setting/page.dart';
+import 'package:elyra/page/el_store/page.dart';
 import 'package:elyra/page/history/page.dart';
 import 'package:elyra/page/main_page.dart';
 import 'package:elyra/page/splash_page.dart';
@@ -33,6 +34,7 @@ class AppRoutes {
   static const String playDetail = '/play_detail';
   static const String webView = '/web_view';
   static const String accountLogout = '/account_logout';
+  static const String store = '/store';
 
   static final routes = [
     GetPage(name: splash, page: () => const SplashPage()),
@@ -51,5 +53,6 @@ class AppRoutes {
     GetPage(name: playDetail, page: () => const PlayDetailPage()),
     GetPage(name: webView, page: () => const WebViewPage()),
     GetPage(name: accountLogout, page: () => const AccountLogoutPage()),
+    GetPage(name: store, page: () => const StorePage()),
   ];
 }
