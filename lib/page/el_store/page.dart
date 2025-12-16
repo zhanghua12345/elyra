@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
@@ -87,7 +88,7 @@ class _StorePageState extends State<StorePage> {
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Padding(
-              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              padding: EdgeInsets.all(5.w),
               child: Image.asset('ely_back.png'.icon, height: 20.h),
             ),
           ),
@@ -100,8 +101,26 @@ class _StorePageState extends State<StorePage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // 右侧可以放置其他操作按钮，暂时留空
-          SizedBox(width: 30.w),
+          GestureDetector(
+            onTap: () {
+              EasyThrottle.throttle(
+                'restore-tap',
+                Duration(seconds: 3),
+                () => controller.restorePay(),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.all(5.w),
+              child: Text(
+                'Restore',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF999999),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

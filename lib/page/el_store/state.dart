@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 class StoreState {
   StoreState();
@@ -18,4 +20,13 @@ class StoreState {
   
   // 排序列表
   List<String> sortList = [];
+  
+  // IAP相关
+  StreamSubscription<List<PurchaseDetails>>? purchaseSubscription;
+  List<PurchaseDetails> purchaseList = [];
+  bool isRestore = false;
+  
+  // 上下文信息
+  num? shortPlayId;
+  num? videoId;
 }

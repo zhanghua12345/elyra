@@ -41,11 +41,19 @@ class PayItem {
   final String price;
   final String priceLocal;
   final String iosTemplateId;
+  final String? androidTemplateId;
   final String vipType; // week, month, three_months, year
   final String shortType;
   final String description;
   final int sort;
+  final int? discountType; // 0: 无折扣, 1: 有折扣, 2: iOS折扣
   final ExtInfo? extInfo;
+  
+  // IAP相关字段(运行时设置)
+  dynamic productDetails; // ProductDetails from in_app_purchase
+  String? orderCode; // 订单号
+  String? transactionId; // 交易ID
+  String? serverVerificationData; // 服务器验证数据
 
   // 计算得出的字段
   int get sendVal => buyType == 'coins' && coins > 0
@@ -61,11 +69,17 @@ class PayItem {
     required this.price,
     required this.priceLocal,
     required this.iosTemplateId,
+    this.androidTemplateId,
     required this.vipType,
     required this.shortType,
     required this.description,
     required this.sort,
+    this.discountType,
     this.extInfo,
+    this.productDetails,
+    this.orderCode,
+    this.transactionId,
+    this.serverVerificationData,
   });
 
   factory PayItem.fromJson(Map<String, dynamic> json) {
@@ -78,13 +92,64 @@ class PayItem {
       price: json['price'] ?? '',
       priceLocal: json['pricelocal'] ?? '',
       iosTemplateId: json['ios_template_id'] ?? '',
+      androidTemplateId: json['android_template_id'],
       vipType: json['vip_type'] ?? '',
       shortType: json['short_type'] ?? '',
       description: json['description'] ?? '',
       sort: json['sort'] ?? 0,
+      discountType: json['discount_type'],
       extInfo: json['ext_info'] != null
           ? ExtInfo.fromJson(json['ext_info'])
           : null,
+    );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'buy_type': buyType,
+      'size': size,
+      'coins': coins,
+      'send_coins': sendCoins,
+      'price': price,
+      'pricelocal': priceLocal,
+      'ios_template_id': iosTemplateId,
+      'android_template_id': androidTemplateId,
+      'vip_type': vipType,
+      'short_type': shortType,
+      'description': description,
+      'sort': sort,
+      'discount_type': discountType,
+      'ext_info': extInfo?.toJson(),
+    };
+  }
+  
+  PayItem copyWith({
+    dynamic productDetails,
+    String? orderCode,
+    String? transactionId,
+    String? serverVerificationData,
+  }) {
+    return PayItem(
+      id: id,
+      buyType: buyType,
+      size: size,
+      coins: coins,
+      sendCoins: sendCoins,
+      price: price,
+      priceLocal: priceLocal,
+      iosTemplateId: iosTemplateId,
+      androidTemplateId: androidTemplateId,
+      vipType: vipType,
+      shortType: shortType,
+      description: description,
+      sort: sort,
+      discountType: discountType,
+      extInfo: extInfo,
+      productDetails: productDetails ?? this.productDetails,
+      orderCode: orderCode ?? this.orderCode,
+      transactionId: transactionId ?? this.transactionId,
+      serverVerificationData: serverVerificationData ?? this.serverVerificationData,
     );
   }
 }
@@ -106,5 +171,12 @@ class ExtInfo {
           ? List<String>.from(json['sub_coins_txt_list'])
           : null,
     );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'receive_coins_rate': receiveCoinsRate,
+      'sub_coins_txt_list': subCoinsTxtList,
+    };
   }
 }
