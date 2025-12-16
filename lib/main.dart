@@ -23,7 +23,7 @@ void main() async {
   runApp(const MyApp());
 }
 
-initSDK() async {
+Future<void> initSDK() async {
   await DeviceInfoUtils().init();
   await WakelockPlus.enable();
   await SpUtils().init();

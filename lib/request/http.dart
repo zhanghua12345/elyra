@@ -126,6 +126,12 @@ class HttpClient {
           requestOptions: e.requestOptions,
           error: ApiException(code: -3, message: '接收超时，请检查网络连接'),
         );
+      case DioExceptionType.connectionError:
+        // 处理网络连接错误，如域名解析失败等
+        return DioException(
+          requestOptions: e.requestOptions,
+          error: ApiException(code: -1000, message: '网络连接失败，请检查网络设置', error: e.error),
+        );
       case DioExceptionType.badResponse:
         final int? statusCode = e.response?.statusCode;
         String message = '服务器异常，请稍后再试';
