@@ -1,5 +1,6 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_about/controller.dart';
+import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +143,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           SizedBox(height: 6.h),
           Text(
-            'Version 1.0.1',
+            'Version ${DeviceInfoUtils().appVersion ?? '1.0.0'}',
             style: TextStyle(
               color: const Color(0xFF999999) /* 9灰 */,
               fontSize: 12,
