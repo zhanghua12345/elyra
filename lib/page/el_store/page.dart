@@ -47,7 +47,7 @@ class _StorePageState extends State<StorePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('Test Page'),
+                _buildAppBar('Store'),
                 SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
