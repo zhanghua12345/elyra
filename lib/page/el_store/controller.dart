@@ -1,4 +1,7 @@
+import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/page/el_store/state.dart';
+import 'package:elyra/request/http.dart';
+import 'package:elyra/request/index.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -12,7 +15,6 @@ class StorePageController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    // 页面准备完成后执行的操作
     loadData();
   }
 
@@ -22,32 +24,79 @@ class StorePageController extends GetxController {
     super.onClose();
   }
 
-  // 加载数据的方法
+  /// 加载数据
   void loadData() async {
     if (state.isLoading) return;
     state.isLoading = true;
-    try {
-      // 模拟加载数据
-      await Future.delayed(Duration(seconds: 2));
+    state.loadStatus = LoadStatusType.loading;
+    update();
 
-      // 加载成功
-      state.loadStatus = LoadStatusType.loadSuccess;
-      update();
+    try {
+      // 调用支付配置接口
+      final res = await HttpClient().request(
+        Apis.paySettingsV4,
+        method: HttpMethod.get,
+      );
+
+      if (res.success && res.data != null) {
+        state.paySettings = PaySettingsBean.fromJson(res.data);
+        state.sortList = state.paySettings!.sort;
+
+        // 分类数据
+        _classifyData();
+
+        state.loadStatus = LoadStatusType.loadSuccess;
+      } else {
+        state.loadStatus = LoadStatusType.loadFailed;
+      }
     } catch (err) {
-      // 错误处理
+      print('加载失败: $err');
       state.loadStatus = LoadStatusType.loadFailed;
-      update();
     } finally {
       state.isLoading = false;
-
-      // 确保刷新控制器正确完成
       refreshController.refreshCompleted();
       update();
     }
   }
 
-  // 下拉刷新
+  /// 分类数据
+  void _classifyData() {
+    if (state.paySettings == null) return;
+
+    final allItems = [
+      ...state.paySettings!.listCoins,
+      ...state.paySettings!.listSubVip,
+    ];
+
+    // 按类型分类
+    state.coinsBigList = _filterAndSort(allItems, 'coins', 'big');
+    state.coinsSmallList = _filterAndSort(allItems, 'coins', 'small');
+    state.coinsWeekList = _filterAndSort(allItems, 'sub_coins');
+    state.subList = _filterAndSort(allItems, 'sub_vip');
+  }
+
+  /// 筛选和排序数据
+  List<PayItem> _filterAndSort(List<PayItem> items, String buyType, [String? size]) {
+    var filtered = items.where((item) {
+      if (size != null) {
+        return item.buyType == buyType && item.size == size;
+      }
+      return item.buyType == buyType;
+    }).toList();
+
+    // 按 sort 字段降序排列
+    filtered.sort((a, b) => b.sort.compareTo(a.sort));
+    return filtered;
+  }
+
+  /// 下拉刷新
   void onRefresh() {
     loadData();
+  }
+
+  /// 处理支付
+  void handlePay(PayItem item) {
+    // TODO: 实现支付逻辑
+    print('点击支付: ${item.buyType} - ${item.coins} coins');
   }
 }
