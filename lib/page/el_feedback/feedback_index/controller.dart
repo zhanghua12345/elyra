@@ -13,7 +13,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class FeedbackPageController extends GetxController {
   final state = FeedbackState();
@@ -223,35 +222,6 @@ class FeedbackPageController extends GetxController {
 
   /// 选择图片
   Future<void> pickImage() async {
-    // 请求完整相册权限（避免进入有限照片访问模式）
-    PermissionStatus status;
-    
-    if (Platform.isIOS) {
-      // iOS 14+ 需要请求完整相册访问权限
-      status = await Permission.photos.request();
-      
-      // 如果用户选择了有限访问，引导用户去设置中开启完整权限
-      if (status.isLimited) {
-        // 可以选择：继续使用有限访问，或者提示用户去设置
-        // 这里我们选择继续使用，但会记录日志
-        debugPrint('⚠️ 用户选择了有限照片访问');
-      }
-    } else {
-      // Android
-      status = await Permission.storage.request();
-    }
-
-    // 如果权限被拒绝，直接返回
-    if (status.isDenied || status.isPermanentlyDenied) {
-      debugPrint('❌ 相册权限被拒绝');
-      // 可以选择显示提示弹窗，引导用户去设置中开启权限
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
-      }
-      return;
-    }
-
-    // 权限已授予，选择图片
     final XFile? image = await _imgPicker.pickImage(
       source: ImageSource.gallery,
     );
