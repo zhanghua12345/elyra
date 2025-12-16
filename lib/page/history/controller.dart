@@ -73,7 +73,6 @@ class HistoryController extends GetxController {
                   .toList();
               state.historyList.addAll(newItems);
             } catch (e) {
-              print('Error mapping new items: $e');
               // 如果解析失败，我们仍然更新状态以停止加载
               state.loadStatus = LoadStatusType.loadFailed;
             }
@@ -91,7 +90,6 @@ class HistoryController extends GetxController {
               
               state.loadStatus = LoadStatusType.loadSuccess;
             } catch (e) {
-              print('Error mapping items: $e');
               state.loadStatus = LoadStatusType.loadFailed;
             }
           } else {

@@ -170,7 +170,7 @@ class SpUtils {
         }
       }
     } catch (e) {
-      debugPrint('Error decoding list: $e');
+      // debugPrint('Error decoding list: $e');
       return null;
     }
   }

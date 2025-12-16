@@ -37,7 +37,7 @@ class WebViewPageController extends GetxController {
             update();
           },
           onWebResourceError: (WebResourceError error) {
-            debugPrint('WebView error: ${error.description}');
+            // debugPrint('WebView error: ${error.description}');
             state.loadStatus = LoadStatusType.loadFailed;
             update();
           },

@@ -90,7 +90,6 @@ class FeedbackListPageController extends GetxController {
       callback: (args) {
         if (args.isNotEmpty && args[0] is String) {
           final id = args[0] as String;
-          debugPrint('openFeedbackDetail==>$id');
           Get.to(() => const FeedbackDetailPage(), arguments: {'id': id});
         }
       },

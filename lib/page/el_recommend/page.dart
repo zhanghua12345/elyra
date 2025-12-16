@@ -560,8 +560,6 @@ class _RecommendPageState extends State<RecommendPage>
         'imageUrl': video.imageUrl ?? '',
       },
     );
-
-    print('跳转到详情页: ${video.name}');
   }
 
   /// 构建底部信息栏（标题、描述、进度条）

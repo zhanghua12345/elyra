@@ -65,7 +65,7 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
         await _fetchHistoryFromApi();
       }
     } catch (e) {
-      debugPrint('加载历史记录失败: $e');
+      // debugPrint('加载历史记录失败: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -111,7 +111,7 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
 
       setState(() => _isLoading = false);
     } catch (e) {
-      debugPrint('从API获取历史记录失败: $e');
+      // debugPrint('从API获取历史记录失败: $e');
       setState(() => _isLoading = false);
     }
   }

@@ -44,7 +44,6 @@ class MePageController extends GetxController {
       }
     } catch (e) {
       state.loadStatus = LoadStatusType.loadFailed;
-      debugPrint('获取用户信息失败: $e');
     } finally {
       // 确保刷新控制器正确完成
       refreshController.refreshCompleted();

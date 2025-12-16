@@ -68,7 +68,6 @@ class SearchResultPageController extends GetxController {
 
             state.loadStatus = LoadStatusType.loadSuccess;
           } catch (e) {
-            print('Error mapping items: $e');
             state.loadStatus = LoadStatusType.loadFailed;
           }
         } else {
@@ -109,7 +108,7 @@ class SearchResultPageController extends GetxController {
       final searchController = Get.find<SearchPageController>();
       searchController.saveSearchHistory(keyword);
     } catch (e) {
-      print('SearchPageController not found: $e');
+      // print('SearchPageController not found: $e');
     }
     
     // 重新加载数据

@@ -424,7 +424,7 @@ class _MePageState extends State<MePage> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      debugPrint('无法打开链接: $url');
+      // debugPrint('无法打开链接: $url');
     }
   }
 }

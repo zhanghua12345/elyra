@@ -90,7 +90,6 @@ class RecommendPageController extends GetxController {
                   .toList();
               state.recommendList.addAll(newItems);
             } catch (e) {
-              print('Error mapping new items: $e');
               // 如果解析失败，我们仍然更新状态以停止加载
               state.loadStatus = LoadStatusType.loadFailed;
             }
@@ -113,7 +112,6 @@ class RecommendPageController extends GetxController {
               setVideoUrl(state.curVideo.videoInfo?.videoUrl ?? '');
               state.loadStatus = LoadStatusType.loadSuccess;
             } catch (e) {
-              print('Error mapping items: $e');
               state.loadStatus = LoadStatusType.loadFailed;
             }
           } else {
@@ -226,7 +224,6 @@ class RecommendPageController extends GetxController {
         return false;
       }
     } catch (e) {
-      print('收藏视频异常: $e');
       return false;
     }
   }
@@ -255,7 +252,6 @@ class RecommendPageController extends GetxController {
         return false;
       }
     } catch (e) {
-      print('取消收藏视频异常: $e');
       return false;
     }
   }
@@ -330,7 +326,7 @@ class RecommendPageController extends GetxController {
       }
     } catch (e) {
       // 如果收藏页面未初始化，忽略错误
-      debugPrint('收藏页面未初始化: $e');
+      // debugPrint('收藏页面未初始化: $e');
     }
   }
 }
