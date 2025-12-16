@@ -29,7 +29,9 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
     // 延迟 1 秒后执行，防止界面一打开就进行异步操作，给用户一点时间看到 Splash 页面
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return; // 检查 mounted 状态
       Future.delayed(const Duration(seconds: 1), () async {
+        if (!mounted) return; // 再次检查 mounted 状态
         // 监听网络状态变化
         _listenToNetworkChanges();
         // 尝试执行网络请求
@@ -48,7 +50,7 @@ class _SplashPageState extends State<SplashPage> {
   void _listenToNetworkChanges() {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
       // 当网络状态变为可用时，尝试执行请求
-      if (results.isNotEmpty && results.first != ConnectivityResult.none && !_hasProcessed) {
+      if (results.isNotEmpty && results.first != ConnectivityResult.none && !_hasProcessed && mounted) {
         _tryExecuteRequest();
       }
     });
@@ -56,26 +58,40 @@ class _SplashPageState extends State<SplashPage> {
 
   /// 尝试执行网络请求
   Future<void> _tryExecuteRequest() async {
-    if (_hasProcessed) return;
+    if (_hasProcessed || !mounted) return;
 
     // 检查网络连接状态
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult.isEmpty || connectivityResult.first == ConnectivityResult.none) {
-      // 没有网络，等待网络连接
+      // 没有网络,等待网络连接
       print('等待网络连接...');
       return;
     }
 
     // 标记已处理，防止重复执行
     _hasProcessed = true;
+    
+    // 取消网络监听，防止重复触发
+    await _connectivitySubscription?.cancel();
 
     // 有网络，执行业务逻辑
     String? token = SpUtils().getString(ElStoreKeys.token);
     if (!token.isNullString) {
-      // 已有 token，直接跳转
+      // 已有 token，设置设备信息头部后跳转
+      final deviceInfo = DeviceInfoUtils();
+      HttpClient().addHeaders({
+        'device-id': deviceInfo.deviceId ?? 'unknown',
+        'system-type': deviceInfo.systemType ?? 'unknown',
+        'model': deviceInfo.deviceModel ?? 'unknown',
+        'system-version': deviceInfo.osVersion ?? 'unknown',
+        'brand': deviceInfo.deviceBrand ?? 'unknown',
+        'app-version': deviceInfo.appVersion ?? 'unknown',
+      });
       HttpClient().setAuthToken(token!);
+      
       if (mounted) {
-        Get.off(() => const MainPage());
+        // 使用 offAll 清空路由栈，直接跳转到主页
+        Get.offAll(() => const MainPage());
       }
     } else {
       // 没有 token，调用注册接口
@@ -102,7 +118,8 @@ class _SplashPageState extends State<SplashPage> {
         HttpClient().setAuthToken(data.token ?? '');
 
         if (mounted) {
-          Get.off(() => const MainPage());
+          // 使用 offAll 清空路由栈，直接跳转到主页
+          Get.offAll(() => const MainPage());
         }
       } else {
         // 注册失败，显示错误信息但允许用户继续
