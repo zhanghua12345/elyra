@@ -23,7 +23,7 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
     // 延迟 1 秒后执行，防止界面一打开就进行异步操作，给用户一点时间看到 Splash 页面
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 2), () async {
+      Future.delayed(const Duration(seconds: 1), () async {
         String? token = SpUtils().getString(ElStoreKeys.token);
         if (!token.isNullString) {
           HttpClient().setAuthToken(token!);
