@@ -587,8 +587,10 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       BuyCoinsDialog(
         userInfo: userInfo,
         currentEpisode: currentEpisode,
+        playController: controller,
         onPurchaseSuccess: () {
           controller.buyVideoUnlock(currentEpisode.id!);
+          controller.state.showLockDialog = true;
         },
       ),
       isScrollControlled: true,

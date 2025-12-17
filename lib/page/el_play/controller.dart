@@ -577,13 +577,13 @@ class PlayDetailController extends GetxController {
       } else if (response.data.status == 'not_enough') {
         return false;
       } else {
-        Message.show(response.message ?? 'Unlock failed');
+        // Message.show(response.message ?? 'Unlock failed');
         return false;
       }
     } catch (e) {
       EasyLoading.dismiss();
       debugPrint('购买解锁失败: $e');
-      Message.show('Unlock failed');
+      // Message.show('Unlock failed');
       return false;
     }
   }
