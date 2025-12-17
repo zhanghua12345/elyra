@@ -1,6 +1,7 @@
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/bean/user_info.dart';
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_play/controller.dart';
 import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/page/el_store/sub_page/store_content_widget.dart';
@@ -70,6 +71,17 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
       setState(() {
         _latestUserInfo = userInfo;
       });
+      
+      // 同步更新 MePageController 的 customerInfo
+      try {
+        if (Get.isRegistered<MePageController>()) {
+          final meController = Get.find<MePageController>();
+          meController.state.customerInfo = userInfo;
+          meController.update();
+        }
+      } catch (e) {
+        debugPrint('更新 MePageController 失败: $e');
+      }
     }
   }
 

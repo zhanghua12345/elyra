@@ -551,13 +551,13 @@ class PlayDetailController extends GetxController {
   Future<bool> buyVideoUnlock(num videoId) async {
     try {
       EasyLoading.show(status: 'Loading...');
-
+  
       ApiResponse response = await HttpClient().request(
         Apis.buyVideo,
         method: HttpMethod.post,
         data: {'short_play_id': state.shortPlayId, 'video_id': videoId},
       );
-
+  
       EasyLoading.dismiss();
       if (response.data['status'] == 'success') {
         // 解锁成功，更新当前item的isLock状态
@@ -575,15 +575,14 @@ class PlayDetailController extends GetxController {
         Message.show('Unlock successful');
         return true;
       } else if (response.data['status'] == 'not_enough') {
+        // 金币不足
         return false;
       } else {
-        // Message.show(response.message ?? 'Unlock failed');
         return false;
       }
     } catch (e) {
       EasyLoading.dismiss();
       debugPrint('购买解锁失败: $e');
-      // Message.show('Unlock failed');
       return false;
     }
   }
@@ -611,6 +610,10 @@ class PlayDetailController extends GetxController {
     // 初始化并播放视频
     if (controllers[index] == null) {
       await _initializeController(index);
+      // 确保视频初始化后自动播放
+      if (controllers[index] != null && controllers[index]!.value.isInitialized) {
+        controllers[index]!.play();
+      }
     } else {
       controllers[index]?.play();
     }
