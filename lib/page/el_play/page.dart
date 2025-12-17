@@ -468,7 +468,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       left: 0,
       right: 0,
       child: Padding(
-        padding: EdgeInsets.only(left: 11.w, right: 16.w, top:4.h),
+        padding: EdgeInsets.only(left: 11.w, right: 16.w, top: 4.h),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () => Get.back(),
@@ -515,10 +515,12 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       backgroundColor: Colors.transparent,
     );
   }
+
   /// 显示锁集的弹框
   void _showEpisodeLock() {
-    final currentEpisode = controller.state.episodeList[controller.currentIndex];
-    
+    final currentEpisode =
+        controller.state.episodeList[controller.currentIndex];
+
     Get.dialog(
       Center(
         child: Container(
@@ -528,10 +530,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFFE424AD),
-                Color(0xFF6018E6),
-              ],
+              colors: [Color(0xFFE424AD), Color(0xFF6018E6)],
             ),
             borderRadius: BorderRadius.circular(26.h),
           ),
@@ -541,7 +540,9 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
               onTap: () async {
                 Get.back(); // 关闭弹框
                 // 调用解锁接口
-                bool success = await controller.buyVideoUnlock(currentEpisode.id!);
+                bool success = await controller.buyVideoUnlock(
+                  currentEpisode.id!,
+                );
                 if (!success) {
                   // 解锁失败，弹出购买金币弹框
                   _showBuyCoinsDialog();
@@ -571,7 +572,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
           ),
         ),
       ),
-      barrierDismissible: true,
+      barrierDismissible: false,
     );
   }
 
@@ -579,8 +580,9 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   void _showBuyCoinsDialog() async {
     // 先获取用户信息
     final userInfo = await controller.getUserInfo();
-    final currentEpisode = controller.state.episodeList[controller.currentIndex];
-    
+    final currentEpisode =
+        controller.state.episodeList[controller.currentIndex];
+
     Get.to(
       () => BuyCoinsDialog(
         episode: currentEpisode.episode ?? 1,
