@@ -29,4 +29,7 @@ class PlayDetailState {
   // 推荐列表
   List<ShortVideoBean> recommendList = [];
   int recommendIndex = 0;
+  
+  // 锁定弹框状态
+  bool showLockDialog = false;
 }

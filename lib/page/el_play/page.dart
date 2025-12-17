@@ -85,6 +85,12 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         backgroundColor: Colors.black,
         body: GetBuilder<PlayDetailController>(
           builder: (ctrl) {
+            // 监听锁定弹框状态
+            if (ctrl.state.showLockDialog) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showEpisodeLock();
+              });
+            }
             return _buildContent();
           },
         ),
@@ -543,7 +549,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    'ell_lock_max.png'.icon,
+                    'ely_lock_max.png'.icon,
                     width: 24.w,
                     height: 24.w,
                   ),

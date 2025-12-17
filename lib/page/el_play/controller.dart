@@ -87,11 +87,13 @@ class PlayDetailController extends GetxController {
         }
 
         state.episodeList = state.detailBean?.episodeList ?? [];
-        
+
         // 根据传入的videoId确定初始集数索引
         if (state.videoId > 0) {
           // 查找对应的集数索引
-          currentIndex = state.episodeList.indexWhere((episode) => episode.id == state.videoId);
+          currentIndex = state.episodeList.indexWhere(
+            (episode) => episode.id == state.videoId,
+          );
           if (currentIndex == -1) {
             // 如果没找到，使用默认的第一集
             currentIndex = (state.detailBean?.videoInfo?.episode ?? 1) - 1;
@@ -100,9 +102,9 @@ class PlayDetailController extends GetxController {
           // 使用默认的第一集
           currentIndex = (state.detailBean?.videoInfo?.episode ?? 1) - 1;
         }
-        
+
         state.currentEpisode = currentIndex;
-        
+
         // 重新初始化PageController为正确的集数
         if (pageController.hasClients) {
           pageController.jumpToPage(currentIndex);
@@ -180,9 +182,10 @@ class PlayDetailController extends GetxController {
 
         // 视频播放完成，自动播放下一集
         // 注意：只有当前正在播放的视频才能触发自动播放
-        if (controller.value.isCompleted && 
-            !controller.value.isBuffering && 
-            index == currentIndex) {  // 关键修复：只有当前集才能触发
+        if (controller.value.isCompleted &&
+            !controller.value.isBuffering &&
+            index == currentIndex) {
+          // 关键修复：只有当前集才能触发
           _playNextEpisode();
         }
       });
@@ -237,6 +240,15 @@ class PlayDetailController extends GetxController {
     // 更新当前集数
     currentIndex = index;
     state.currentEpisode = index;
+
+    // 检查当前集是否锁定
+    final currentEpisode = state.episodeList[index];
+    if (currentEpisode.isLock == true) {
+      // 集数被锁定，设置标记让UI显示锁定弹框
+      state.showLockDialog = true;
+      update();
+      return;
+    }
 
     // 初始化并播放新视频
     if (controllers[index] == null) {
@@ -373,23 +385,23 @@ class PlayDetailController extends GetxController {
       if (spInfo?.shortPlayId == null) {
         return false;
       }
-      
+
       // 使用当前集的video_id
       if (currentIndex < 0 || currentIndex >= state.episodeList.length) {
         return false;
       }
-      
+
       Map<String, dynamic> params = {
         'short_play_id': spInfo?.shortPlayId,
-        'video_id': state.episodeList[currentIndex].id,  // 使用当前集的id
+        'video_id': state.episodeList[currentIndex].id, // 使用当前集的id
       };
-      
+
       ApiResponse response = await HttpClient().request(
         Apis.collect,
         method: HttpMethod.post,
         data: params,
       );
-      
+
       if (response.success) {
         // 更新本地状态
         spInfo?.isCollect = true;
@@ -413,23 +425,23 @@ class PlayDetailController extends GetxController {
       if (spInfo?.shortPlayId == null) {
         return false;
       }
-      
+
       // 使用当前集的video_id
       if (currentIndex < 0 || currentIndex >= state.episodeList.length) {
         return false;
       }
-      
+
       Map<String, dynamic> params = {
         'short_play_id': spInfo?.shortPlayId,
-        'video_id': state.episodeList[currentIndex].id,  // 使用当前集的id
+        'video_id': state.episodeList[currentIndex].id, // 使用当前集的id
       };
-      
+
       ApiResponse response = await HttpClient().request(
         Apis.cancelCollect,
         method: HttpMethod.post,
         data: params,
       );
-      
+
       if (response.success) {
         spInfo?.isCollect = false;
         spInfo?.collectTotal = (spInfo.collectTotal ?? 1) - 1;
@@ -523,30 +535,34 @@ class PlayDetailController extends GetxController {
   }
 
   /// 购买解锁视频
-  Future<bool> buyVideoUnlock(int videoId) async {
+  Future<bool> buyVideoUnlock(num videoId) async {
     try {
       EasyLoading.show(status: 'Loading...');
-      
+
       ApiResponse response = await HttpClient().request(
         Apis.buyVideo,
         method: HttpMethod.post,
-        data: {
-          'short_play_id': state.shortPlayId,
-          'video_id': videoId,
-        },
+        data: {'short_play_id': state.shortPlayId, 'video_id': videoId},
       );
 
       EasyLoading.dismiss();
-
-      if (response.success) {
+      if (response.data.status == 'success') {
         // 解锁成功，更新当前item的isLock状态
-        final episodeIndex = state.episodeList.indexWhere((e) => e.id == videoId);
+        final episodeIndex = state.episodeList.indexWhere(
+          (e) => e.id == videoId,
+        );
         if (episodeIndex != -1) {
           state.episodeList[episodeIndex].isLock = false;
+          // 关闭锁定弹框
+          state.showLockDialog = false;
+          // 继续播放当前集
+          await continuePlayAfterUnlock(episodeIndex);
           update();
         }
         Message.show('Unlock successful');
         return true;
+      } else if (response.data.status == 'not_enough') {
+        return false;
       } else {
         Message.show(response.message ?? 'Unlock failed');
         return false;
@@ -575,5 +591,24 @@ class PlayDetailController extends GetxController {
       debugPrint('获取用户信息失败: $e');
       return null;
     }
+  }
+
+  /// 解锁成功后继续播放
+  Future<void> continuePlayAfterUnlock(int index) async {
+    // 初始化并播放视频
+    if (controllers[index] == null) {
+      await _initializeController(index);
+    } else {
+      controllers[index]?.play();
+    }
+
+    // 预加载相邻视频
+    _preloadAdjacentVideos();
+
+    // 创建历史记录
+    createHistory();
+
+    // 更新首页历史记录
+    updateHomeVideo();
   }
 }
