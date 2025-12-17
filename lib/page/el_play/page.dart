@@ -583,17 +583,16 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     final currentEpisode =
         controller.state.episodeList[controller.currentIndex];
 
-    Get.to(
-      () => BuyCoinsDialog(
+    Get.bottomSheet(
+      BuyCoinsDialog(
         userInfo: userInfo,
         currentEpisode: currentEpisode,
         onPurchaseSuccess: () {
-          // 购买成功后重新尝试解锁
           controller.buyVideoUnlock(currentEpisode.id!);
         },
       ),
-      fullscreenDialog: true,
-      transition: Transition.downToUp,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 }
