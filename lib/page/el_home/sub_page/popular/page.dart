@@ -22,6 +22,14 @@ class PopularPage extends StatefulWidget {
 class _PopularPageState extends State<PopularPage>
     with AutomaticKeepAliveClientMixin {
   final controller = Get.put(PopularController());
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -32,10 +40,12 @@ class _PopularPageState extends State<PopularPage>
     return GetBuilder<PopularController>(
       builder: (controller) {
         return SmartRefresher(
-          controller: controller.refreshController,
+          controller: _refreshController,
           enablePullDown: true,
           enablePullUp: false,
-          onRefresh: controller.onRefresh,
+          onRefresh: () => controller.getHomeData(
+            refreshCtrl: _refreshController,
+          ),
           header: ClassicHeader(
             height: 40,
             textStyle: TextStyle(color: Colors.white),

@@ -8,7 +8,6 @@ import 'package:elyra/bean/short_video_bean.dart';
 
 class RankingController extends GetxController {
   final state = RankingState();
-  final RefreshController refreshController = RefreshController(initialRefresh: false);
 
   @override
   void onReady() {
@@ -18,7 +17,6 @@ class RankingController extends GetxController {
 
   @override
   void onClose() {
-    refreshController.dispose();
     super.onClose();
   }
 
@@ -31,11 +29,9 @@ class RankingController extends GetxController {
         method: HttpMethod.post,
         queryParameters: {'type': 'most_trending'},
       );
-      
+
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
-      } else {
-        refreshController.refreshCompleted();
       }
       
       if (response.success) {
@@ -69,8 +65,6 @@ class RankingController extends GetxController {
     } catch (e) {
       if (refreshCtrl != null) {
         refreshCtrl.refreshFailed();
-      } else {
-        refreshController.refreshFailed();
       }
       state.loadStatus = LoadStatusType.loadFailed;
       update();

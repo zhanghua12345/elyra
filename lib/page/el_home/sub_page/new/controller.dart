@@ -8,7 +8,6 @@ import 'package:elyra/bean/short_video_bean.dart';
 
 class NewController extends GetxController {
   final state = NewState();
-  final RefreshController refreshController = RefreshController(initialRefresh: false);
 
   @override
   void onReady() {
@@ -18,7 +17,6 @@ class NewController extends GetxController {
 
   @override
   void onClose() {
-    refreshController.dispose();
     super.onClose();
   }
 
@@ -31,11 +29,9 @@ class NewController extends GetxController {
         method: HttpMethod.post,
         queryParameters: {'type': 'new_releases'},
       );
-      
+
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
-      } else {
-        refreshController.refreshCompleted();
       }
       
       if (response.success) {
@@ -60,8 +56,6 @@ class NewController extends GetxController {
     } catch (e) {
       if (refreshCtrl != null) {
         refreshCtrl.refreshFailed();
-      } else {
-        refreshController.refreshFailed();
       }
       state.loadStatus = LoadStatusType.loadFailed;
       update();

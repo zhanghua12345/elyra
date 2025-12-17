@@ -21,6 +21,14 @@ class NewPage extends StatefulWidget {
 class _NewPageState extends State<NewPage>
     with AutomaticKeepAliveClientMixin {
   final controller = Get.put(NewController());
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -31,10 +39,12 @@ class _NewPageState extends State<NewPage>
     return GetBuilder<NewController>(
       builder: (controller) {
         return SmartRefresher(
-          controller: controller.refreshController,
+          controller: _refreshController,
           enablePullDown: true,
           enablePullUp: false,
-          onRefresh: controller.onRefresh,
+          onRefresh: () => controller.getNewData(
+            refreshCtrl: _refreshController,
+          ),
           header: ClassicHeader(
             height: 40,
             textStyle: TextStyle(color: Colors.white),

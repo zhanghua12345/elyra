@@ -8,7 +8,6 @@ import 'package:elyra/bean/short_video_bean.dart';
 
 class PopularController extends GetxController {
   final state = PopularState();
-  final RefreshController refreshController = RefreshController(initialRefresh: false);
 
   @override
   void onReady() {
@@ -18,7 +17,6 @@ class PopularController extends GetxController {
 
   @override
   void onClose() {
-    refreshController.dispose();
     super.onClose();
   }
 
@@ -44,11 +42,9 @@ class PopularController extends GetxController {
         Apis.homeData,
         method: HttpMethod.get,
       );
-      
+
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
-      } else {
-        refreshController.refreshCompleted();
       }
       
       if (response.success) {
@@ -109,8 +105,6 @@ class PopularController extends GetxController {
     } catch (e) {
       if (refreshCtrl != null) {
         refreshCtrl.refreshFailed();
-      } else {
-        refreshController.refreshFailed();
       }
       state.loadStatus = LoadStatusType.loadFailed;
       update();

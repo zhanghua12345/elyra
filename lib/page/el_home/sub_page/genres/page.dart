@@ -21,6 +21,14 @@ class GenresPage extends StatefulWidget {
 class _GenresPageState extends State<GenresPage>
     with AutomaticKeepAliveClientMixin {
   final controller = Get.put(GenresController());
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -31,10 +39,12 @@ class _GenresPageState extends State<GenresPage>
     return GetBuilder<GenresController>(
       builder: (controller) {
         return SmartRefresher(
-          controller: controller.refreshController,
+          controller: _refreshController,
           enablePullDown: true,
           enablePullUp: false,
-          onRefresh: controller.onRefresh,
+          onRefresh: () => controller.getCategoryData(
+            refreshCtrl: _refreshController,
+          ),
           header: ClassicHeader(
             height: 40,
             textStyle: TextStyle(color: Colors.white),

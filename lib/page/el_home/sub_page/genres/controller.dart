@@ -7,7 +7,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class GenresController extends GetxController {
   final state = GenresState();
-  final RefreshController refreshController = RefreshController(initialRefresh: false);
 
   @override
   void onReady() {
@@ -17,7 +16,6 @@ class GenresController extends GetxController {
 
   @override
   void onClose() {
-    refreshController.dispose();
     super.onClose();
   }
 
@@ -30,11 +28,9 @@ class GenresController extends GetxController {
         method: HttpMethod.get,
         queryParameters: {'short_play_num': 3},
       );
-      
+
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
-      } else {
-        refreshController.refreshCompleted();
       }
       
       if (response.success) {
@@ -59,8 +55,6 @@ class GenresController extends GetxController {
     } catch (e) {
       if (refreshCtrl != null) {
         refreshCtrl.refreshFailed();
-      } else {
-        refreshController.refreshFailed();
       }
       state.loadStatus = LoadStatusType.loadFailed;
       update();

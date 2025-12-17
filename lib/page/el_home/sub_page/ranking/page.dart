@@ -20,6 +20,14 @@ class RankingPage extends StatefulWidget {
 class _RankingPageState extends State<RankingPage>
     with AutomaticKeepAliveClientMixin {
   final controller = Get.put(RankingController());
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -30,10 +38,12 @@ class _RankingPageState extends State<RankingPage>
     return GetBuilder<RankingController>(
       builder: (controller) {
         return SmartRefresher(
-          controller: controller.refreshController,
+          controller: _refreshController,
           enablePullDown: true,
           enablePullUp: false,
-          onRefresh: controller.onRefresh,
+          onRefresh: () => controller.getRankingData(
+            refreshCtrl: _refreshController,
+          ),
           header: ClassicHeader(
             height: 40,
             textStyle: TextStyle(color: Colors.white),
