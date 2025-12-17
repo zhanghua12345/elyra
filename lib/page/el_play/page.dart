@@ -89,6 +89,9 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
             if (ctrl.state.showLockDialog) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 _showEpisodeLock();
+                // 弹框展示后重置标记，避免无法关闭或重复弹出
+                ctrl.state.showLockDialog = false;
+                ctrl.update();
               });
             }
             return _buildContent();

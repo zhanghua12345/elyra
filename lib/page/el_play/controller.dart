@@ -120,6 +120,16 @@ class PlayDetailController extends GetxController {
           growable: true,
         );
 
+        // 如果当前集是锁定状态，则只弹出锁定弹框，不初始化播放器
+        if (currentIndex >= 0 &&
+            currentIndex < state.episodeList.length &&
+            state.episodeList[currentIndex].isLock == true) {
+          state.showLockDialog = true;
+          _preloadAdjacentVideos();
+          update();
+          return;
+        }
+
         // 初始化当前视频
         await _initializeController(currentIndex);
         _preloadAdjacentVideos();
@@ -139,9 +149,12 @@ class PlayDetailController extends GetxController {
   /// 初始化视频控制器
   Future<void> _initializeController(int index) async {
     if (index < 0 || index >= state.episodeList.length) return;
-    if (controllers[index] != null) return;
 
     final episode = state.episodeList[index];
+    // 锁定剧集不初始化播放器，保持封面背景
+    if (episode.isLock == true) return;
+
+    if (controllers[index] != null) return;
     if (episode.videoUrl == null || episode.videoUrl!.isEmpty) return;
 
     VideoPlayerController controller =
