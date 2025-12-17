@@ -559,7 +559,7 @@ class PlayDetailController extends GetxController {
       );
 
       EasyLoading.dismiss();
-      if (response.data.status == 'success') {
+      if (response.data['status'] == 'success') {
         // 解锁成功，更新当前item的isLock状态
         final episodeIndex = state.episodeList.indexWhere(
           (e) => e.id == videoId,
@@ -574,7 +574,7 @@ class PlayDetailController extends GetxController {
         }
         Message.show('Unlock successful');
         return true;
-      } else if (response.data.status == 'not_enough') {
+      } else if (response.data['status'] == 'not_enough') {
         return false;
       } else {
         // Message.show(response.message ?? 'Unlock failed');
