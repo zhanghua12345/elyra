@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_play/controller.dart';
+import 'package:elyra/page/el_play/sub_page/buy_coins_dialog.dart';
 import 'package:elyra/page/el_play/sub_page/select/select_episode_page.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
@@ -503,6 +504,85 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+    );
+  }
+  /// 显示锁集的弹框
+  void _showEpisodeLock() {
+    final currentEpisode = controller.state.episodeList[controller.currentIndex];
+    
+    Get.dialog(
+      Center(
+        child: Container(
+          width: 286.w,
+          height: 52.h,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFE424AD),
+                Color(0xFF6018E6),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(26.h),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () async {
+                Get.back(); // 关闭弹框
+                // 调用解锁接口
+                bool success = await controller.buyVideoUnlock(currentEpisode.id!);
+                if (!success) {
+                  // 解锁失败，弹出购买金币弹框
+                  _showBuyCoinsDialog();
+                }
+              },
+              borderRadius: BorderRadius.circular(26.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'ell_lock_max.png'.icon,
+                    width: 24.w,
+                    height: 24.w,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Unlock Episode',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  /// 显示购买金币弹框
+  void _showBuyCoinsDialog() async {
+    // 先获取用户信息
+    final userInfo = await controller.getUserInfo();
+    final currentEpisode = controller.state.episodeList[controller.currentIndex];
+    
+    Get.to(
+      () => BuyCoinsDialog(
+        episode: currentEpisode.episode ?? 1,
+        userInfo: userInfo,
+        onPurchaseSuccess: () {
+          // 购买成功后重新尝试解锁
+          controller.buyVideoUnlock(currentEpisode.id!);
+        },
+      ),
+      fullscreenDialog: true,
+      transition: Transition.downToUp,
     );
   }
 }

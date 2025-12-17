@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/bean/short_video_bean.dart';
+import 'package:elyra/bean/user_info.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/page/el_home/controller.dart';
@@ -11,9 +12,11 @@ import 'package:elyra/request/index.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
+import 'package:elyra/utils/toast.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_confirm_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
@@ -516,6 +519,61 @@ class PlayDetailController extends GetxController {
     } catch (e) {
       // 如果收藏页面未初始化，忽略错误
       debugPrint('收藏页面未初始化: $e');
+    }
+  }
+
+  /// 购买解锁视频
+  Future<bool> buyVideoUnlock(int videoId) async {
+    try {
+      EasyLoading.show(status: 'Loading...');
+      
+      ApiResponse response = await HttpClient().request(
+        Apis.buyVideo,
+        method: HttpMethod.post,
+        data: {
+          'short_play_id': state.shortPlayId,
+          'video_id': videoId,
+        },
+      );
+
+      EasyLoading.dismiss();
+
+      if (response.success) {
+        // 解锁成功，更新当前item的isLock状态
+        final episodeIndex = state.episodeList.indexWhere((e) => e.id == videoId);
+        if (episodeIndex != -1) {
+          state.episodeList[episodeIndex].isLock = false;
+          update();
+        }
+        Message.show('Unlock successful');
+        return true;
+      } else {
+        Message.show(response.message ?? 'Unlock failed');
+        return false;
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('购买解锁失败: $e');
+      Message.show('Unlock failed');
+      return false;
+    }
+  }
+
+  /// 获取用户信息
+  Future<UserInfo?> getUserInfo() async {
+    try {
+      ApiResponse response = await HttpClient().request(
+        Apis.customerInfo,
+        method: HttpMethod.get,
+      );
+
+      if (response.success) {
+        return UserInfo.fromJson(response.data);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('获取用户信息失败: $e');
+      return null;
     }
   }
 }

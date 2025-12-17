@@ -27,4 +27,5 @@ class Apis {
   static const String paySettingsV4 = "/paySettingsV4";  // get 获取反馈通知数量 没参数
   static const String createOrder = "/createOrder";  // post 创建订单（安卓/IOS金币、订阅支付动作调用这个）
   static const String applePaid = "/applePaid";  // post applePaid（iOS金币、订阅支付结果调用这个）
+  static const String buyVideo = "/buy_video";  // post 购买单集短剧  short_play_id   video_id
 }

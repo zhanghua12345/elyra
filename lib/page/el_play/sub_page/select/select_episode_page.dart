@@ -1,4 +1,5 @@
 import 'package:elyra/bean/short_play_detail_bean.dart';
+import 'package:elyra/extend/el_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -198,42 +199,57 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                   itemBuilder: (_, index) {
                     int episode = start + index;
                     bool isCurrent = episode == _currentEpisode;
+                    var item = widget.episodeList[episode - 1];
 
                     return GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onTap: () => _selectEpisode(episode),
-                      child: Container(
-                        decoration: isCurrent
-                            ? ShapeDecoration(
-                                gradient: const LinearGradient(
-                                  begin: Alignment(0.50, 0.00),
-                                  end: Alignment(0.50, 1.00),
-                                  colors: [
-                                    Color(0xFFDC23B1),
-                                    Color(0xFF6018E6),
-                                  ],
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
-                              )
-                            : ShapeDecoration(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3),
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: isCurrent
+                                ? ShapeDecoration(
+                                    gradient: const LinearGradient(
+                                      begin: Alignment(0.50, 0.00),
+                                      end: Alignment(0.50, 1.00),
+                                      colors: [
+                                        Color(0xFFDC23B1),
+                                        Color(0xFF6018E6),
+                                      ],
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                  )
+                                : ShapeDecoration(
+                                    color: Colors.white.withValues(alpha: 0.25),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                  ),
+                            child: Center(
+                              child: Text(
+                                '$episode',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.80),
+                                  fontSize: 16,
+                                  fontFamily: 'DDinPro',
+                                  fontWeight: FontWeight.w900,
                                 ),
                               ),
-                        child: Center(
-                          child: Text(
-                            '$episode',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.80),
-                              fontSize: 16,
-                              fontFamily: 'DDinPro',
-                              fontWeight: FontWeight.w900,
                             ),
                           ),
-                        ),
+                          // 锁图标
+                          if (item.isLock != null && item.isLock!)
+                            Positioned(
+                              bottom: 1.h, // 距离顶部4个像素
+                              right: 4.h, // 距离右侧4个像素
+                              child: Image.asset(
+                                'ely_lock.png'.icon,
+                                width: 12.w,
+                              ),
+                            ),
+                        ],
                       ),
                     );
                   },
