@@ -3,7 +3,6 @@ import 'package:elyra/page/el_me/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 

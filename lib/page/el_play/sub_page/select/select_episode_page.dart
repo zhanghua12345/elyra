@@ -229,7 +229,7 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.80),
                               fontSize: 16,
-                              fontFamily: 'DIN Black',
+                              fontFamily: 'DDinPro',
                               fontWeight: FontWeight.w900,
                             ),
                           ),

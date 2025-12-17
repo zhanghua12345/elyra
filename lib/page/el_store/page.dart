@@ -101,26 +101,27 @@ class _StorePageState extends State<StorePage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              EasyThrottle.throttle(
-                'restore-tap',
-                Duration(seconds: 3),
-                () => controller.restorePay(),
-              );
-            },
-            child: Padding(
-              padding: EdgeInsets.all(5.w),
-              child: Text(
-                'Restore',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF999999),
-                ),
-              ),
-            ),
-          ),
+          SizedBox(width: 30.w,)
+          // GestureDetector(
+          //   onTap: () {
+          //     EasyThrottle.throttle(
+          //       'restore-tap',
+          //       Duration(seconds: 3),
+          //       () => controller.restorePay(),
+          //     );
+          //   },
+          //   child: Padding(
+          //     padding: EdgeInsets.all(5.w),
+          //     child: Text(
+          //       'Restore',
+          //       style: TextStyle(
+          //         fontSize: 14,
+          //         fontWeight: FontWeight.w500,
+          //         color: Color(0xFF999999),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -184,6 +185,7 @@ class _StorePageState extends State<StorePage> {
   /// Coins 区块
   Widget _buildCoinsSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // 确保左对齐
       children: [
         SizedBox(height: 24.h),
         // Big Coins
@@ -305,7 +307,8 @@ class _StorePageState extends State<StorePage> {
                                       child: Transform.rotate(
                                         angle: 0.785398, // 45°
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
                                             SizedBox(height: 10.h),
                                             Text(
@@ -319,7 +322,7 @@ class _StorePageState extends State<StorePage> {
                                               ),
                                             ),
                                             Text(
-                                              '\${((item.sendCoins / item.coins) * 100).toInt()}%',
+                                              '${((item.sendCoins / item.coins) * 100).toInt()}%',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12,
@@ -356,36 +359,43 @@ class _StorePageState extends State<StorePage> {
                                 SizedBox(height: 2.h),
                                 // 金币数量
                                 Text(
-                                  '\${item.coins}',
+                                  '${item.coins}',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    fontFamily: 'PingFang SC',
+                                    fontWeight: FontWeight.w500,
+                                    height: 1,
                                   ),
                                 ),
                                 // 赠币
                                 if (item.sendCoins > 0) ...[
                                   SizedBox(height: 2.h),
                                   Text(
-                                    '+\${item.sendCoins} Coins',
+                                    '+${item.sendCoins} Coins',
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
+                                      fontSize: 10,
+                                      fontFamily: 'PingFang SC',
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
                                 SizedBox(height: 7.h),
                                 // 价格
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
                                   children: [
                                     Text(
-                                      item.priceLocal,
+                                      '\$',
                                       style: TextStyle(
                                         color: Color(0xFFFF0BBA),
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'DDinPro',
+                                        fontWeight: FontWeight.w900,
+                                        height: 1.17,
                                       ),
                                     ),
                                     ShaderMask(
@@ -402,7 +412,9 @@ class _StorePageState extends State<StorePage> {
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
-                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'DDinPro',
+                                          fontWeight: FontWeight.w900,
+                                          height: 0.88,
                                         ),
                                       ),
                                     ),
@@ -422,7 +434,10 @@ class _StorePageState extends State<StorePage> {
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
-                                  colors: [Color(0xFFFF0BBA), Color(0xFF6018E6)],
+                                  colors: [
+                                    Color(0xFFFF0BBA),
+                                    Color(0xFF6018E6),
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(12.h),
                               ),
@@ -432,7 +447,10 @@ class _StorePageState extends State<StorePage> {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
+                                  fontFamily: 'PingFang SC',
                                   fontWeight: FontWeight.w600,
+                                  height: 1.14,
+                                  letterSpacing: -0,
                                 ),
                               ),
                             ),
@@ -440,10 +458,11 @@ class _StorePageState extends State<StorePage> {
                         ],
                       ),
                     ),
+                  ),
                   // Hot角标（左上角）- 在ClipRRect外面，不会被裁切
                   if (item.cornerMarker == 'fiery')
                     Positioned(
-                      bottom: 93.h,
+                      bottom: 92.h,
                       left: 12.w,
                       child: Container(
                         width: 48.w,
@@ -484,12 +503,13 @@ class _StorePageState extends State<StorePage> {
   /// 小金币
   Widget _buildSmallCoins() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // 设置为左对齐
       children: [
         SizedBox(height: 13.h),
         Wrap(
           spacing: 8.w,
           runSpacing: 13.h,
-          alignment: WrapAlignment.start,
+          alignment: WrapAlignment.start, // 设置为左对齐
           children: controller.state.coinsSmallList.map((item) {
             return GestureDetector(
               onTap: () => controller.handlePay(item),
@@ -532,25 +552,28 @@ class _StorePageState extends State<StorePage> {
                                       child: Transform.rotate(
                                         angle: 0.785398, // 45°
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
-                                            SizedBox(height: 4.h),
+                                            SizedBox(height: 10.h),
                                             Text(
                                               '+',
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.w700,
-                                                height: 1,
+                                                fontSize: 12,
+                                                fontFamily: 'PingFang SC',
+                                                fontWeight: FontWeight.w500,
+                                                height: 1.17,
                                               ),
                                             ),
                                             Text(
-                                              '\${((item.sendCoins / item.coins) * 100).toInt()}',
+                                              '${((item.sendCoins / item.coins) * 100).toInt()}%',
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w700,
-                                                height: 1,
+                                                fontSize: 12,
+                                                fontFamily: 'PingFang SC',
+                                                fontWeight: FontWeight.w500,
+                                                height: 1.17,
                                               ),
                                             ),
                                           ],
@@ -581,39 +604,45 @@ class _StorePageState extends State<StorePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 2.h),
+                                  SizedBox(height: 3.h),
                                   // 金币数量
                                   Text(
-                                    '\${item.coins}',
+                                    '${item.coins}',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      fontFamily: 'PingFang SC',
+                                      fontWeight: FontWeight.w500,
+                                      height: 1,
                                     ),
                                   ),
                                   // 赠币
                                   if (item.sendCoins > 0) ...[
-                                    SizedBox(height: 2.h),
                                     Text(
-                                      '+\${item.sendCoins}',
+                                      '+${item.sendCoins}',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 10,
-                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'PingFang SC',
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ],
                                   Spacer(),
                                   // 价格
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.baseline,
+                                    textBaseline: TextBaseline.alphabetic,
                                     children: [
                                       Text(
-                                        item.priceLocal,
+                                        '\$',
                                         style: TextStyle(
                                           color: Color(0xFFFF0BBA),
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          fontFamily: 'DDinPro',
+                                          fontWeight: FontWeight.w900,
+                                          height: 1.17,
                                         ),
                                       ),
                                       ShaderMask(
@@ -628,9 +657,11 @@ class _StorePageState extends State<StorePage> {
                                         child: Text(
                                           item.price,
                                           style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFFFF0BBA),
+                                            fontSize: 16,
+                                            fontFamily: 'DDinPro',
+                                            fontWeight: FontWeight.w900,
+                                            height: 0.88,
                                           ),
                                         ),
                                       ),
@@ -643,44 +674,44 @@ class _StorePageState extends State<StorePage> {
                         ],
                       ),
                     ),
-              // Hot角标（左上角）- 在ClipRRect外面，不会被裁切
-              if (item.cornerMarker == 'fiery')
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                    width: 14.w,
-                    height: 40.h,
-                    decoration: ShapeDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment(0.50, -.7),
-                        end: Alignment(0.50, 1),
-                        colors: [
-                          const Color(0xFFFF0BBA),
-                          const Color(0xFF6018E6),
-                        ],
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: RotatedBox(
-                      quarterTurns: 3,
-                      child: Text(
-                        'Hot',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                  ),
+                  // Hot角标（左上角）- 在ClipRRect外面，不会被裁切
+                  if (item.cornerMarker == 'fiery')
+                    Positioned(
+                      bottom: 92.h,
+                      left: 8.w,
+                      child: Container(
+                        height: 14.h,
+                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                        decoration: ShapeDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment(0.50, -.7),
+                            end: Alignment(0.50, 1),
+                            colors: [
+                              const Color(0xFFFF0BBA),
+                              const Color(0xFF6018E6),
+                            ],
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Hot',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontFamily: 'PingFang SC',
+                            fontWeight: FontWeight.w500,
+                            height: 1.27,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-            ],
-          ),
-        );
+                ],
+              ),
+            );
           }).toList(),
         ),
       ],
