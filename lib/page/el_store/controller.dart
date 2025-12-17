@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:elyra/bean/pay_settings_bean.dart';
+import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_store/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
@@ -547,6 +548,8 @@ class StorePageController extends GetxController {
         if (!isRestore) {
           Message.show('Pay Success');
           Future.delayed(Duration(seconds: 1), () => loadData());
+          // 充值成功后更新 el_me 页面的用户信息
+          _refreshMePageUserInfo();
         }
 
         // 移除缓存
@@ -603,6 +606,19 @@ class StorePageController extends GetxController {
 
     if (showTips) {
       Message.show('Restore completed');
+    }
+  }
+
+  /// 刷新 MePageController 的用户信息
+  void _refreshMePageUserInfo() {
+    try {
+      if (Get.isRegistered<MePageController>()) {
+        final meController = Get.find<MePageController>();
+        // 调用 getUserInfo 方法刷新用户数据
+        meController.getUserInfo();
+      }
+    } catch (e) {
+      debugPrint('刷新 MePageController 用户信息失败: $e');
     }
   }
 }
