@@ -585,8 +585,8 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
 
     Get.to(
       () => BuyCoinsDialog(
-        episode: currentEpisode.episode ?? 1,
         userInfo: userInfo,
+        currentEpisode: currentEpisode,
         onPurchaseSuccess: () {
           // 购买成功后重新尝试解锁
           controller.buyVideoUnlock(currentEpisode.id!);
