@@ -256,131 +256,409 @@ class _StorePageState extends State<StorePage> {
 
   /// 大金币
   Widget _buildBigCoins() {
-    return Wrap(
-      spacing: 28.w,
-      runSpacing: 20.h,
-      children: controller.state.coinsBigList.map((item) {
-        return GestureDetector(
-          onTap: () => controller.handlePay(item),
-          child: Container(
-            width: 164.w,
-            height: 168.h,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('store_coins_big.png'.icon),
-                fit: BoxFit.fill,
-              ),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+    return Column(
+      children: [
+        SizedBox(height: 13.h),
+        Wrap(
+          spacing: 15.w,
+          runSpacing: 13.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsBigList.map((item) {
+            return GestureDetector(
+              onTap: () => controller.handlePay(item),
+              child: Container(
+                width: 164.w,
+                height: 101.h,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('store_coins_big.png'.icon),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    Image.asset('store_gold.png'.icon, width: 18.w),
-                    SizedBox(width: 6.w),
-                    Text(
-                      '${item.coins}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w700,
+                    // Hot角标（左上角）
+                    if (item.cornerMarker == 'fiery')
+                      Positioned(
+                        bottom: 93.h,
+                        left: 12.w,
+                        child: Container(
+                          width: 48.w,
+                          height: 17.h,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFFFF0BBA),
+                                Color(0xFF6018E6),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Hot',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    // 赠币角标（右上角）
+                    if (item.sendCoins > 0)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: SizedBox(
+                          width: 54.w,
+                          height: 54.h,
+                          child: Stack(
+                            children: [
+                              Image.asset(
+                                'store_coins_jiao.png'.icon,
+                                width: 54.w,
+                                height: 54.h,
+                                fit: BoxFit.fill,
+                              ),
+                              Positioned.fill(
+                                child: Transform.rotate(
+                                  angle: 0.785398, // 45°
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(height: 6.h),
+                                      Text(
+                                        '+',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${((item.sendCoins / item.coins) * 100).toInt()}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    // 内容区域
+                    Positioned(
+                      left: 12.w,
+                      top: 10.h,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 金币图标和数量
+                          Row(
+                            children: [
+                              Image.asset(
+                                'store_gold.png'.icon,
+                                width: 28.w,
+                                height: 28.w,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 2.h),
+                          // 金币数量
+                          Text(
+                            '${item.coins}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          // 赠币
+                          if (item.sendCoins > 0) ...[
+                            SizedBox(height: 2.h),
+                            Text(
+                              '+${item.sendCoins} Coins',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                          SizedBox(height: 7.h),
+                          // 价格
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                item.priceLocal,
+                                style: TextStyle(
+                                  color: Color(0xFFFF0BBA),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              ShaderMask(
+                                shaderCallback: (bounds) {
+                                  return LinearGradient(
+                                    colors: [
+                                      Color(0xFFFF0BBA),
+                                      Color(0xFF6018E6),
+                                    ],
+                                  ).createShader(bounds);
+                                },
+                                child: Text(
+                                  item.price,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Top Up按钮
+                    Positioned(
+                      right: 12.w,
+                      bottom: 10.h,
+                      child: Container(
+                        width: 79.w,
+                        height: 24.h,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFFFF0BBA),
+                              Color(0xFF6018E6),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12.h),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Top Up',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                if (item.sendCoins > 0)
-                  Text(
-                    '+ ${item.sendCoins} Bonus',
-                    style: TextStyle(
-                      color: Color(0xFFFFE682),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.9),
-                    border: Border.all(
-                      color: Color(0xFFFFDAA4).withOpacity(0.5),
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    item.price,
-                    style: TextStyle(
-                      color: Color(0xFFFFE88D),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
   /// 小金币
   Widget _buildSmallCoins() {
-    return Wrap(
-      spacing: 14.w,
-      runSpacing: 10.h,
-      children: controller.state.coinsSmallList.map((item) {
-        return GestureDetector(
-          onTap: () => controller.handlePay(item),
-          child: Container(
-            width: 104.w,
-            height: 84.h,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('store_coins_small.png'.icon),
-                fit: BoxFit.fill,
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      children: [
+        SizedBox(height: 13.h),
+        Wrap(
+          spacing: 8.w,
+          runSpacing: 13.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsSmallList.map((item) {
+            return GestureDetector(
+              onTap: () => controller.handlePay(item),
+              child: Container(
+                width: 109.w,
+                height: 99.h,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('store_coins_small.png'.icon),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    Image.asset('store_gold.png'.icon, width: 13.w),
-                    SizedBox(width: 4.w),
-                    Text(
-                      '${item.coins}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w700,
+                    // Hot角标（左上角）
+                    if (item.cornerMarker == 'fiery')
+                      Positioned(
+                        bottom: 87.h,
+                        left: 8.w,
+                        child: Container(
+                          width: 14.w,
+                          height: 40.h,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFFFF0BBA),
+                                Color(0xFF6018E6),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          alignment: Alignment.center,
+                          child: RotatedBox(
+                            quarterTurns: 3,
+                            child: Text(
+                              'Hot',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    // 赠币角标（右上角）
+                    if (item.sendCoins > 0)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: SizedBox(
+                          width: 48.w,
+                          height: 50.h,
+                          child: Stack(
+                            children: [
+                              Image.asset(
+                                'store_coins_jiao.png'.icon,
+                                width: 48.w,
+                                height: 50.h,
+                                fit: BoxFit.fill,
+                              ),
+                              Positioned.fill(
+                                child: Transform.rotate(
+                                  angle: 0.785398, // 45°
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        '+',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${((item.sendCoins / item.coins) * 100).toInt()}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    // 内容区域
+                    Positioned.fill(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 12.h,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 金币图标
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'store_gold.png'.icon,
+                                  width: 22.w,
+                                  height: 22.w,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 2.h),
+                            // 金币数量
+                            Text(
+                              '${item.coins}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            // 赠币
+                            if (item.sendCoins > 0) ...[
+                              SizedBox(height: 2.h),
+                              Text(
+                                '+${item.sendCoins}',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                            Spacer(),
+                            // 价格
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  item.priceLocal,
+                                  style: TextStyle(
+                                    color: Color(0xFFFF0BBA),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                ShaderMask(
+                                  shaderCallback: (bounds) {
+                                    return LinearGradient(
+                                      colors: [
+                                        Color(0xFFFF0BBA),
+                                        Color(0xFF6018E6),
+                                      ],
+                                    ).createShader(bounds);
+                                  },
+                                  child: Text(
+                                    item.price,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                if (item.sendCoins > 0) ...[
-                  SizedBox(height: 4.h),
-                  Text(
-                    '+ ${item.sendCoins}',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 

@@ -23,6 +23,9 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
   bool _isLoading = true;
   bool _isHidden = false; // 用户是否手动关闭了历史记录模块
   String? _lastHistoryKey; // 记录最后一次显示的历史记录标识
+  
+  // 用于取消异步操作
+  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -30,9 +33,17 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
     _loadHistory();
   }
 
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
   /// 加载历史记录
   Future<void> _loadHistory() async {
-    setState(() => _isLoading = true);
+    if (_isDisposed) return;
+    
+    if (mounted) setState(() => _isLoading = true);
 
     try {
       // 先尝试从本地获取
@@ -59,19 +70,21 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
           _lastHistoryKey = currentHistoryKey;
         }
 
-        setState(() => _isLoading = false);
+        if (mounted && !_isDisposed) setState(() => _isLoading = false);
       } else {
         // 本地没有,从接口获取
         await _fetchHistoryFromApi();
       }
     } catch (e) {
       // debugPrint('加载历史记录失败: $e');
-      setState(() => _isLoading = false);
+      if (mounted && !_isDisposed) setState(() => _isLoading = false);
     }
   }
 
   /// 从API获取历史记录
   Future<void> _fetchHistoryFromApi() async {
+    if (_isDisposed) return;
+    
     try {
       ApiResponse res = await HttpClient().request(
         Apis.history,
@@ -109,18 +122,20 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
         }
       }
 
-      setState(() => _isLoading = false);
+      if (mounted && !_isDisposed) setState(() => _isLoading = false);
     } catch (e) {
       // debugPrint('从API获取历史记录失败: $e');
-      setState(() => _isLoading = false);
+      if (mounted && !_isDisposed) setState(() => _isLoading = false);
     }
   }
 
   /// 关闭历史记录模块
   void _closeHistory() {
-    setState(() {
-      _isHidden = true;
-    });
+    if (mounted && !_isDisposed) {
+      setState(() {
+        _isHidden = true;
+      });
+    }
   }
 
   @override

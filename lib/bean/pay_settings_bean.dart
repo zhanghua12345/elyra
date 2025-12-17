@@ -47,6 +47,7 @@ class PayItem {
   final String description;
   final int sort;
   final int? discountType; // 0: 无折扣, 1: 有折扣, 2: iOS折扣
+  final String? cornerMarker; // 角标类型: fiery等
   final ExtInfo? extInfo;
   
   // IAP相关字段(运行时设置)
@@ -75,6 +76,7 @@ class PayItem {
     required this.description,
     required this.sort,
     this.discountType,
+    this.cornerMarker,
     this.extInfo,
     this.productDetails,
     this.orderCode,
@@ -98,6 +100,7 @@ class PayItem {
       description: json['description'] ?? '',
       sort: json['sort'] ?? 0,
       discountType: json['discount_type'],
+      cornerMarker: json['corner_marker'],
       extInfo: json['ext_info'] != null
           ? ExtInfo.fromJson(json['ext_info'])
           : null,
@@ -120,6 +123,7 @@ class PayItem {
       'description': description,
       'sort': sort,
       'discount_type': discountType,
+      'corner_marker': cornerMarker,
       'ext_info': extInfo?.toJson(),
     };
   }
@@ -145,6 +149,7 @@ class PayItem {
       description: description,
       sort: sort,
       discountType: discountType,
+      cornerMarker: cornerMarker,
       extInfo: extInfo,
       productDetails: productDetails ?? this.productDetails,
       orderCode: orderCode ?? this.orderCode,
