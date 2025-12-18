@@ -1,5 +1,3 @@
-import 'package:easy_debounce/easy_throttle.dart';
-import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/page/el_store/sub_page/store_content_widget.dart';

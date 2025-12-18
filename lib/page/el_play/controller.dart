@@ -267,7 +267,7 @@ class PlayDetailController extends GetxController {
     if (isToggle && pageController.hasClients) {
       pageController.jumpToPage(index);
     }
-
+    await Future.delayed(Duration(milliseconds: 200));
     // 检查当前集是否锁定
     final currentEpisode = state.episodeList[index];
     if (currentEpisode.isLock == true) {

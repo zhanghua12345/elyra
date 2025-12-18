@@ -24,16 +24,23 @@ class StorePageController extends GetxController {
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );
+  
+  // 🔥 新增：标记是否是对话框中的实例
+  bool isDialogInstance = false;
 
   @override
   void onReady() {
     super.onReady();
     loadData();
     initPurchaseListener();
-    // 自动恢复购买（静默执行）
-    Future.delayed(Duration(seconds: 1), () {
-      restorePay(showTips: false);
-    });
+    
+    // 🔥 关键修复：只在非对话框实例中自动恢复购买
+    if (!isDialogInstance) {
+      // 自动恢复购买（静默执行）
+      Future.delayed(Duration(seconds: 1), () {
+        restorePay(showTips: false);
+      });
+    }
   }
 
   @override

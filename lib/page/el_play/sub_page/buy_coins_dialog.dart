@@ -36,7 +36,11 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
   void initState() {
     super.initState();
     // 初始化 StorePageController，使用 tag 避免与其他页面冲突
-    storeController = Get.put(StorePageController(), tag: 'buy_coins_dialog');
+    storeController = Get.put(
+      StorePageController()..isDialogInstance = true, // 🔥 设置为对话框实例
+      tag: 'buy_coins_dialog',
+    );
+    
     // 加载商店数据
     storeController.loadData();
   }
