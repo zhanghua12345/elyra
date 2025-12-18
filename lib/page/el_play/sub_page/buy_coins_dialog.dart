@@ -40,7 +40,7 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
       StorePageController()..isDialogInstance = true, // 🔥 设置为对话框实例
       tag: 'buy_coins_dialog',
     );
-    
+
     // 加载商店数据
     storeController.loadData();
   }
@@ -67,6 +67,8 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -77,7 +79,10 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
           builder: (controller) {
             return Column(
               children: [
-                _buildHeader(),
+                Padding(
+                  padding: EdgeInsets.only(top: statusBarHeight), // 设置顶部上边距
+                  child: _buildHeader(),
+                ),
                 Expanded(child: _buildContent(controller)),
               ],
             );
@@ -130,94 +135,74 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
         final userInfo = _getUserInfo();
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // 第一行：Ep.x 标题
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Ep.${widget.currentEpisode?.episode ?? 1}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              // 第二行：Price和Balance
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Price: ',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 16.w,
-                            height: 16.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            '${userInfo?.coinLeftTotal ?? 0}',
-                            style: TextStyle(
-                              color: Color(0xFFFFD67C),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Price: ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      SizedBox(width: 24.w),
-                      // Balance
-                      Row(
-                        children: [
-                          Text(
-                            'Balance: ',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 16.w,
-                            height: 16.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            '${userInfo?.sendCoinLeftTotal ?? 0}',
-                            style: TextStyle(
-                              color: Color(0xFFFFD67C),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      Image.asset(
+                        'ely_gold.png'.icon,
+                        width: 16.w,
+                        height: 16.w,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        '${userInfo?.coinLeftTotal ?? 0}',
+                        style: TextStyle(
+                          color: Color(0xFFFFD67C),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
-                  // 关闭按钮
-                  GestureDetector(
-                    onTap: () => Get.back(),
-                    child: Padding(
-                      padding: EdgeInsets.all(5.w),
-                      child: Image.asset('ely_close.png'.icon, height: 20.h),
-                    ),
+                  SizedBox(width: 24.w),
+                  // Balance
+                  Row(
+                    children: [
+                      Text(
+                        'Balance: ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Image.asset(
+                        'ely_gold.png'.icon,
+                        width: 16.w,
+                        height: 16.w,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        '${userInfo?.sendCoinLeftTotal ?? 0}',
+                        style: TextStyle(
+                          color: Color(0xFFFFD67C),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
+              ),
+              // 关闭按钮
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Padding(
+                  padding: EdgeInsets.all(5.w),
+                  child: Image.asset('ely_close.png'.icon, height: 20.h),
+                ),
               ),
             ],
           ),
