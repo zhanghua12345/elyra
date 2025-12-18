@@ -37,6 +37,8 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
     super.initState();
     // 初始化 StorePageController，使用 tag 避免与其他页面冲突
     storeController = Get.put(StorePageController(), tag: 'buy_coins_dialog');
+    // 加载商店数据
+    storeController.loadData();
   }
 
   /// 获取 MePageController 的用户信息
@@ -67,6 +69,7 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
         decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
         child: GetBuilder<StorePageController>(
           tag: 'buy_coins_dialog',
+          init: storeController, // 添加 init 参数确保控制器存在
           builder: (controller) {
             return Column(
               children: [
@@ -118,6 +121,7 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
   /// 头部 - 使用 GetBuilder 实现响应式更新
   Widget _buildHeader() {
     return GetBuilder<MePageController>(
+      autoRemove: false, // 不自动移除，避免 controller 被清理
       builder: (meController) {
         final userInfo = _getUserInfo();
         return Container(

@@ -262,6 +262,11 @@ class PlayDetailController extends GetxController {
     currentIndex = index;
     state.currentEpisode = index;
 
+    // 🔥 关键修复：先跳转页面，再检查锁定状态
+    if (isToggle && pageController.hasClients) {
+      pageController.jumpToPage(index);
+    }
+
     // 检查当前集是否锁定
     final currentEpisode = state.episodeList[index];
     if (currentEpisode.isLock == true) {
@@ -282,11 +287,6 @@ class PlayDetailController extends GetxController {
     } else {
       // 如果已经初始化，直接播放
       controllers[index]?.play();
-    }
-
-    // 跳转到对应页面
-    if (isToggle && pageController.hasClients) {
-      pageController.jumpToPage(index);
     }
 
     // 预加载相邻视频

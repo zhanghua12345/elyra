@@ -373,6 +373,13 @@ class StorePageController extends GetxController {
   /// 创建订单
   Future<void> createOrder(PayItem goods,
       {num? shortPlayId, num? videoId}) async {
+    // 检查 productDetails 是否存在（防止模拟器空指针错误）
+    if (goods.productDetails == null) {
+      Message.show('Product not available in store');
+      debugPrint('---createOrder-error: productDetails is null for ${goods.id}');
+      return;
+    }
+
     EasyLoading.show(
         status: 'Paying...', maskType: EasyLoadingMaskType.black);
 
