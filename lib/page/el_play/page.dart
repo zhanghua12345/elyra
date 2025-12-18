@@ -183,11 +183,11 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         // 视频播放器
         _buildVideoPlayer(index, videoController, episode),
 
-        // 锁定蒙层（类似 short_video）
-        if (episode.isLock == true) _buildLockOverlay(episode),
-
         // 底部信息栏
         _buildBottomBar(index, videoController, episode),
+
+        // 锁定蒙层（类似 short_video）- 层级在底部内容之上，顶部导航之下
+        if (episode.isLock == true) _buildLockOverlay(episode),
 
         // 顶部导航栏
         _buildTopBar(),
