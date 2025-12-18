@@ -41,8 +41,12 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
       tag: 'buy_coins_dialog',
     );
 
-    // 加载商店数据
-    storeController.loadData();
+    // 🔥 关键修复：等待数据加载完成后再更新UI
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        storeController.loadData();
+      }
+    });
   }
 
   /// 获取 MePageController 的用户信息
@@ -84,39 +88,64 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
-        child: Column(
-          children: [
-            // 🔥 使用 LayoutBuilder 获取正确的安全距离
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final view = View.of(context);
-                final viewPadding = view.viewPadding;
-                final devicePixelRatio = view.devicePixelRatio;
-                final topPadding = viewPadding.top / devicePixelRatio;
-                
-                debugPrint('💡 顶部安全距离: $topPadding');
-                
-                return SizedBox(height: topPadding);
-              },
-            ),
-            GetBuilder<StorePageController>(
-              tag: 'buy_coins_dialog',
-              init: storeController,
-              builder: (controller) {
-                return Expanded(
+      body: GetBuilder<StorePageController>(
+        tag: 'buy_coins_dialog',
+        init: storeController,
+        builder: (controller) {
+          // 🔥 关键修复：数据未准备好时，直接返回简单的 loading 界面
+          final isDataReady = controller.state.loadStatus == LoadStatusType.loadSuccess &&
+              controller.state.paySettings != null &&
+              controller.state.sortList.isNotEmpty;
+
+          if (!isDataReady) {
+            return Container(
+              decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('loading.gif'.icon, width: 120, height: 120),
+                    SizedBox(height: 20.h),
+                    Text(
+                      'Loading store...',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // 数据已准备就绪，渲染完整界面
+          return Container(
+            decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
+            child: Column(
+              children: [
+                // 🔥 使用 LayoutBuilder 获取正确的安全距离
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final view = View.of(context);
+                    final viewPadding = view.viewPadding;
+                    final devicePixelRatio = view.devicePixelRatio;
+                    final topPadding = viewPadding.top / devicePixelRatio;
+                    
+                    debugPrint('💡 顶部安全距离: $topPadding');
+                    
+                    return SizedBox(height: topPadding);
+                  },
+                ),
+                Expanded(
                   child: Column(
                     children: [
                       _buildHeader(),
                       Expanded(child: _buildContent(controller)),
                     ],
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -178,91 +207,86 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
     );
   }
 
-  /// 头部 - 使用 GetBuilder 实现响应式更新
+  /// 头部 - 显示用户金币信息
   Widget _buildHeader() {
-    return GetBuilder<MePageController>(
-      autoRemove: false, // 不自动移除，避免 controller 被清理
-      builder: (meController) {
-        final userInfo = _getUserInfo();
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final userInfo = _getUserInfo();
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
             children: [
               Row(
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Price: ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Image.asset(
-                        'ely_gold.png'.icon,
-                        width: 16.w,
-                        height: 16.w,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        '${userInfo?.coinLeftTotal ?? 0}',
-                        style: TextStyle(
-                          color: Color(0xFFFFD67C),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Price: ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  SizedBox(width: 24.w),
-                  // Balance
-                  Row(
-                    children: [
-                      Text(
-                        'Balance: ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Image.asset(
-                        'ely_gold.png'.icon,
-                        width: 16.w,
-                        height: 16.w,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        '${userInfo?.sendCoinLeftTotal ?? 0}',
-                        style: TextStyle(
-                          color: Color(0xFFFFD67C),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  Image.asset(
+                    'ely_gold.png'.icon,
+                    width: 16.w,
+                    height: 16.w,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    '${userInfo?.coinLeftTotal ?? 0}',
+                    style: TextStyle(
+                      color: Color(0xFFFFD67C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
-              // 关闭按钮
-              GestureDetector(
-                onTap: () {
-                  Get.back();
-                  // 🔥 关闭弹窗后，重新尝试解锁
-                  _retryUnlock();
-                },
-                child: Padding(
-                  padding: EdgeInsets.all(5.w),
-                  child: Image.asset('ely_close.png'.icon, height: 20.h),
-                ),
+              SizedBox(width: 24.w),
+              // Balance
+              Row(
+                children: [
+                  Text(
+                    'Balance: ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Image.asset(
+                    'ely_gold.png'.icon,
+                    width: 16.w,
+                    height: 16.w,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    '${userInfo?.sendCoinLeftTotal ?? 0}',
+                    style: TextStyle(
+                      color: Color(0xFFFFD67C),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        );
-      },
+          // 关闭按钮
+          GestureDetector(
+            onTap: () {
+              Get.back();
+              // 🔥 关闭弹窗后，重新尝试解锁
+              _retryUnlock();
+            },
+            child: Padding(
+              padding: EdgeInsets.all(5.w),
+              child: Image.asset('ely_close.png'.icon, height: 20.h),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
