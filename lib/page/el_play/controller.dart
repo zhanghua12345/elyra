@@ -126,22 +126,21 @@ class PlayDetailController extends GetxController {
         controllers = List<VideoPlayerController?>.filled(
           state.episodeList.length,
           null,
-          growable: true,
+          growable: true, // TODO
         );
 
         // 如果当前集是锁定状态，则只弹出锁定弹框，不初始化播放器
         if (currentIndex >= 0 &&
-            currentIndex < state.episodeList.length &&
             state.episodeList[currentIndex].isLock == true) {
           state.showLockDialog = true;
-          _preloadAdjacentVideos();
+          _preloadAdjacentVideos(); // 初始化上下播放器
           update();
           return;
         }
 
         // 初始化当前视频
         await _initializeController(currentIndex);
-        _preloadAdjacentVideos();
+        _preloadAdjacentVideos(); // 初始化上下播放器
 
         update();
       } else {
@@ -164,7 +163,7 @@ class PlayDetailController extends GetxController {
     if (episode.isLock == true) return;
 
     if (controllers[index] != null) return;
-    if (episode.videoUrl == null || episode.videoUrl!.isEmpty) return;
+    if (episode.videoUrl.isNullString) return;
 
     VideoPlayerController controller =
         Platform.isAndroid && DeviceInfoUtils().osVersion == '10'
@@ -182,10 +181,10 @@ class PlayDetailController extends GetxController {
 
     try {
       await controller.initialize();
-      controller.setPlaybackSpeed(state.curSpeed);
+      // controller.setPlaybackSpeed(state.curSpeed);  // 设置播放速度
 
       // 如果有历史播放记录，跳转到指定位置
-      if (episode.playSeconds != null && episode.playSeconds!.isNotEmpty) {
+      if (!episode.playSeconds.isNullString) {
         try {
           int seconds = int.parse(episode.playSeconds!);
           if (seconds > 0) {
@@ -196,7 +195,7 @@ class PlayDetailController extends GetxController {
         }
       }
 
-      // 添加监听器
+      // 添加监听器 TODO
       controller.addListener(() {
         if (currentIndex == index && !isClosed) {
           update();
@@ -296,7 +295,7 @@ class PlayDetailController extends GetxController {
     createHistory();
 
     // 更新首页历史记录
-    updateHomeVideo();
+    // updateHomeVideo();
 
     update();
   }
@@ -370,23 +369,23 @@ class PlayDetailController extends GetxController {
   }
 
   /// 更新首页历史记录显示
-  void updateHomeVideo() {
-    try {
-      final homeLogic = Get.put(HomeController());
-      int playTime = controllers[currentIndex]?.value.position.inSeconds ?? 0;
+  // void updateHomeVideo() {
+  //   try {
+  //     final homeLogic = Get.put(HomeController());
+  //     int playTime = controllers[currentIndex]?.value.position.inSeconds ?? 0;
 
-      homeLogic.state.curVideo = ShortVideoBean()
-        ..shortPlayId = state.shortPlayId
-        ..imageUrl = state.detailBean?.shortPlayInfo?.imageUrl
-        ..name = state.detailBean?.shortPlayInfo?.name
-        ..playTime = playTime
-        ..process = currentIndex + 1;
+  //     homeLogic.state.curVideo = ShortVideoBean()
+  //       ..shortPlayId = state.shortPlayId
+  //       ..imageUrl = state.detailBean?.shortPlayInfo?.imageUrl
+  //       ..name = state.detailBean?.shortPlayInfo?.name
+  //       ..playTime = playTime
+  //       ..process = currentIndex + 1;
 
-      homeLogic.update();
-    } catch (e) {
-      debugPrint('更新首页历史失败: $e');
-    }
-  }
+  //     homeLogic.update();
+  //   } catch (e) {
+  //     debugPrint('更新首页历史失败: $e');
+  //   }
+  // }
 
   /// 切换播放速度
   void changeSpeed(double speed) {
@@ -562,36 +561,18 @@ class PlayDetailController extends GetxController {
 
   /// 自动检查并解锁视频（新逻辑：不弹窗，只判断金币）
   Future<void> autoCheckAndUnlock(num coins, int index) async {
-    // 先获取最新的用户信息
-    final userInfo = await getUserInfo();
-    final totalCoins =
-        (userInfo?.coinLeftTotal ?? 0) + (userInfo?.sendCoinLeftTotal ?? 0);
-
-    debugPrint('🔑 自动检查解锁: 需要${coins}金币, 当前总金币: $totalCoins');
-
-    // 金币足够，自动解锁
-    if (totalCoins >= coins) {
-      debugPrint('✅ 金币足够，200毫秒后自动解锁...');
-      await Future.delayed(Duration(milliseconds: 200));
-
-      final success = await buyVideoUnlock(
-        state.episodeList[index].id!,
-        coins,
-        toRecharge: false,
-      );
-
-      if (success) {
-        // 解锁成功，刷新 MePageController 的用户信息
-        _refreshMePageUserInfo();
-      }
-    } else {
-      // 金币不足，保持锁定蒙层显示，不做任何操作
-      debugPrint('❌ 金币不足，保持锁定状态');
-      update();
+    final success = await buyVideoUnlock(
+      state.episodeList[index].id!,
+      coins,
+      toRecharge: false,
+    );
+    if (success) {
+      // 解锁成功，刷新 MePageController 的用户信息
+      _refreshMePageUserInfo();
     }
+    update();
   }
 
-  /// 购买解锁视频（支持 toRecharge 参数）
   Future<bool> buyVideoUnlock(
     num videoId,
     num coins, {
@@ -599,7 +580,7 @@ class PlayDetailController extends GetxController {
   }) async {
     try {
       if (!toRecharge) {
-        EasyLoading.show(status: 'Loading...');
+        // EasyLoading.show(status: 'Loading...');
       }
 
       ApiResponse response = await HttpClient().request(
@@ -609,7 +590,7 @@ class PlayDetailController extends GetxController {
       );
 
       if (!toRecharge) {
-        EasyLoading.dismiss();
+        // EasyLoading.dismiss();
       }
 
       if (response.data['status'] == 'success') {
@@ -627,7 +608,6 @@ class PlayDetailController extends GetxController {
 
           update();
 
-          // 初始化并播放视频（不调用 onEpisodeChanged 避免循环）
           if (controllers[episodeIndex] == null) {
             await _initializeController(episodeIndex);
           }
@@ -642,11 +622,11 @@ class PlayDetailController extends GetxController {
           createHistory();
 
           // 更新首页历史记录
-          updateHomeVideo();
+          // updateHomeVideo();
         }
 
         if (!toRecharge) {
-          Message.show('Unlock successful');
+          // Message.show('Unlock successful');
         }
         return true;
       } else if (response.data['status'] == 'not_enough') {
@@ -661,28 +641,10 @@ class PlayDetailController extends GetxController {
       }
     } catch (e) {
       if (!toRecharge) {
-        EasyLoading.dismiss();
+        // EasyLoading.dismiss();
       }
       debugPrint('购买解锁失败: $e');
       return false;
-    }
-  }
-
-  /// 获取用户信息
-  Future<UserInfo?> getUserInfo() async {
-    try {
-      ApiResponse response = await HttpClient().request(
-        Apis.customerInfo,
-        method: HttpMethod.get,
-      );
-
-      if (response.success) {
-        return UserInfo.fromJson(response.data);
-      }
-      return null;
-    } catch (e) {
-      debugPrint('获取用户信息失败: $e');
-      return null;
     }
   }
 

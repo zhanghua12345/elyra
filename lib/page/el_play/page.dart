@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_play/controller.dart';
 import 'package:elyra/page/el_play/sub_page/buy_coins_dialog.dart';
 import 'package:elyra/page/el_play/sub_page/select/select_episode_page.dart';
@@ -581,7 +582,8 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   /// 显示购买金币弹窗
   void _showBuyCoinsDialog() async {
     // 先获取用户信息
-    final userInfo = await controller.getUserInfo();
+    final meController = Get.find<MePageController>();
+    final userInfo = meController.state.customerInfo;
     final currentEpisode = controller.state.episodeList[controller.currentIndex];
 
     Get.bottomSheet(
