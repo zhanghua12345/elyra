@@ -84,21 +84,38 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
-          child: GetBuilder<StorePageController>(
-            tag: 'buy_coins_dialog',
-            init: storeController, // 添加 init 参数确保控制器存在
-            builder: (controller) {
-              return Column(
-                children: [
-                  _buildHeader(),
-                  Expanded(child: _buildContent(controller)),
-                ],
-              );
-            },
-          ),
+      body: Container(
+        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
+        child: Column(
+          children: [
+            // 🔥 使用 LayoutBuilder 获取正确的安全距离
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final view = View.of(context);
+                final viewPadding = view.viewPadding;
+                final devicePixelRatio = view.devicePixelRatio;
+                final topPadding = viewPadding.top / devicePixelRatio;
+                
+                debugPrint('💡 顶部安全距离: $topPadding');
+                
+                return SizedBox(height: topPadding);
+              },
+            ),
+            GetBuilder<StorePageController>(
+              tag: 'buy_coins_dialog',
+              init: storeController,
+              builder: (controller) {
+                return Expanded(
+                  child: Column(
+                    children: [
+                      _buildHeader(),
+                      Expanded(child: _buildContent(controller)),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -106,6 +123,9 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
 
   /// 内容区域
   Widget _buildContent(StorePageController controller) {
+    // 🔥 关键修复：添加更多空检查
+    debugPrint('📊 loadStatus: ${controller.state.loadStatus}, paySettings: ${controller.state.paySettings != null}, sortList: ${controller.state.sortList.length}');
+    
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
         child: Image.asset('loading.gif'.icon, width: 120, height: 120),
@@ -127,6 +147,25 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
             TextButton(
               onPressed: controller.onRefresh,
               child: Text('Retry', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // 🔥 关键修复：确保数据完全加载完成
+    if (controller.state.paySettings == null || 
+        controller.state.sortList.isEmpty ||
+        controller.state.loadStatus != LoadStatusType.loadSuccess) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('loading.gif'.icon, width: 120, height: 120),
+            SizedBox(height: 20.h),
+            Text(
+              'Loading store...',
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ],
         ),

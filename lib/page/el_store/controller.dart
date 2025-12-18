@@ -145,17 +145,24 @@ class StorePageController extends GetxController {
 
   /// 初始化商店商品（匹配iOS/Android商店）
   Future<void> initStore() async {
-    EasyLoading.show(status: 'Loading...');
-    bool isAvailable = await InAppPurchaseUtil.isAvailable();
-    if (!isAvailable) {
-      EasyLoading.dismiss();
-      Message.show('In App purchase is not available');
-      return;
-    }
+    try {
+      // 🔥 关键修复：添加空检查
+      if (state.paySettings == null) {
+        debugPrint('initStore 错误: paySettings 为 null');
+        return;
+      }
 
-    // 产品ID
-    List<String> productIds = [];
-    List<String> vipIds = [];
+      EasyLoading.show(status: 'Loading...');
+      bool isAvailable = await InAppPurchaseUtil.isAvailable();
+      if (!isAvailable) {
+        EasyLoading.dismiss();
+        Message.show('In App purchase is not available');
+        return;
+      }
+
+      // 产品ID
+      List<String> productIds = [];
+      List<String> vipIds = [];
     
     if (Platform.isIOS) {
       productIds = state.paySettings!.listCoins
@@ -249,6 +256,11 @@ class StorePageController extends GetxController {
 
     EasyLoading.dismiss();
     update();
+    } catch (e) {
+      debugPrint('初始化商店失败: $e');
+      EasyLoading.dismiss();
+      Message.show('Failed to initialize store');
+    }
   }
 
   /// 处理支付

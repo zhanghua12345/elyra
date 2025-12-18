@@ -158,6 +158,15 @@ class _StorePageState extends State<StorePage> {
   }
 
   Widget _buildContentArea() {
+    // 🔥 关键修复：确保数据完全加载完成后才渲染
+    if (controller.state.paySettings == null || 
+        controller.state.sortList.isEmpty ||
+        controller.state.loadStatus != LoadStatusType.loadSuccess) {
+      return Center(
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+      );
+    }
+    
     return StoreContentWidget(showTips: true);
   }
 }
