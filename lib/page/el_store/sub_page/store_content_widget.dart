@@ -31,8 +31,8 @@ class StoreContentWidget extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Column(
           children: [
-            // 根据排序显示内容
-            if (controller.state.sortList.isNotEmpty)
+            // 🔥 关键修复：添加空检查
+            if (controller.state.sortList.isNotEmpty && controller.state.paySettings != null)
               ...controller.state.sortList.map((type) {
                 if (type == 'list_coins') {
                   return _StoreCoinsSection(controller: controller);

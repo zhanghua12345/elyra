@@ -79,15 +79,22 @@ class StorePageController extends GetxController {
 
       if (res.success && res.data != null) {
         state.paySettings = PaySettingsBean.fromJson(res.data);
-        state.sortList = state.paySettings!.sort;
-
-        // 分类数据
-        _classifyData();
         
-        // 初始化商店商品
-        await initStore();
+        // 🔥 关键修复：添加空检查
+        if (state.paySettings != null && state.paySettings!.sort.isNotEmpty) {
+          state.sortList = state.paySettings!.sort;
 
-        state.loadStatus = LoadStatusType.loadSuccess;
+          // 分类数据
+          _classifyData();
+          
+          // 初始化商店商品
+          await initStore();
+
+          state.loadStatus = LoadStatusType.loadSuccess;
+        } else {
+          debugPrint('加载失败: paySettings 或 sort 为 null');
+          state.loadStatus = LoadStatusType.loadFailed;
+        }
       } else {
         state.loadStatus = LoadStatusType.loadFailed;
       }

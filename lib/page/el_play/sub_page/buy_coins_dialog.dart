@@ -58,6 +58,21 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
     return widget.userInfo; // 降级方案：使用传入的 userInfo
   }
 
+  /// 关闭弹窗后重新尝试解锁
+  void _retryUnlock() async {
+    final currentEpisode = widget.currentEpisode;
+    if (currentEpisode == null || currentEpisode.isLock != true) return;
+
+    // 延迟执行，确保弹窗已完全关闭
+    await Future.delayed(Duration(milliseconds: 300));
+
+    // 重新检查并尝试解锁
+    await widget.playController.autoCheckAndUnlock(
+      currentEpisode.coins ?? 0,
+      widget.playController.currentIndex,
+    );
+  }
+
   @override
   void dispose() {
     // 清理 controller
@@ -67,26 +82,23 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
-        child: GetBuilder<StorePageController>(
-          tag: 'buy_coins_dialog',
-          init: storeController, // 添加 init 参数确保控制器存在
-          builder: (controller) {
-            return Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: statusBarHeight), // 设置顶部上边距
-                  child: _buildHeader(),
-                ),
-                Expanded(child: _buildContent(controller)),
-              ],
-            );
-          },
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
+          child: GetBuilder<StorePageController>(
+            tag: 'buy_coins_dialog',
+            init: storeController, // 添加 init 参数确保控制器存在
+            builder: (controller) {
+              return Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(child: _buildContent(controller)),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -198,7 +210,11 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
               ),
               // 关闭按钮
               GestureDetector(
-                onTap: () => Get.back(),
+                onTap: () {
+                  Get.back();
+                  // 🔥 关闭弹窗后，重新尝试解锁
+                  _retryUnlock();
+                },
                 child: Padding(
                   padding: EdgeInsets.all(5.w),
                   child: Image.asset('ely_close.png'.icon, height: 20.h),
