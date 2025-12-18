@@ -267,7 +267,7 @@ class PlayDetailController extends GetxController {
     if (isToggle && pageController.hasClients) {
       pageController.jumpToPage(index);
     }
-    await Future.delayed(Duration(milliseconds: 200));
+    // await Future.delayed(Duration(milliseconds: 200));
     // 检查当前集是否锁定
     final currentEpisode = state.episodeList[index];
     if (currentEpisode.isLock == true) {
@@ -275,9 +275,8 @@ class PlayDetailController extends GetxController {
       controllers[index]?.seekTo(Duration.zero);
       controllers[index]?.pause();
       update();
-      
+      await Future.delayed(Duration(milliseconds: 200));
       // 延迟300ms后自动检查金币并尝试解锁（不弹窗）
-      await Future.delayed(Duration(milliseconds: 300));
       await autoCheckAndUnlock(currentEpisode.coins ?? 0, index);
       return;
     }
@@ -565,16 +564,22 @@ class PlayDetailController extends GetxController {
   Future<void> autoCheckAndUnlock(num coins, int index) async {
     // 先获取最新的用户信息
     final userInfo = await getUserInfo();
-    final totalCoins = (userInfo?.coinLeftTotal ?? 0) + (userInfo?.sendCoinLeftTotal ?? 0);
-    
+    final totalCoins =
+        (userInfo?.coinLeftTotal ?? 0) + (userInfo?.sendCoinLeftTotal ?? 0);
+
     debugPrint('🔑 自动检查解锁: 需要${coins}金币, 当前总金币: $totalCoins');
-    
+
     // 金币足够，自动解锁
     if (totalCoins >= coins) {
-      debugPrint('✅ 金币足够，1秒后自动解锁...');
-      await Future.delayed(Duration(seconds: 1));
-      final success = await buyVideoUnlock(state.episodeList[index].id!, coins, toRecharge: false);
-      
+      debugPrint('✅ 金币足够，200毫秒后自动解锁...');
+      await Future.delayed(Duration(milliseconds: 200));
+
+      final success = await buyVideoUnlock(
+        state.episodeList[index].id!,
+        coins,
+        toRecharge: false,
+      );
+
       if (success) {
         // 解锁成功，刷新 MePageController 的用户信息
         _refreshMePageUserInfo();
@@ -587,22 +592,26 @@ class PlayDetailController extends GetxController {
   }
 
   /// 购买解锁视频（支持 toRecharge 参数）
-  Future<bool> buyVideoUnlock(num videoId, num coins, {bool toRecharge = false}) async {
+  Future<bool> buyVideoUnlock(
+    num videoId,
+    num coins, {
+    bool toRecharge = false,
+  }) async {
     try {
       if (!toRecharge) {
         EasyLoading.show(status: 'Loading...');
       }
-  
+
       ApiResponse response = await HttpClient().request(
         Apis.buyVideo,
         method: HttpMethod.post,
         data: {'short_play_id': state.shortPlayId, 'video_id': videoId},
       );
-  
+
       if (!toRecharge) {
         EasyLoading.dismiss();
       }
-      
+
       if (response.data['status'] == 'success') {
         // 解锁成功，更新当前item的isLock状态
         final episodeIndex = state.episodeList.indexWhere(
@@ -610,14 +619,14 @@ class PlayDetailController extends GetxController {
         );
         if (episodeIndex != -1) {
           state.episodeList[episodeIndex].isLock = false;
-          
+
           // 如果是当前集，更新解锁索引
           if (episodeIndex != state.episodeList.length - 1) {
             state.curUnlock = episodeIndex + 1;
           }
-          
+
           update();
-          
+
           // 初始化并播放视频（不调用 onEpisodeChanged 避免循环）
           if (controllers[episodeIndex] == null) {
             await _initializeController(episodeIndex);
@@ -625,17 +634,17 @@ class PlayDetailController extends GetxController {
           if (controllers[episodeIndex] != null) {
             controllers[episodeIndex]!.play();
           }
-          
+
           // 预加载相邻视频
           _preloadAdjacentVideos();
-          
+
           // 创建历史记录
           createHistory();
-          
+
           // 更新首页历史记录
           updateHomeVideo();
         }
-        
+
         if (!toRecharge) {
           Message.show('Unlock successful');
         }
@@ -689,6 +698,4 @@ class PlayDetailController extends GetxController {
       debugPrint('刷新 MePageController 用户信息失败: $e');
     }
   }
-
 }
-
