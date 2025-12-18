@@ -6,6 +6,7 @@ import 'package:elyra/bean/user_info.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/page/el_home/controller.dart';
+import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_play/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
@@ -270,14 +271,14 @@ class PlayDetailController extends GetxController {
     // 检查当前集是否锁定
     final currentEpisode = state.episodeList[index];
     if (currentEpisode.isLock == true) {
-      // 集数被锁定，暂停视频并自动显示购买弹窗
+      // 集数被锁定，暂停视频并显示锁定蒙层
       controllers[index]?.seekTo(Duration.zero);
       controllers[index]?.pause();
       update();
       
-      // 延迟300ms后自动弹出购买弹窗（类似 short_video 的 throttle）
+      // 延迟300ms后自动检查金币并尝试解锁（不弹窗）
       await Future.delayed(Duration(milliseconds: 300));
-      autoShowBuyDialog(currentEpisode.coins ?? 0, index);
+      await autoCheckAndUnlock(currentEpisode.coins ?? 0, index);
       return;
     }
 
@@ -560,20 +561,28 @@ class PlayDetailController extends GetxController {
     }
   }
 
-  /// 自动显示购买弹窗逻辑（类似 short_video 的 autoShowBuyDialog）
-  Future<void> autoShowBuyDialog(num coins, int index) async {
+  /// 自动检查并解锁视频（新逻辑：不弹窗，只判断金币）
+  Future<void> autoCheckAndUnlock(num coins, int index) async {
     // 先获取最新的用户信息
     final userInfo = await getUserInfo();
     final totalCoins = (userInfo?.coinLeftTotal ?? 0) + (userInfo?.sendCoinLeftTotal ?? 0);
     
-    // 金币不足，显示购买弹窗
-    if (totalCoins < coins) {
-      state.showLockDialog = true;
-      update();
-    } else {
-      // 金币足够，延迟1秒后自动解锁
+    debugPrint('🔑 自动检查解锁: 需要${coins}金币, 当前总金币: $totalCoins');
+    
+    // 金币足够，自动解锁
+    if (totalCoins >= coins) {
+      debugPrint('✅ 金币足够，1秒后自动解锁...');
       await Future.delayed(Duration(seconds: 1));
-      await buyVideoUnlock(state.episodeList[index].id!, coins, toRecharge: false);
+      final success = await buyVideoUnlock(state.episodeList[index].id!, coins, toRecharge: false);
+      
+      if (success) {
+        // 解锁成功，刷新 MePageController 的用户信息
+        _refreshMePageUserInfo();
+      }
+    } else {
+      // 金币不足，保持锁定蒙层显示，不做任何操作
+      debugPrint('❌ 金币不足，保持锁定状态');
+      update();
     }
   }
 
@@ -634,11 +643,6 @@ class PlayDetailController extends GetxController {
       } else if (response.data['status'] == 'not_enough') {
         // 金币不足
         Message.show('Coin not enough');
-        if (toRecharge) {
-          // 显示购买弹窗
-          state.showLockDialog = true;
-          update();
-        }
         return false;
       } else if (response.data['status'] == 'jump') {
         Message.show('Cannot jump episode');
@@ -670,6 +674,19 @@ class PlayDetailController extends GetxController {
     } catch (e) {
       debugPrint('获取用户信息失败: $e');
       return null;
+    }
+  }
+
+  /// 刷新 MePageController 的用户信息
+  void _refreshMePageUserInfo() {
+    try {
+      if (Get.isRegistered<MePageController>()) {
+        final meController = Get.find<MePageController>();
+        meController.getUserInfo();
+        debugPrint('✅ 已刷新 MePageController 用户信息');
+      }
+    } catch (e) {
+      debugPrint('刷新 MePageController 用户信息失败: $e');
     }
   }
 

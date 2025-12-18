@@ -85,15 +85,6 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         backgroundColor: Colors.black,
         body: GetBuilder<PlayDetailController>(
           builder: (ctrl) {
-            // 监听 showLockDialog 状态，自动弹出购买弹窗
-            if (ctrl.state.showLockDialog) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _showBuyCoinsDialog();
-                // 弹窗展示后重置标记
-                ctrl.state.showLockDialog = false;
-                ctrl.update();
-              });
-            }
             return _buildContent();
           },
         ),
@@ -509,13 +500,9 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       color: Colors.black.withValues(alpha: 0.75),
       child: Center(
         child: GestureDetector(
-          onTap: () async {
-            // 点击解锁按钮，调用 buyVideo 接口（toRecharge: true）
-            await controller.buyVideoUnlock(
-              episode.id!,
-              episode.coins ?? 0,
-              toRecharge: true,
-            );
+          onTap: () {
+            // 🔥 点击解锁按钮，弹出购买金币弹窗
+            _showBuyCoinsDialog();
           },
           child: Container(
             width: 260.w,
@@ -588,13 +575,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-    ).then((_) {
-      // 弹窗关闭后，如果还是锁定状态，重置标记
-      if (controller.state.showLockDialog) {
-        controller.state.showLockDialog = false;
-        controller.update();
-      }
-    });
+    );
   }
 
   /// 显示购买金币弹窗
@@ -619,12 +600,6 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-    ).then((_) {
-      // 弹窗关闭后重置标记
-      if (controller.state.showLockDialog) {
-        controller.state.showLockDialog = false;
-        controller.update();
-      }
-    });
+    );
   }
 }
