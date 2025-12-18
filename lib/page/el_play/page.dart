@@ -85,11 +85,11 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         backgroundColor: Colors.black,
         body: GetBuilder<PlayDetailController>(
           builder: (ctrl) {
-            // 监听锁定弹框状态
+            // 监听 showLockDialog 状态，自动弹出购买弹窗
             if (ctrl.state.showLockDialog) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                _showEpisodeLock();
-                // 弹框展示后重置标记，避免无法关闭或重复弹出
+                _showBuyCoinsDialog();
+                // 弹窗展示后重置标记
                 ctrl.state.showLockDialog = false;
                 ctrl.update();
               });
@@ -191,6 +191,9 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       children: [
         // 视频播放器
         _buildVideoPlayer(index, videoController, episode),
+
+        // 锁定蒙层（类似 short_video）
+        if (episode.isLock == true) _buildLockOverlay(episode),
 
         // 底部信息栏
         _buildBottomBar(index, videoController, episode),
@@ -498,6 +501,78 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     );
   }
 
+  /// 锁定蒙层（类似 short_video）
+  Widget _buildLockOverlay(EpisodeList episode) {
+    return Container(
+      width: ScreenUtil().screenWidth,
+      height: ScreenUtil().screenHeight,
+      color: Colors.black.withValues(alpha: 0.75),
+      child: Center(
+        child: GestureDetector(
+          onTap: () async {
+            // 点击解锁按钮，调用 buyVideo 接口（toRecharge: true）
+            await controller.buyVideoUnlock(
+              episode.id!,
+              episode.coins ?? 0,
+              toRecharge: true,
+            );
+          },
+          child: Container(
+            width: 260.w,
+            padding: EdgeInsets.symmetric(vertical: 17.w),
+            decoration: ShapeDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment(0.00, -1.00),
+                end: Alignment(0, 1),
+                colors: [Color(0xFFDC23B1), Color(0xFF6018E6)],
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('ely_lock_max.png'.icon, width: 20.w),
+                SizedBox(width: 3.w),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Unlocking costs ',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '${episode.coins ?? 0}',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' coins',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 显示选集弹窗
   void _showEpisodeSelector() {
     Get.bottomSheet(
@@ -513,32 +588,20 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-    );
+    ).then((_) {
+      // 弹窗关闭后，如果还是锁定状态，重置标记
+      if (controller.state.showLockDialog) {
+        controller.state.showLockDialog = false;
+        controller.update();
+      }
+    });
   }
 
-  /// 显示锁集的弹框
-  void _showEpisodeLock() async {
-    final currentEpisode =
-        controller.state.episodeList[controller.currentIndex];
-
-    // 立即调用 buyVideo 接口判断能否解锁
-    bool canUnlock = await controller.buyVideoUnlock(currentEpisode.id!);
-    
-    if (canUnlock) {
-      // 能解锁，不显示弹窗，直接播放
-      return;
-    }
-    
-    // 不能解锁（金币不足），显示购买金币弹窗
-    _showBuyCoinsDialog();
-  }
-
-  /// 显示购买金币弹框
+  /// 显示购买金币弹窗
   void _showBuyCoinsDialog() async {
     // 先获取用户信息
     final userInfo = await controller.getUserInfo();
-    final currentEpisode =
-        controller.state.episodeList[controller.currentIndex];
+    final currentEpisode = controller.state.episodeList[controller.currentIndex];
 
     Get.bottomSheet(
       BuyCoinsDialog(
@@ -547,11 +610,21 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
         playController: controller,
         onPurchaseSuccess: () async {
           // 购买成功后自动尝试解锁
-          await controller.buyVideoUnlock(currentEpisode.id!);
+          await controller.buyVideoUnlock(
+            currentEpisode.id!,
+            currentEpisode.coins ?? 0,
+            toRecharge: false,
+          );
         },
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-    );
+    ).then((_) {
+      // 弹窗关闭后重置标记
+      if (controller.state.showLockDialog) {
+        controller.state.showLockDialog = false;
+        controller.update();
+      }
+    });
   }
 }

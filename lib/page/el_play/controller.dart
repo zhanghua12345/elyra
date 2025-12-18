@@ -88,6 +88,14 @@ class PlayDetailController extends GetxController {
 
         state.episodeList = state.detailBean?.episodeList ?? [];
 
+        // 计算当前解锁索引
+        for (var video in state.episodeList) {
+          if (video.isLock == true) {
+            state.curUnlock = state.episodeList.indexOf(video);
+            break;
+          }
+        }
+
         // 根据传入的videoId确定初始集数索引
         if (state.videoId > 0) {
           // 查找对应的集数索引
@@ -257,9 +265,14 @@ class PlayDetailController extends GetxController {
     // 检查当前集是否锁定
     final currentEpisode = state.episodeList[index];
     if (currentEpisode.isLock == true) {
-      // 集数被锁定，设置标记让UI显示锁定弹框
-      state.showLockDialog = true;
+      // 集数被锁定，暂停视频并自动显示购买弹窗
+      controllers[index]?.seekTo(Duration.zero);
+      controllers[index]?.pause();
       update();
+      
+      // 延迟300ms后自动弹出购买弹窗（类似 short_video 的 throttle）
+      await Future.delayed(Duration(milliseconds: 300));
+      autoShowBuyDialog(currentEpisode.coins ?? 0, index);
       return;
     }
 
@@ -547,10 +560,29 @@ class PlayDetailController extends GetxController {
     }
   }
 
-  /// 购买解锁视频
-  Future<bool> buyVideoUnlock(num videoId) async {
+  /// 自动显示购买弹窗逻辑（类似 short_video 的 autoShowBuyDialog）
+  Future<void> autoShowBuyDialog(num coins, int index) async {
+    // 先获取最新的用户信息
+    final userInfo = await getUserInfo();
+    final totalCoins = (userInfo?.coinLeftTotal ?? 0) + (userInfo?.sendCoinLeftTotal ?? 0);
+    
+    // 金币不足，显示购买弹窗
+    if (totalCoins < coins) {
+      state.showLockDialog = true;
+      update();
+    } else {
+      // 金币足够，延迟1秒后自动解锁
+      await Future.delayed(Duration(seconds: 1));
+      await buyVideoUnlock(state.episodeList[index].id!, coins, toRecharge: false);
+    }
+  }
+
+  /// 购买解锁视频（支持 toRecharge 参数）
+  Future<bool> buyVideoUnlock(num videoId, num coins, {bool toRecharge = false}) async {
     try {
-      EasyLoading.show(status: 'Loading...');
+      if (!toRecharge) {
+        EasyLoading.show(status: 'Loading...');
+      }
   
       ApiResponse response = await HttpClient().request(
         Apis.buyVideo,
@@ -558,7 +590,10 @@ class PlayDetailController extends GetxController {
         data: {'short_play_id': state.shortPlayId, 'video_id': videoId},
       );
   
-      EasyLoading.dismiss();
+      if (!toRecharge) {
+        EasyLoading.dismiss();
+      }
+      
       if (response.data['status'] == 'success') {
         // 解锁成功，更新当前item的isLock状态
         final episodeIndex = state.episodeList.indexWhere(
@@ -566,22 +601,55 @@ class PlayDetailController extends GetxController {
         );
         if (episodeIndex != -1) {
           state.episodeList[episodeIndex].isLock = false;
-          // 关闭锁定弹框
-          state.showLockDialog = false;
-          // 继续播放当前集
-          await continuePlayAfterUnlock(episodeIndex);
+          
+          // 如果是当前集，更新解锁索引
+          if (episodeIndex != state.episodeList.length - 1) {
+            state.curUnlock = episodeIndex + 1;
+          }
+          
           update();
+          
+          // 初始化并播放视频（不调用 onEpisodeChanged 避免循环）
+          if (controllers[episodeIndex] == null) {
+            await _initializeController(episodeIndex);
+          }
+          if (controllers[episodeIndex] != null) {
+            controllers[episodeIndex]!.play();
+          }
+          
+          // 预加载相邻视频
+          _preloadAdjacentVideos();
+          
+          // 创建历史记录
+          createHistory();
+          
+          // 更新首页历史记录
+          updateHomeVideo();
         }
-        Message.show('Unlock successful');
+        
+        if (!toRecharge) {
+          Message.show('Unlock successful');
+        }
         return true;
       } else if (response.data['status'] == 'not_enough') {
         // 金币不足
+        Message.show('Coin not enough');
+        if (toRecharge) {
+          // 显示购买弹窗
+          state.showLockDialog = true;
+          update();
+        }
+        return false;
+      } else if (response.data['status'] == 'jump') {
+        Message.show('Cannot jump episode');
         return false;
       } else {
         return false;
       }
     } catch (e) {
-      EasyLoading.dismiss();
+      if (!toRecharge) {
+        EasyLoading.dismiss();
+      }
       debugPrint('购买解锁失败: $e');
       return false;
     }
@@ -605,26 +673,5 @@ class PlayDetailController extends GetxController {
     }
   }
 
-  /// 解锁成功后继续播放
-  Future<void> continuePlayAfterUnlock(int index) async {
-    // 初始化并播放视频
-    if (controllers[index] == null) {
-      await _initializeController(index);
-      // 确保视频初始化后自动播放
-      if (controllers[index] != null && controllers[index]!.value.isInitialized) {
-        controllers[index]!.play();
-      }
-    } else {
-      controllers[index]?.play();
-    }
-
-    // 预加载相邻视频
-    _preloadAdjacentVideos();
-
-    // 创建历史记录
-    createHistory();
-
-    // 更新首页历史记录
-    updateHomeVideo();
-  }
 }
+

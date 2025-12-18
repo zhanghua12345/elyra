@@ -18,6 +18,7 @@ class PlayDetailState {
   
   // 当前播放信息
   int currentEpisode = 0; // 当前集数索引
+  int curUnlock = 0; // 当前可解锁的集数索引（用于判断是否需要解锁）
   
   // 播放设置
   double curSpeed = 1.0;
