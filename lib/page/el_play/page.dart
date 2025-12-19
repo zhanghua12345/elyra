@@ -5,6 +5,7 @@ import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_play/controller.dart';
 import 'package:elyra/page/el_play/sub_page/buy_coins_dialog.dart';
 import 'package:elyra/page/el_play/sub_page/select/select_episode_page.dart';
+import 'package:elyra/utils/toast.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -495,6 +496,8 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
 
   /// 锁定蒙层（类似 short_video）
   Widget _buildLockOverlay(EpisodeList episode) {
+    final currentEpisodePre =
+        controller.state.episodeList[controller.currentIndex - 1];
     return Container(
       width: ScreenUtil().screenWidth,
       height: ScreenUtil().screenHeight,
@@ -502,8 +505,12 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
       child: Center(
         child: GestureDetector(
           onTap: () {
-            // 🔥 点击解锁按钮，弹出购买金币弹窗
-            _showBuyCoinsDialog();
+            if (currentEpisodePre.isLock == false) {
+              // 🔥 点击解锁按钮，弹出购买金币弹窗
+              _showBuyCoinsDialog();
+            } else {
+              Message.show('Cannot jump episode');
+            }
           },
           child: Container(
             width: 260.w,
@@ -526,30 +533,40 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
                 RichText(
                   text: TextSpan(
                     children: [
-                      TextSpan(
-                        text: 'Unlocking costs',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
+                      if (currentEpisodePre.isLock == false) ...[
+                        TextSpan(
+                          text: 'Unlocking costs',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: '${episode.coins ?? 0}',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                        TextSpan(
+                          text: '${episode.coins ?? 0}',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: ' coins',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
+                        TextSpan(
+                          text: ' coins',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                      ),
+                      ] else
+                        TextSpan(
+                          text: 'Cannot jump episode',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                     ],
                   ),
                 ),

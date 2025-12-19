@@ -629,11 +629,11 @@ class PlayDetailController extends GetxController {
           // Message.show('Unlock successful');
         }
         return true;
-      } else if (response.data['status'] == 'not_enough') {
+      } else if (response.data['status'] == 'not_enough' && toRecharge) {
         // 金币不足
         Message.show('Coin not enough');
         return false;
-      } else if (response.data['status'] == 'jump') {
+      } else if (response.data['status'] == 'jump' && toRecharge) {
         Message.show('Cannot jump episode');
         return false;
       } else {
