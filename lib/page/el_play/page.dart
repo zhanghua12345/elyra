@@ -527,7 +527,7 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Unlocking costs ',
+                        text: 'Unlocking costs',
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: Colors.white,
@@ -584,7 +584,8 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
     // 先获取用户信息
     final meController = Get.find<MePageController>();
     final userInfo = meController.state.customerInfo;
-    final currentEpisode = controller.state.episodeList[controller.currentIndex];
+    final currentEpisode =
+        controller.state.episodeList[controller.currentIndex];
 
     Get.bottomSheet(
       BuyCoinsDialog(

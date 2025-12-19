@@ -1,5 +1,6 @@
 import 'package:elyra/bean/short_play_detail_bean.dart';
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -203,7 +204,13 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
 
                     return GestureDetector(
                       behavior: HitTestBehavior.translucent,
-                      onTap: () => _selectEpisode(episode),
+                      onTap: () => {
+                        if (episode >= 2 &&
+                            widget.episodeList[episode - 2].isLock == true)
+                          {Message.show('Cannot jump episode')}
+                        else
+                          {_selectEpisode(episode)},
+                      },
                       child: Stack(
                         children: [
                           Container(
