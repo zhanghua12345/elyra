@@ -599,7 +599,13 @@ class _PlayDetailPageState extends State<PlayDetailPage> {
   /// 显示购买金币弹窗
   void _showBuyCoinsDialog() async {
     // 先获取用户信息
-    final meController = Get.find<MePageController>();
+    MePageController meController;
+    if (Get.isRegistered<MePageController>()) {
+      meController = Get.find<MePageController>();
+    } else {
+      meController = Get.put(MePageController());
+      await meController.getUserInfo(); // ✅ 必须
+    }
     final userInfo = meController.state.customerInfo;
     final currentEpisode =
         controller.state.episodeList[controller.currentIndex];

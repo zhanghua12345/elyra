@@ -6,6 +6,7 @@ import 'package:elyra/page/el_play/controller.dart';
 import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/page/el_store/sub_page/store_content_widget.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -49,19 +50,6 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
     });
   }
 
-  /// 获取 MePageController 的用户信息
-  UserInfo? _getUserInfo() {
-    try {
-      if (Get.isRegistered<MePageController>()) {
-        final meController = Get.find<MePageController>();
-        return meController.state.customerInfo;
-      }
-    } catch (e) {
-      debugPrint('获取 MePageController 用户信息失败: $e');
-    }
-    return widget.userInfo; // 降级方案：使用传入的 userInfo
-  }
-
   /// 关闭弹窗后重新尝试解锁
   void _retryUnlock() async {
     final currentEpisode = widget.currentEpisode;
@@ -93,28 +81,28 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
         init: storeController,
         builder: (controller) {
           // 🔥 关键修复：数据未准备好时，直接返回简单的 loading 界面
-          final isDataReady = controller.state.loadStatus == LoadStatusType.loadSuccess &&
-              controller.state.paySettings != null &&
-              controller.state.sortList.isNotEmpty;
+          // final isDataReady = controller.state.loadStatus == LoadStatusType.loadSuccess &&
+          //     controller.state.paySettings != null &&
+          //     controller.state.sortList.isNotEmpty;
 
-          if (!isDataReady) {
-            return Container(
-              decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('loading.gif'.icon, width: 120, height: 120),
-                    SizedBox(height: 20.h),
-                    Text(
-                      'Loading store...',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+          // if (!isDataReady) {
+          //   return Container(
+          //     decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60)),
+          //     child: Center(
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           Image.asset('loading.gif'.icon, width: 120, height: 120),
+          //           SizedBox(height: 20.h),
+          //           Text(
+          //             'Loading store...',
+          //             style: TextStyle(color: Colors.white, fontSize: 14),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   );
+          // }
 
           // 数据已准备就绪，渲染完整界面
           return Container(
@@ -152,9 +140,6 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
 
   /// 内容区域
   Widget _buildContent(StorePageController controller) {
-    // 🔥 关键修复：添加更多空检查
-    debugPrint('📊 loadStatus: ${controller.state.loadStatus}, paySettings: ${controller.state.paySettings != null}, sortList: ${controller.state.sortList.length}');
-    
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
         child: Image.asset('loading.gif'.icon, width: 120, height: 120),
@@ -162,44 +147,33 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
     }
 
     if (controller.state.loadStatus == LoadStatusType.loadFailed) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('ely_error.png'.icon, width: 180.w, height: 180.h),
-            SizedBox(height: 20.h),
-            Text(
-              'Failed to load store data',
-              style: TextStyle(color: Colors.white, fontSize: 14),
-            ),
-            SizedBox(height: 10.h),
-            TextButton(
-              onPressed: controller.onRefresh,
-              child: Text('Retry', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
       );
     }
 
     // 🔥 关键修复：确保数据完全加载完成
-    if (controller.state.paySettings == null || 
-        controller.state.sortList.isEmpty ||
-        controller.state.loadStatus != LoadStatusType.loadSuccess) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('loading.gif'.icon, width: 120, height: 120),
-            SizedBox(height: 20.h),
-            Text(
-              'Loading store...',
-              style: TextStyle(color: Colors.white, fontSize: 14),
-            ),
-          ],
-        ),
-      );
-    }
+    // if (controller.state.paySettings == null || 
+    //     controller.state.sortList.isEmpty ||
+    //     controller.state.loadStatus != LoadStatusType.loadSuccess) {
+    //   return Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Image.asset('loading.gif'.icon, width: 120, height: 120),
+    //         SizedBox(height: 20.h),
+    //         Text(
+    //           'Loading store...',
+    //           style: TextStyle(color: Colors.white, fontSize: 14),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    // }
 
     return StoreContentWidget(
       controllerTag: 'buy_coins_dialog',
@@ -209,7 +183,7 @@ class _BuyCoinsDialogState extends State<BuyCoinsDialog> {
 
   /// 头部 - 显示用户金币信息
   Widget _buildHeader() {
-    final userInfo = _getUserInfo();
+    final userInfo = widget.userInfo;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
