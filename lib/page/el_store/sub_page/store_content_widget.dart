@@ -2,13 +2,13 @@ import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/page/el_store/sub_page/store_coin_item.dart';
-import 'package:elyra/page/el_store/sub_page/store_week_coin_item.dart';
+import 'package:elyra/page/el_store/sub_page/store_coin_pack_item.dart';
+import 'package:elyra/page/el_store/sub_page/store_vip_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 /// Store商店内容组件
-/// 可在任何页面复用，共享StorePageController的数据和功能
 class StoreContentWidget extends StatelessWidget {
   final String? controllerTag; // 可选的controller标签，用于多实例场景
   final bool showTips; // 是否显示底部提示
@@ -30,14 +30,16 @@ class StoreContentWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 🔥 关键修复：添加空检查
-            if (controller.state.sortList.isNotEmpty && controller.state.paySettings != null)
+            if (controller.state.sortList.isNotEmpty &&
+                controller.state.paySettings != null)
               ...controller.state.sortList.map((type) {
                 if (type == 'list_coins') {
                   return _StoreCoinsSection(controller: controller);
                 } else {
-                  return _StoreVipSection(controller: controller);
+                  return _StoreVipCoins(controller: controller);
                 }
               }),
             // 底部提示
@@ -53,48 +55,126 @@ class StoreContentWidget extends StatelessWidget {
 /// Coins 区块组件
 class _StoreCoinsSection extends StatelessWidget {
   final StorePageController controller;
-
   const _StoreCoinsSection({required this.controller});
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StoreSectionTitle(title: 'Go Coins Limited-time coin packs'),
+        // Big Coins
+        if (controller.state.coinsBigList.isNotEmpty)
+          _StoreBigCoins(controller: controller),
+        // Week Coins
+        if (controller.state.coinsWeekList.isNotEmpty)
+          _StoreWeekCoins(controller: controller),
+        // Small Coins
+        if (controller.state.coinsSmallList.isNotEmpty)
+          _StoreSmallCoins(controller: controller),
+      ],
+    );
+  }
+}
+
+// 大金币组件
+class _StoreBigCoins extends StatelessWidget {
+  final StorePageController controller;
+
+  const _StoreBigCoins({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 16.h),
+        Wrap(
+          spacing: 15.w,
+          runSpacing: 15.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsBigList.map((item) {
+            return StoreCoinItem(
+              controller: controller,
+              item: item,
+              isBig: true,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// 小金币组件
+class _StoreSmallCoins extends StatelessWidget {
+  final StorePageController controller;
+
+  const _StoreSmallCoins({required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 24.h),
-        // Big Coins
-        if (controller.state.coinsBigList.isNotEmpty)
-          _StoreBigCoins(controller: controller),
-        // Small Coins
-        if (controller.state.coinsSmallList.isNotEmpty)
-          _StoreSmallCoins(controller: controller),
-        // Week Coins
-        if (controller.state.coinsWeekList.isNotEmpty)
-          _StoreWeekCoins(controller: controller),
+        SizedBox(height: 16.h),
+        Wrap(
+          spacing: 8.w,
+          runSpacing: 15.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsSmallList.map((item) {
+            return StoreCoinItem(
+              controller: controller,
+              item: item,
+              isBig: false,
+            );
+          }).toList(),
+        ),
       ],
     );
   }
 }
 
-/// VIP 区块组件
-class _StoreVipSection extends StatelessWidget {
+// 周卡金币组件
+class _StoreWeekCoins extends StatelessWidget {
   final StorePageController controller;
 
-  const _StoreVipSection({required this.controller});
+  const _StoreWeekCoins({required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    if (controller.state.subList.isEmpty) return SizedBox();
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 40.h),
-        _StoreSectionTitle(title: 'VIP Membership'),
-        SizedBox(height: 16.h),
-        ...controller.state.subList.map((item) => _StoreVipItem(
-              controller: controller,
-              item: item,
-            )),
+        SizedBox(height: 8.h),
+        Wrap(
+          runSpacing: 8.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsWeekList.map((item) {
+            return StoreCoinPackItem(controller: controller, item: item);
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+/// VIP组件
+class _StoreVipCoins extends StatelessWidget {
+  final StorePageController controller;
+  const _StoreVipCoins({required this.controller});
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StoreSectionTitle(title: 'VIP Auto renew,cancel anytime'),
+        SizedBox(height: 10.h),
+        Wrap(
+          runSpacing: 10.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsWeekList.map((item) {
+            return StoreVipItem(controller: controller, item: item);
+          }).toList(),
+        ),
       ],
     );
   }
@@ -103,49 +183,20 @@ class _StoreVipSection extends StatelessWidget {
 /// 标题组件
 class _StoreSectionTitle extends StatelessWidget {
   final String title;
-
   const _StoreSectionTitle({required this.title});
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48.h,
-      alignment: Alignment.center,
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 2,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.white.withOpacity(0.25), Colors.transparent],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Text(
-              title,
-              style: TextStyle(
-                color: Color(0xFFFFE79D),
-                fontSize: 14,
-                fontFamily: 'PingFang SC',
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: 2,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.white.withOpacity(0.25)],
-                ),
-              ),
-            ),
-          ),
-        ],
+      padding: EdgeInsets.only(top: 15.h),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: Colors.white /* 白 */,
+          fontSize: 12,
+          fontFamily: 'PingFang SC',
+          fontWeight: FontWeight.w500,
+          height: 1,
+        ),
       ),
     );
   }
@@ -191,89 +242,12 @@ class _StoreTips extends StatelessWidget {
   }
 }
 
-// 由于代码较长，我将剩余组件分成多个部分
-// 大金币组件
-class _StoreBigCoins extends StatelessWidget {
-  final StorePageController controller;
-
-  const _StoreBigCoins({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: 13.h),
-        Wrap(
-          spacing: 15.w,
-          runSpacing: 13.h,
-          alignment: WrapAlignment.start,
-          children: controller.state.coinsBigList.map((item) {
-            return StoreCoinItem(
-              controller: controller,
-              item: item,
-              isBig: true,
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
-
-// 小金币组件
-class _StoreSmallCoins extends StatelessWidget {
-  final StorePageController controller;
-
-  const _StoreSmallCoins({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 13.h),
-        Wrap(
-          spacing: 8.w,
-          runSpacing: 13.h,
-          alignment: WrapAlignment.start,
-          children: controller.state.coinsSmallList.map((item) {
-            return StoreCoinItem(
-              controller: controller,
-              item: item,
-              isBig: false,
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
-
-// 周卡金币组件
-class _StoreWeekCoins extends StatelessWidget {
-  final StorePageController controller;
-
-  const _StoreWeekCoins({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: controller.state.coinsWeekList.map((item) {
-        return StoreWeekCoinItem(controller: controller, item: item);
-      }).toList(),
-    );
-  }
-}
-
 // VIP项组件
 class _StoreVipItem extends StatelessWidget {
   final StorePageController controller;
   final PayItem item;
 
-  const _StoreVipItem({
-    required this.controller,
-    required this.item,
-  });
+  const _StoreVipItem({required this.controller, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -431,5 +405,3 @@ class _StoreVipItem extends StatelessWidget {
     }
   }
 }
-
-

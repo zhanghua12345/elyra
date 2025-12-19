@@ -4,12 +4,12 @@ import 'package:elyra/page/el_store/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// 周卡金币Item组件
-class StoreWeekCoinItem extends StatelessWidget {
+/// 金币商品Item组件（大金币/小金币通用）
+class StoreCoinPackItem extends StatelessWidget {
   final StorePageController controller;
   final PayItem item;
 
-  const StoreWeekCoinItem({
+  const StoreCoinPackItem({
     super.key,
     required this.controller,
     required this.item,
@@ -50,13 +50,14 @@ class StoreWeekCoinItem extends StatelessWidget {
                 Text(
                   'Weekly Refill',
                   style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFFFF0BBA),
+                    color: const Color(0xFFDF23B8),
+                    fontSize: 14,
+                    fontFamily: 'PingFang SC',
+                    fontWeight: FontWeight.w700,
+                    height: 1.57,
                   ),
                 ),
-
-                SizedBox(height: 6.h),
+                SizedBox(height: 5.h),
 
                 /// 2000 + 53%
                 Row(
@@ -68,7 +69,6 @@ class StoreWeekCoinItem extends StatelessWidget {
                       width: 16.w,
                       height: 16.w,
                     ),
-
                     SizedBox(width: 4.w),
 
                     /// 2000 渐变文字
@@ -81,14 +81,15 @@ class StoreWeekCoinItem extends StatelessWidget {
                       child: Text(
                         '2000',
                         style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: const Color(0xFFFF0BBA),
+                          fontSize: 18,
+                          fontFamily: 'DDinPro',
+                          fontWeight: FontWeight.w900,
+                          height: 0.78,
                         ),
                       ),
                     ),
-
-                    SizedBox(width: 6.w),
+                    SizedBox(width: 4.w),
 
                     /// +53% 背景标签
                     Container(
@@ -96,15 +97,18 @@ class StoreWeekCoinItem extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 8.w),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.25),
-                        borderRadius: BorderRadius.circular(9.r),
+                        color: Colors.black.withValues(alpha: 0.40),
+                        borderRadius: BorderRadius.circular(4.r),
                       ),
                       child: Text(
                         '+53%',
                         style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
                           color: Colors.white,
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                          height: 1,
+                          letterSpacing: -0,
                         ),
                       ),
                     ),
@@ -119,10 +123,15 @@ class StoreWeekCoinItem extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: Container(
                   height: 48.h,
-                  padding: EdgeInsets.symmetric(horizontal: 21.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFF0BBA), Color(0xFF6018E6)],
+                    gradient: LinearGradient(
+                      begin: Alignment(-.80, 0.50),
+                      end: Alignment(.50, 0.50),
+                      colors: [
+                        const Color(0xFFFF0BBA),
+                        const Color(0xFF6018E6),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(24.r),
                   ),
@@ -136,20 +145,24 @@ class StoreWeekCoinItem extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            item.price, // $9.99
+                            '\$' + item.price, // $9.99
                             style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w700,
                               color: Colors.white,
+                              fontSize: 18,
+                              fontFamily: 'DDinPro',
+                              fontWeight: FontWeight.w700,
+                              height: 1,
                             ),
                           ),
                           SizedBox(width: 2.w),
                           Text(
                             '/week',
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              color: const Color(0xFFDFD1FA),
+                              fontSize: 12,
+                              fontFamily: 'DDinPro',
                               fontWeight: FontWeight.w400,
-                              color: Colors.white.withOpacity(0.9),
+                              height: 1,
                             ),
                           ),
                         ],
@@ -157,12 +170,16 @@ class StoreWeekCoinItem extends StatelessWidget {
 
                       /// 第二行：原价
                       Text(
-                        '\$19.99',
+                        '\$' + item.price, 
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          color: Colors.white.withValues(alpha: 0.21),
+                          fontSize: 12,
+                          fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.6),
                           decoration: TextDecoration.lineThrough,
+                          decorationColor: Colors.white.withValues(
+                            alpha: 0.21,
+                          ), // 删除线颜色
                         ),
                       ),
                     ],

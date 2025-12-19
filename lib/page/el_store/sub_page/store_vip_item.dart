@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// 金币商品Item组件（大金币/小金币通用）
-class StoreCoinItem extends StatelessWidget {
+class StoreVipItem extends StatelessWidget {
   final StorePageController controller;
   final PayItem item;
-  final bool isBig; // true=大金币模式，false=小金币模式
 
-  const StoreCoinItem({
+  const StoreVipItem({
     super.key,
     required this.controller,
     required this.item,
-    required this.isBig,
   });
 
   @override
@@ -28,15 +26,11 @@ class StoreCoinItem extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.only(topRight: Radius.circular(35.r)),
             child: Container(
-              width: isBig ? 164.w : 109.w,
-              height: isBig ? 101.h : 99.h,
+              width: 109.w,
+              height: 99.h,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(
-                    isBig
-                        ? 'store_coins_big.png'.icon
-                        : 'store_coins_small.png'.icon,
-                  ),
+                  image: AssetImage('store_coins_big.png'.icon),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -48,14 +42,14 @@ class StoreCoinItem extends StatelessWidget {
                       top: 0,
                       right: 0,
                       child: SizedBox(
-                        width: isBig ? 54.w : 48.w,
-                        height: isBig ? 54.h : 50.h,
+                        width: 48.w,
+                        height: 50.h,
                         child: Stack(
                           children: [
                             Image.asset(
                               'store_coins_jiao.png'.icon,
-                              width: isBig ? 54.w : 48.w,
-                              height: isBig ? 54.h : 50.h,
+                              width: 48.w,
+                              height: 50.h,
                               fit: BoxFit.fill,
                             ),
                             Positioned.fill(
@@ -128,7 +122,7 @@ class StoreCoinItem extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                        SizedBox(height: isBig ? 7.h : 4.h),
+                        SizedBox(height: 4.h),
                         Spacer(),
                         Row(
                           children: [
@@ -171,40 +165,6 @@ class StoreCoinItem extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Top Up按钮（仅大金币模式）
-                  if (isBig)
-                    Positioned(
-                      bottom: 10.h,
-                      right: 12.w,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 4.h),
-                          Container(
-                            width: 79.w,
-                            height: 24.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40.r),
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [Color(0xFFFF0BBA), Color(0xFF6018E6)],
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Top Up',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontFamily: 'PingFang SC',
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                 ],
               ),
             ),
@@ -215,8 +175,8 @@ class StoreCoinItem extends StatelessWidget {
               bottom: 92.h,
               left: 12.w,
               child: Container(
-                height: isBig ? 17.h : 14.h,
-                padding: EdgeInsets.symmetric(horizontal: isBig ? 14.w : 10.w),
+                height: 14.h,
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5.r),
                   gradient: LinearGradient(
@@ -227,16 +187,15 @@ class StoreCoinItem extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                        'Hot',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize:isBig ? 12.sp:11.sp,
-                          fontFamily: 'PingFang SC',
-                          fontWeight: FontWeight.w500,
-                          height: isBig ?1.17: 1.27,
-                        ),
-                      )
-                    
+                  'Hot',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11.sp,
+                    fontFamily: 'PingFang SC',
+                    fontWeight: FontWeight.w500,
+                    height: 1.27,
+                  ),
+                ),
               ),
             ),
         ],

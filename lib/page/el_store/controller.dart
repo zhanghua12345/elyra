@@ -24,7 +24,7 @@ class StorePageController extends GetxController {
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );
-  
+
   // 🔥 新增：标记是否是对话框中的实例
   bool isDialogInstance = false;
 
@@ -33,7 +33,7 @@ class StorePageController extends GetxController {
     super.onReady();
     loadData();
     initPurchaseListener();
-    
+
     // 🔥 关键修复：只在非对话框实例中自动恢复购买
     if (!isDialogInstance) {
       // 自动恢复购买（静默执行）
@@ -79,14 +79,14 @@ class StorePageController extends GetxController {
 
       if (res.success && res.data != null) {
         state.paySettings = PaySettingsBean.fromJson(res.data);
-        
+
         // 🔥 关键修复：添加空检查
         if (state.paySettings != null && state.paySettings!.sort.isNotEmpty) {
           state.sortList = state.paySettings!.sort;
 
           // 分类数据
           _classifyData();
-          
+
           // 初始化商店商品
           await initStore();
 
@@ -125,7 +125,11 @@ class StorePageController extends GetxController {
   }
 
   /// 筛选和排序数据
-  List<PayItem> _filterAndSort(List<PayItem> items, String buyType, [String? size]) {
+  List<PayItem> _filterAndSort(
+    List<PayItem> items,
+    String buyType, [
+    String? size,
+  ]) {
     var filtered = items.where((item) {
       if (size != null) {
         return item.buyType == buyType && item.size == size;
@@ -152,10 +156,8 @@ class StorePageController extends GetxController {
         return;
       }
 
-      EasyLoading.show(status: 'Loading...');
       bool isAvailable = await InAppPurchaseUtil.isAvailable();
       if (!isAvailable) {
-        EasyLoading.dismiss();
         Message.show('In App purchase is not available');
         return;
       }
@@ -163,102 +165,99 @@ class StorePageController extends GetxController {
       // 产品ID
       List<String> productIds = [];
       List<String> vipIds = [];
-    
-    if (Platform.isIOS) {
-      productIds = state.paySettings!.listCoins
-          .map((item) => 'elyra.${item.iosTemplateId}')
-          .toList();
-      vipIds = state.paySettings!.listSubVip
-          .map((item) => 'elyra.${item.iosTemplateId}')
-          .toList();
-    } else {
-      productIds = state.paySettings!.listCoins
-          .where((item) => item.androidTemplateId != null)
-          .map((item) => item.androidTemplateId!)
-          .toList();
-      vipIds = state.paySettings!.listSubVip
-          .where((item) => item.androidTemplateId != null)
-          .map((item) => item.androidTemplateId!)
-          .toList();
-    }
 
-    if (productIds.isEmpty && vipIds.isEmpty) {
-      EasyLoading.dismiss();
-      Message.show('Pay item is empty');
-      return;
-    }
+      if (Platform.isIOS) {
+        productIds = state.paySettings!.listCoins
+            .map((item) => 'elyra.${item.iosTemplateId}')
+            .toList();
+        vipIds = state.paySettings!.listSubVip
+            .map((item) => 'elyra.${item.iosTemplateId}')
+            .toList();
+      } else {
+        productIds = state.paySettings!.listCoins
+            .where((item) => item.androidTemplateId != null)
+            .map((item) => item.androidTemplateId!)
+            .toList();
+        vipIds = state.paySettings!.listSubVip
+            .where((item) => item.androidTemplateId != null)
+            .map((item) => item.androidTemplateId!)
+            .toList();
+      }
 
-    ProductDetailsResponse productDetailsResponse =
-        await InAppPurchaseUtil.queryProducts(<String>{
-      ...vipIds,
-      ...productIds,
-    });
+      if (productIds.isEmpty && vipIds.isEmpty) {
+        Message.show('Pay item is empty');
+        return;
+      }
 
-    if (productDetailsResponse.error != null) {
-      EasyLoading.dismiss();
-      debugPrint('----productDetailsResponse.error${productDetailsResponse.error}');
-      Message.show(productDetailsResponse.error!.message);
-      return;
-    }
+      ProductDetailsResponse productDetailsResponse =
+          await InAppPurchaseUtil.queryProducts(<String>{
+            ...vipIds,
+            ...productIds,
+          });
 
-    debugPrint('---未找到的商品: ${productDetailsResponse.notFoundIDs.join(', ')}');
-    debugPrint('----productDetailsResponse:${productDetailsResponse.productDetails.length}');
+      if (productDetailsResponse.error != null) {
+        debugPrint(
+          '----productDetailsResponse.error${productDetailsResponse.error}',
+        );
+        Message.show(productDetailsResponse.error!.message);
+        return;
+      }
 
-    if (productDetailsResponse.productDetails.isEmpty) {
-      EasyLoading.dismiss();
-      Message.show('Query store is empty');
-      return;
-    }
+      if (productDetailsResponse.productDetails.isEmpty) {
+        Message.show('Query store is empty');
+        return;
+      }
 
-    // 匹配商品
-    if (Platform.isIOS) {
-      for (var item in state.paySettings!.listCoins) {
-        for (var detail in productDetailsResponse.productDetails) {
-          if (detail.id == 'elyra.${item.iosTemplateId}') {
-            item.productDetails = detail;
-            break;
+      // 匹配商品
+      if (Platform.isIOS) {
+        for (var item in state.paySettings!.listCoins) {
+          for (var detail in productDetailsResponse.productDetails) {
+            if (detail.id == 'elyra.${item.iosTemplateId}') {
+              item.productDetails = detail;
+              break;
+            }
+          }
+        }
+        for (var item in state.paySettings!.listSubVip) {
+          for (var detail in productDetailsResponse.productDetails) {
+            if (detail.id == 'elyra.${item.iosTemplateId}') {
+              item.productDetails = detail;
+              break;
+            }
+          }
+        }
+      } else if (Platform.isAndroid) {
+        for (var item in state.paySettings!.listCoins) {
+          for (var detail in productDetailsResponse.productDetails) {
+            if (detail.id == item.androidTemplateId) {
+              item.productDetails = detail;
+              break;
+            }
+          }
+        }
+        for (var item in state.paySettings!.listSubVip) {
+          for (var detail in productDetailsResponse.productDetails) {
+            if (detail.id == item.androidTemplateId) {
+              item.productDetails = detail;
+              break;
+            }
           }
         }
       }
-      for (var item in state.paySettings!.listSubVip) {
-        for (var detail in productDetailsResponse.productDetails) {
-          if (detail.id == 'elyra.${item.iosTemplateId}') {
-            item.productDetails = detail;
-            break;
-          }
-        }
-      }
-    } else if (Platform.isAndroid) {
-      for (var item in state.paySettings!.listCoins) {
-        for (var detail in productDetailsResponse.productDetails) {
-          if (detail.id == item.androidTemplateId) {
-            item.productDetails = detail;
-            break;
-          }
-        }
-      }
-      for (var item in state.paySettings!.listSubVip) {
-        for (var detail in productDetailsResponse.productDetails) {
-          if (detail.id == item.androidTemplateId) {
-            item.productDetails = detail;
-            break;
-          }
-        }
-      }
-    }
 
-    // 移除未匹配到的商品
-    state.paySettings!.listCoins.removeWhere((item) => item.productDetails == null);
-    state.paySettings!.listSubVip.removeWhere((item) => item.productDetails == null);
+      // 移除未匹配到的商品
+      state.paySettings!.listCoins.removeWhere(
+        (item) => item.productDetails == null,
+      );
+      state.paySettings!.listSubVip.removeWhere(
+        (item) => item.productDetails == null,
+      );
 
-    // 重新分类
-    _classifyData();
-
-    EasyLoading.dismiss();
-    update();
+      // 重新分类
+      _classifyData();
+      update();
     } catch (e) {
       debugPrint('初始化商店失败: $e');
-      EasyLoading.dismiss();
       Message.show('Failed to initialize store');
     }
   }
@@ -266,7 +265,7 @@ class StorePageController extends GetxController {
   /// 处理支付
   void handlePay(PayItem item, {num? shortPlayId, num? videoId}) {
     debugPrint('点击支付: ${item.buyType} - ${item.coins} coins');
-    
+
     if (item.buyType == 'sub_coins') {
       // 金币包需要显示详情确认（暂不实现弹窗，直接购买）
       createOrder(item, shortPlayId: shortPlayId, videoId: videoId);
@@ -293,7 +292,8 @@ class StorePageController extends GetxController {
 
   /// 购买监听回调
   Future<void> _listenToPurchaseUpdated(
-      List<PurchaseDetails> purchaseDetailsList) async {
+    List<PurchaseDetails> purchaseDetailsList,
+  ) async {
     for (var purchaseDetails in purchaseDetailsList) {
       debugPrint(
         '---listen-purchaseDetails:${purchaseDetailsList.length} ${purchaseDetails.productID} ${purchaseDetails.status} ${purchaseDetails.pendingCompletePurchase}',
@@ -312,13 +312,15 @@ class StorePageController extends GetxController {
 
         try {
           // 查找匹配的商品
-          PayItem? goods = [
-            ...state.coinsBigList,
-            ...state.coinsSmallList,
-            ...state.coinsWeekList,
-            ...state.subList,
-          ].firstWhereOrNull(
-              (item) => item.productDetails?.id == purchaseDetails.productID);
+          PayItem? goods =
+              [
+                ...state.coinsBigList,
+                ...state.coinsSmallList,
+                ...state.coinsWeekList,
+                ...state.subList,
+              ].firstWhereOrNull(
+                (item) => item.productDetails?.id == purchaseDetails.productID,
+              );
 
           if (goods == null) {
             UserUtil().reportErrorEvent(
@@ -351,13 +353,15 @@ class StorePageController extends GetxController {
         debugPrint('Purchase failed: ${purchaseDetails.error?.message}');
         EasyLoading.dismiss();
 
-        PayItem? goods = [
-          ...state.coinsBigList,
-          ...state.coinsSmallList,
-          ...state.coinsWeekList,
-          ...state.subList,
-        ].firstWhereOrNull(
-            (item) => item.productDetails?.id == purchaseDetails.productID);
+        PayItem? goods =
+            [
+              ...state.coinsBigList,
+              ...state.coinsSmallList,
+              ...state.coinsWeekList,
+              ...state.subList,
+            ].firstWhereOrNull(
+              (item) => item.productDetails?.id == purchaseDetails.productID,
+            );
 
         UserUtil().reportErrorEvent(
           'platform pay failed',
@@ -378,13 +382,15 @@ class StorePageController extends GetxController {
         EasyLoading.dismiss();
         Message.show('User canceled');
 
-        PayItem? goods = [
-          ...state.coinsBigList,
-          ...state.coinsSmallList,
-          ...state.coinsWeekList,
-          ...state.subList,
-        ].firstWhereOrNull(
-            (item) => item.productDetails?.id == purchaseDetails.productID);
+        PayItem? goods =
+            [
+              ...state.coinsBigList,
+              ...state.coinsSmallList,
+              ...state.coinsWeekList,
+              ...state.subList,
+            ].firstWhereOrNull(
+              (item) => item.productDetails?.id == purchaseDetails.productID,
+            );
 
         UserUtil().reportErrorEvent(
           'user pay canceled',
@@ -397,21 +403,25 @@ class StorePageController extends GetxController {
   }
 
   /// 创建订单
-  Future<void> createOrder(PayItem goods,
-      {num? shortPlayId, num? videoId}) async {
+  Future<void> createOrder(
+    PayItem goods, {
+    num? shortPlayId,
+    num? videoId,
+  }) async {
     // 检查 productDetails 是否存在（防止模拟器空指针错误）
     if (goods.productDetails == null) {
       Message.show('Product not available in store');
-      debugPrint('---createOrder-error: productDetails is null for ${goods.id}');
+      debugPrint(
+        '---createOrder-error: productDetails is null for ${goods.id}',
+      );
       return;
     }
 
-    EasyLoading.show(
-        status: 'Paying...', maskType: EasyLoadingMaskType.black);
+    EasyLoading.show(status: 'Paying...', maskType: EasyLoadingMaskType.black);
 
     Map<String, dynamic> params = {
       "pay_setting_id": goods.id,
-      "is_discount": goods.discountType == 0 ? 0 : 1
+      "is_discount": goods.discountType == 0 ? 0 : 1,
     };
 
     if (Platform.isIOS && params["is_discount"] == 1) {
@@ -431,8 +441,10 @@ class StorePageController extends GetxController {
       state.videoId = videoId;
     }
 
-    ApiResponse res =
-        await HttpClient().request(Apis.createOrder, data: params);
+    ApiResponse res = await HttpClient().request(
+      Apis.createOrder,
+      data: params,
+    );
     EasyLoading.dismiss();
 
     if (res.success) {
@@ -461,8 +473,7 @@ class StorePageController extends GetxController {
                 productDetails: goods.productDetails!,
                 applicationUserName: signData['application_username'],
                 discount: SKPaymentDiscountWrapper(
-                  identifier:
-                      product.skProduct.discounts.first.identifier!,
+                  identifier: product.skProduct.discounts.first.identifier!,
                   keyIdentifier: signData['key_identifier'],
                   nonce: signData['nonce'],
                   signature: signData['signature'],
@@ -471,18 +482,21 @@ class StorePageController extends GetxController {
               );
               await InAppPurchaseUtil.buyDiscount(purchaseParamSk2);
             } else {
-              await InAppPurchaseUtil.buy(goods.productDetails!,
-                  consumable: goods.buyType == 'coins');
+              await InAppPurchaseUtil.buy(
+                goods.productDetails!,
+                consumable: goods.buyType == 'coins',
+              );
             }
           } else if (Platform.isAndroid) {
             if (goods.productDetails! is GooglePlayProductDetails) {
               final googleProduct =
                   goods.productDetails! as GooglePlayProductDetails;
-              if (googleProduct
-                      .productDetails.subscriptionOfferDetails !=
+              if (googleProduct.productDetails.subscriptionOfferDetails !=
                   null) {
                 final offer = googleProduct
-                    .productDetails.subscriptionOfferDetails!.first;
+                    .productDetails
+                    .subscriptionOfferDetails!
+                    .first;
                 final purchaseParam = GooglePlayPurchaseParam(
                   productDetails: goods.productDetails!,
                   offerToken: offer.offerIdToken,
@@ -497,8 +511,7 @@ class StorePageController extends GetxController {
               goods.productDetails! is GooglePlayProductDetails) {
             final googleProduct =
                 goods.productDetails! as GooglePlayProductDetails;
-            if (googleProduct.productDetails.subscriptionOfferDetails !=
-                null) {
+            if (googleProduct.productDetails.subscriptionOfferDetails != null) {
               final offerList =
                   googleProduct.productDetails.subscriptionOfferDetails!;
               final offerIdToken = offerList.length > 1
@@ -510,18 +523,23 @@ class StorePageController extends GetxController {
               );
               await InAppPurchaseUtil.buyDiscount(purchaseParam);
             } else {
-              await InAppPurchaseUtil.buy(goods.productDetails!,
-                  consumable: goods.buyType == 'coins');
+              await InAppPurchaseUtil.buy(
+                goods.productDetails!,
+                consumable: goods.buyType == 'coins',
+              );
             }
           } else {
-            await InAppPurchaseUtil.buy(goods.productDetails!,
-                consumable: goods.buyType == 'coins');
+            await InAppPurchaseUtil.buy(
+              goods.productDetails!,
+              consumable: goods.buyType == 'coins',
+            );
           }
         }
       } catch (e) {
         EasyLoading.dismiss();
         Message.show(
-            'There were some problems with the payment, Please try again!');
+          'There were some problems with the payment, Please try again!',
+        );
         debugPrint('---purchase-error:$e');
 
         UserUtil().reportErrorEvent(
@@ -547,13 +565,16 @@ class StorePageController extends GetxController {
   }
 
   /// 校验订单
-  Future<bool> verifyPay(PayItem goods,
-      {bool isRestore = false, bool isAuto = false}) async {
+  Future<bool> verifyPay(
+    PayItem goods, {
+    bool isRestore = false,
+    bool isAuto = false,
+  }) async {
     String transactionId = goods.transactionId ?? "";
     String serverVerificationData = goods.serverVerificationData ?? "";
 
     Map<String, dynamic> params = {
-      'pkg_name':  "elyra",
+      'pkg_name': "elyra",
       'order_code': goods.orderCode ?? "",
       'product_id': Platform.isAndroid
           ? goods.androidTemplateId
@@ -575,8 +596,10 @@ class StorePageController extends GetxController {
     }
 
     try {
-      ApiResponse res =
-          await HttpClient().request(Apis.applePaid, data: params);
+      ApiResponse res = await HttpClient().request(
+        Apis.applePaid,
+        data: params,
+      );
       if (res.success && res.data['status'] == 'success') {
         if (!isRestore) {
           Message.show('Pay Success');
@@ -616,8 +639,8 @@ class StorePageController extends GetxController {
     if (state.isRestore) return;
     state.isRestore = true;
 
-    List<PayItem> restoreGoodsList =
-        await PurchaseRestoreUtil().getCachedGoodsList();
+    List<PayItem> restoreGoodsList = await PurchaseRestoreUtil()
+        .getCachedGoodsList();
     debugPrint('----restoreGoodsList:${restoreGoodsList.length}');
 
     if (restoreGoodsList.isEmpty) {
@@ -628,7 +651,11 @@ class StorePageController extends GetxController {
 
     EasyLoading.show(status: 'Restore...');
     for (PayItem payItem in restoreGoodsList) {
-      bool isSuccess = await verifyPay(payItem, isRestore: true, isAuto: !showTips);
+      bool isSuccess = await verifyPay(
+        payItem,
+        isRestore: true,
+        isAuto: !showTips,
+      );
       if (isSuccess) {
         PurchaseRestoreUtil().removeGoods(payItem);
       }
