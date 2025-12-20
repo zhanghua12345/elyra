@@ -4,6 +4,10 @@ import 'package:elyra/page/el_home/sub_page/genres/page.dart';
 import 'package:elyra/page/el_home/sub_page/new/page.dart';
 import 'package:elyra/page/el_home/sub_page/popular/page.dart';
 import 'package:elyra/page/el_home/sub_page/ranking/page.dart';
+import 'package:elyra/page/el_popup/recharge_coins_pack.dart';
+import 'package:elyra/page/el_popup/recharge_coins_pack_again.dart';
+import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/widgets/home_video_history_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -112,18 +116,66 @@ class _HomePageState extends State<HomePage>
                                 'ely_home_logo.png'.icon,
                                 height: 22.h,
                               ),
-                              GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () {
-                                  Get.toNamed('/search');
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.all(5.w), // 扩大点击热区
-                                  child: Image.asset(
-                                    'ely_search.png'.icon,
-                                    height: 30.h,
+                              Row(
+                                children: [
+                                  // 🔥 模拟按钮：点击显示充值金币包弹窗
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: () {
+                                      // 模拟 PayItem 数据
+                                      final mockItem = PayItem(
+                                        id: 1,
+                                        buyType: 'sub_coins',
+                                        coins: 2000,
+                                        sendCoins: 2800,
+                                        sendCoinTtl: 7,
+                                        price: '19.99',
+                                        priceLocal: '19.99',
+                                        iosTemplateId: 'test_ios',
+                                        vipType: 'week',
+                                        shortType: '',
+                                        description: 'Weekly coin pack',
+                                        sort: 1,
+                                      );
+                                      RechargeCoinsPackAgainPopup.show(mockItem);
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.all(5.w),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.w,
+                                          vertical: 4.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange,
+                                          borderRadius: BorderRadius.circular(4.r),
+                                        ),
+                                        child: Text(
+                                          'Test',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(width: 8.w),
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: () {
+                                      Get.toNamed('/search');
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.all(5.w), // 扩大点击热区
+                                      child: Image.asset(
+                                        'ely_search.png'.icon,
+                                        height: 30.h,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-/// 引导充值金币包弹窗
 class RechargeCoinsPackPopup extends StatefulWidget {
   final PayItem item;
 
@@ -356,14 +355,17 @@ class _RechargeContent extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12.h),
-        Text(
-          'Maybe Later',
-          style: TextStyle(
-            color: const Color(0xFFFF65DB),
-            fontSize: 14.sp,
-            fontFamily: 'PingFang SC',
-            fontWeight: FontWeight.w600,
-            height: 1.57,
+        InkWell(
+          onTap: () => Get.back(),
+          child: Text(
+            'Maybe Later',
+            style: TextStyle(
+              color: const Color(0xFFFF65DB),
+              fontSize: 14.sp,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+              height: 1.57,
+            ),
           ),
         ),
       ],

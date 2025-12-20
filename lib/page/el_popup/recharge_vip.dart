@@ -153,7 +153,6 @@ class _RechargeVipPopupState extends State<RechargeVipPopup> {
 
             /// 关闭按钮（InkWell 更规范）
             InkWell(
-              borderRadius: BorderRadius.circular(20.r),
               onTap: () => Get.back(),
               child: Image.asset(
                 'popup_recharge_vip_close.png'.icon,

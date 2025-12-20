@@ -118,7 +118,8 @@ class StoreCoinPackItem extends StatelessWidget {
             ),
 
             /// 右侧价格区（顶到最右）
-            Expanded(
+            Flexible(
+              fit: FlexFit.loose,
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Container(
