@@ -1,3 +1,4 @@
+  // 支付详情，点击某个金币包/订阅，底部弹起
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
