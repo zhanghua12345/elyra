@@ -31,12 +31,6 @@ class VipTheme {
     required this.extraNumColor,
     required this.descColor,
   });
-
-  Shader titleShader() {
-    return LinearGradient(
-      colors: titleGradient,
-    ).createShader(const Rect.fromLTWH(0, 0, 200, 24));
-  }
 }
 
 /// =======================
