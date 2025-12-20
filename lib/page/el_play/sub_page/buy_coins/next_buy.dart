@@ -1,18 +1,19 @@
 // 第一次购买充值
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/page/el_store/sub_page/store_coin_item.dart';
 import 'package:elyra/widgets/week_coin_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class FirstBuyPopup extends StatefulWidget {
-  const FirstBuyPopup({super.key});
+class NextBuyPopup extends StatefulWidget {
+  const NextBuyPopup({super.key});
 
   /// 显示弹窗
   static void show() {
     Get.bottomSheet(
-      const FirstBuyPopup(),
+      const NextBuyPopup(),
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       isDismissible: true,
@@ -20,10 +21,10 @@ class FirstBuyPopup extends StatefulWidget {
   }
 
   @override
-  State<FirstBuyPopup> createState() => _FirstBuyPopupState();
+  State<NextBuyPopup> createState() => _NextBuyPopupState();
 }
 
-class _FirstBuyPopupState extends State<FirstBuyPopup> {
+class _NextBuyPopupState extends State<NextBuyPopup> {
   late final StorePageController storeController;
 
   @override
@@ -33,7 +34,7 @@ class _FirstBuyPopupState extends State<FirstBuyPopup> {
     // 初始化 Controller（只创建一次）
     storeController = Get.put(
       StorePageController()..isDialogInstance = true,
-      tag: 'first_buy_dialog',
+      tag: 'next_buy_dialog',
     );
 
     storeController.loadData();
@@ -42,7 +43,7 @@ class _FirstBuyPopupState extends State<FirstBuyPopup> {
   @override
   void dispose() {
     // 弹窗销毁时清理 Controller
-    Get.delete<StorePageController>(tag: 'first_buy_dialog');
+    Get.delete<StorePageController>(tag: 'next_buy_dialog');
     super.dispose();
   }
 
@@ -103,7 +104,7 @@ class _FirstBuyPopupState extends State<FirstBuyPopup> {
 
         // 横向滚动列表
         GetBuilder<StorePageController>(
-          tag: 'first_buy_dialog',
+          tag: 'next_buy_dialog',
           builder: (controller) {
             if (controller.state.coinsWeekList.isEmpty) {
               return const SizedBox(
@@ -156,7 +157,6 @@ class _FirstBuyPopupState extends State<FirstBuyPopup> {
             ),
             padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 40.h),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 // 第一行：Balance 和关闭按钮
                 Row(
@@ -203,7 +203,7 @@ class _FirstBuyPopupState extends State<FirstBuyPopup> {
                         ],
                       ),
                     ),
-                    GestureDetector(
+                    InkWell(
                       onTap: () => Get.back(),
                       child: Image.asset(
                         'store_popup_close.png'.icon,
@@ -221,94 +221,148 @@ class _FirstBuyPopupState extends State<FirstBuyPopup> {
                   color: Colors.white.withValues(alpha: 0.10),
                 ),
 
-                SizedBox(height: 24.h),
-
-                // Episode Locked 标题
-                Text(
-                  'Episode Locked',
-                  style: TextStyle(
-                    color: const Color(0xFFFFB6EA),
-                    fontSize: 24,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w900,
-                    height: 1.50,
-                  ),
-                ),
-
                 SizedBox(height: 12.h),
-
-                // Price to unlock this episode
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Price to unlock this episode:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        height: 1.57,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Image.asset(
-                      'store_gold.png'.icon,
-                      width: 12.w,
-                      height: 12.w,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      '500',
-                      style: TextStyle(
-                        color: const Color(0xFFFFB6EA),
-                        fontSize: 14,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        height: 0.86,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.h),
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    width: 286.w,
-                    height: 48.h,
-                    decoration: ShapeDecoration(
-                      color: const Color(0xFF999999),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.r),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'popup_lock.png'.icon,
-                          width: 12.w,
-                          height: 12.w,
+                SizedBox(
+                  width: 343.w,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6.w,
+                        height: 6.w,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFFF0BBA),
                         ),
-                        SizedBox(width: 9.w),
-                        Text(
-                          'Unlock Now',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            height: 1.29,
-                          ),
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        'Episode Locked',
+                        style: TextStyle(
+                          color: const Color(0xFFFFB6EA),
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w900,
+                          height: 1.29,
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 6.w),
+                      Container(
+                        width: 6.w,
+                        height: 6.w,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFFF0BBA),
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+
+                SizedBox(height: 6.h),
+                GetBuilder<StorePageController>(
+                  tag: 'next_buy_dialog',
+                  builder: (controller) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Big Coins
+                        if (controller.state.coinsBigList.isNotEmpty)
+                          _StoreBigCoins(controller: controller),
+                        // Small Coins
+                        if (controller.state.coinsSmallList.isNotEmpty)
+                          _StoreSmallCoins(controller: controller),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+// 大金币组件
+class _StoreBigCoins extends StatelessWidget {
+  final StorePageController controller;
+
+  const _StoreBigCoins({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 16.h),
+        Wrap(
+          spacing: 15.w,
+          runSpacing: 15.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsBigList.map((item) {
+            return StoreCoinItem(
+              controller: controller,
+              item: item,
+              isBig: true,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// 小金币组件
+class _StoreSmallCoins extends StatelessWidget {
+  final StorePageController controller;
+
+  const _StoreSmallCoins({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 16.h),
+        Wrap(
+          spacing: 8.w,
+          runSpacing: 15.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsSmallList.map((item) {
+            return StoreCoinItem(
+              controller: controller,
+              item: item,
+              isBig: false,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// 周包金币组件
+class _StoreWeekCoins extends StatelessWidget {
+  final StorePageController controller;
+
+  const _StoreWeekCoins({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 8.h),
+        Wrap(
+          runSpacing: 8.h,
+          alignment: WrapAlignment.start,
+          children: controller.state.coinsWeekList.map((item) {
+            return WeekCoinItem(
+              item: item,
+              controller: controller,
+              width: double.infinity,
+            );
+          }).toList(),
         ),
       ],
     );

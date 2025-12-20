@@ -148,8 +148,8 @@ class WeekCoinItem extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment(-.80, 0.50),
-                        end: Alignment(.50, 0.50),
+                        begin: Alignment(-1, .5),
+                        end: Alignment(0, .5),
                         colors: [
                           const Color(0xFFFF0BBA),
                           const Color(0xFF6018E6),
