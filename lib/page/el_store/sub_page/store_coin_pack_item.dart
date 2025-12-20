@@ -18,7 +18,7 @@ class StoreCoinPackItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => controller.handlePay(item, {isPopup: true}),
+      onTap: () => controller.handlePay(item, isPopup: true),
       child: Container(
         width: double.infinity,
         height: 84.h,

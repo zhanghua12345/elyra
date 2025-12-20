@@ -268,8 +268,13 @@ class StorePageController extends GetxController {
     debugPrint('点击支付: ${item.buyType} - ${item.coins} coins');
 
     if (isPopup) {
-      StorePopupBuy.show()
+      // 显示弹窗
+      StorePopupBuy.show(
+        controller: this,
+        item: item,
+      );
     } else {
+      // 直接拉起支付
       createOrder(item, shortPlayId: shortPlayId, videoId: videoId);
     }
   }
