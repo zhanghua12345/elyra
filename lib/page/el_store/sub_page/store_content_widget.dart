@@ -1,9 +1,7 @@
-import 'package:elyra/bean/pay_settings_bean.dart';
-import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/page/el_store/sub_page/store_coin_item.dart';
-import 'package:elyra/page/el_store/sub_page/store_coin_pack_item.dart';
 import 'package:elyra/page/el_store/sub_page/store_vip_item.dart';
+import 'package:elyra/widgets/week_coin_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -149,7 +147,12 @@ class _StoreWeekCoins extends StatelessWidget {
           runSpacing: 8.h,
           alignment: WrapAlignment.start,
           children: controller.state.coinsWeekList.map((item) {
-            return StoreCoinPackItem(controller: controller, item: item);
+            return WeekCoinItem(
+              item: item,
+              controller: controller,
+              width: 343,
+              isOldPrice: true,
+            );
           }).toList(),
         ),
       ],
@@ -241,4 +244,3 @@ class _StoreTips extends StatelessWidget {
     );
   }
 }
-
