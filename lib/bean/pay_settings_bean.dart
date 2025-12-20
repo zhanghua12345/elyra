@@ -38,6 +38,7 @@ class PayItem {
   final String? size; // big, small
   final int coins;
   final int sendCoins;
+  final int sendCoinTtl;
   final String price;
   final String priceLocal;
   final String iosTemplateId;
@@ -67,6 +68,7 @@ class PayItem {
     this.size,
     required this.coins,
     required this.sendCoins,
+    required this.sendCoinTtl,
     required this.price,
     required this.priceLocal,
     required this.iosTemplateId,
@@ -91,6 +93,7 @@ class PayItem {
       size: json['size'],
       coins: json['coins'] ?? 0,
       sendCoins: json['send_coins'] ?? 0,
+      sendCoinTtl: json['send_coin_ttl'] ?? 0,
       price: json['price'] ?? '',
       priceLocal: json['pricelocal'] ?? '',
       iosTemplateId: json['ios_template_id'] ?? '',
@@ -114,6 +117,7 @@ class PayItem {
       'size': size,
       'coins': coins,
       'send_coins': sendCoins,
+      'send_coin_ttl': sendCoinTtl,
       'price': price,
       'pricelocal': priceLocal,
       'ios_template_id': iosTemplateId,
@@ -140,6 +144,7 @@ class PayItem {
       size: size,
       coins: coins,
       sendCoins: sendCoins,
+      sendCoinTtl: sendCoinTtl,
       price: price,
       priceLocal: priceLocal,
       iosTemplateId: iosTemplateId,

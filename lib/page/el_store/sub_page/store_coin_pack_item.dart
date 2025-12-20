@@ -18,7 +18,7 @@ class StoreCoinPackItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => controller.handlePay(item),
+      onTap: () => controller.handlePay(item, {isPopup: true}),
       child: Container(
         width: double.infinity,
         height: 84.h,
@@ -170,7 +170,7 @@ class StoreCoinPackItem extends StatelessWidget {
 
                       /// 第二行：原价
                       Text(
-                        '\$' + item.price, 
+                        '\$' + item.price,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.21),
                           fontSize: 12,

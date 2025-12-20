@@ -9,27 +9,33 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 /// =======================
 class VipTheme {
   final String bgImage;
+  final String title;
   final List<Color> titleGradient;
-  final List<Color> priceGradient;
+  final String priceType;
+  final Color priceColor;
+  final Color originalPrice;
+  final String subTitle;
   final Color subTitleColor;
+  final Color extraNumColor;
   final Color descColor;
 
   const VipTheme({
     required this.bgImage,
+    required this.title,
     required this.titleGradient,
-    required this.priceGradient,
+    required this.priceType,
+    required this.priceColor,
+    required this.originalPrice,
+    required this.subTitle,
     required this.subTitleColor,
+    required this.extraNumColor,
     required this.descColor,
   });
 
   Shader titleShader() {
-    return LinearGradient(colors: titleGradient)
-        .createShader(const Rect.fromLTWH(0, 0, 200, 24));
-  }
-
-  Shader priceShader() {
-    return LinearGradient(colors: priceGradient)
-        .createShader(const Rect.fromLTWH(0, 0, 200, 44));
+    return LinearGradient(
+      colors: titleGradient,
+    ).createShader(const Rect.fromLTWH(0, 0, 200, 24));
   }
 }
 
@@ -40,35 +46,50 @@ class VipThemes {
   static final Map<String, VipTheme> _themes = {
     'week': VipTheme(
       bgImage: 'store_sup_week.png',
-      title:'Weekly VIP',
+      title: 'Weekly VIP',
       titleGradient: [Color(0xFF26343A), Color(0xFF698FA0)],
-      priceType:'/month',
-      priceGradient: [Color(0xFFFFFFFF), Color(0xFFBDEDFF)],
-      originalPrice: Color(0xFF26343A),,
-      subTitle:'Unlimited access to all series',
+      priceType: '',
+      priceColor: Color(0xFF26343A),
+      originalPrice: Colors.black.withValues(alpha: 0.15),
+      subTitle: 'Unlimited access to all series',
       subTitleColor: Color(0xFF26343A),
-      extraNumColor: Color(0xFF26343A),
+      extraNumColor: Colors.white,
       descColor: Color(0xFF26343A),
     ),
     'month': VipTheme(
       bgImage: 'store_sup_month.png',
+      title: 'Monthly VIP',
       titleGradient: [Color(0xFF2C5289), Color(0xFF3981EE)],
-      priceGradient: [Color(0xFFFFFFFF), Color(0xFFCFFBDB)],
-      subTitleColor: Color(0xFF2B5289),
+      priceType: '/month',
+      priceColor: Color(0xFF2B5289),
+      originalPrice: Colors.black.withValues(alpha: 0.15),
+      subTitle: 'Unlimited access to all series',
+      subTitleColor: Color(0xFF2C5289),
+      extraNumColor: Colors.white,
       descColor: Color(0xFF2C5289),
     ),
     'three_months': VipTheme(
       bgImage: 'store_sup_quarter.png',
+      title: 'Quarterly VIP',
       titleGradient: [Color(0xFFD25DB8), Color(0xFFE01DB8)],
-      priceGradient: [Color(0xFFC6AEFF), Color(0xFFFFFFFF)],
+      priceType: '/quarter',
+      priceColor: Color(0xFFDF23B8),
+      originalPrice: Colors.black.withValues(alpha: 0.15),
+      subTitle: 'Unlimited access to all series',
       subTitleColor: Color(0xFFDF23B8),
+      extraNumColor: Colors.white,
       descColor: Color(0xFFDF23B8),
     ),
     'year': VipTheme(
       bgImage: 'store_sup_year.png',
+      title: 'Yearly VIP',
       titleGradient: [Color(0xFFFFE652), Color(0xFFFDA71E)],
-      priceGradient: [Color(0xFF9F5300), Color(0xFF9F5300)],
+      priceType: '/year',
+      priceColor: Color(0xFFFE890E),
+      originalPrice: Colors.black.withValues(alpha: 0.15),
+      subTitle: 'Unlimited access to all series',
       subTitleColor: Color(0xFFFE890E),
+      extraNumColor: Color(0xFFFE890E),
       descColor: Color(0xFFFE890E),
     ),
   };
@@ -86,11 +107,7 @@ class StoreVipItem extends StatelessWidget {
   final StorePageController controller;
   final PayItem item;
 
-  const StoreVipItem({
-    super.key,
-    required this.controller,
-    required this.item,
-  });
+  const StoreVipItem({super.key, required this.controller, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -98,62 +115,168 @@ class StoreVipItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => controller.handlePay(item),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: 100.h,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(theme.bgImage.icon),
-            fit: BoxFit.fill,
-          ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 34.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            /// 标题
-            Text(
-              item.shortType,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                foreground: Paint()..shader = theme.titleShader(),
+            /// ================== 背景 + 原内容 ==================
+            Container(
+              width: double.infinity,
+              height: 100.h,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(theme.bgImage.icon),
+                  fit: BoxFit.fill,
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 10.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// 标题
+                  ShaderMask(
+                    shaderCallback: (bounds) {
+                      return LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: theme.titleGradient,
+                      ).createShader(bounds);
+                    },
+                    child: Text(
+                      theme.title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'DDinPro',
+                        fontWeight: FontWeight.w900,
+                        height: 0.88,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+
+                  /// 价格行
+                  SizedBox(
+                    height: 24.h,
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'USD\$',
+                            style: TextStyle(
+                              color: theme.priceColor,
+                              fontSize: 18,
+                              fontFamily: 'DDinPro',
+                              fontWeight: FontWeight.w900,
+                              height: 1.11,
+                            ),
+                          ),
+                          TextSpan(
+                            text: item.price,
+                            style: TextStyle(
+                              color: theme.priceColor,
+                              fontSize: 24,
+                              fontFamily: 'DDinPro',
+                              fontWeight: FontWeight.w900,
+                              height: 0.83,
+                            ),
+                          ),
+                          TextSpan(
+                            text: theme.priceType,
+                            style: TextStyle(
+                              color: theme.priceColor,
+                              fontSize: 14,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w500,
+                              height: 1.43,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
+
+                  /// 描述
+                  Text(
+                    item.description,
+                    style: TextStyle(
+                      color: theme.subTitleColor,
+                      fontSize: 12,
+                      fontFamily: 'PingFang SC',
+                      fontWeight: FontWeight.w400,
+                      height: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            SizedBox(height: 15.h),
-
-            /// 价格行
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  item.price,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    foreground: Paint()..shader = theme.priceShader(),
-                  ),
+            /// ================== 删除线原价（顶部浮层） ==================
+            Positioned(
+              top: 18.h,
+              left: 128.w,
+              child: Text(
+                '\$${item.price}',
+                style: TextStyle(
+                  color: theme.originalPrice,
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  decoration: TextDecoration.lineThrough,
+                  decorationColor: theme.originalPrice,
                 ),
-                SizedBox(width: 4.w),
-                Text(
-                  '/${item.vipType}',
-                  style: TextStyle(
-                    color: theme.subTitleColor,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+              ),
             ),
 
-            const Spacer(),
-
-            /// 描述
-            Text(
-              item.description,
-              style: TextStyle(
-                color: theme.descColor,
-                fontSize: 10,
+            /// ================== Bonus 区域（底部浮层） ==================
+            Positioned(
+              left: 0,
+              bottom: 0,
+              height: 22.h,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 96.w,
+                    height: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '+Extra 500',
+                          style: TextStyle(
+                            color: theme.extraNumColor,
+                            fontSize: 12,
+                            fontFamily: 'PingFang SC',
+                            fontWeight: FontWeight.w500,
+                            height: 0.83,
+                          ),
+                        ),
+                        SizedBox(width: 3.w),
+                        Image.asset(
+                          'store_gold.png'.icon,
+                          width: 12.w,
+                          height: 12.w,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 16.w),
+                    child: Text(
+                      'Bonus expires in ${item.sendCoinTtl} days',
+                      style: TextStyle(
+                        color: theme.descColor,
+                        fontSize: 12,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

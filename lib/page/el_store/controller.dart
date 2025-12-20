@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_store/state.dart';
+import 'package:elyra/page/el_store/sub_page/store_popup_buy.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/utils/iap_util.dart';
@@ -263,12 +264,11 @@ class StorePageController extends GetxController {
   }
 
   /// 处理支付
-  void handlePay(PayItem item, {num? shortPlayId, num? videoId}) {
+  void handlePay(PayItem item, {num? shortPlayId, num? videoId, bool isPopup = false}) {
     debugPrint('点击支付: ${item.buyType} - ${item.coins} coins');
 
-    if (item.buyType == 'sub_coins') {
-      // 金币包需要显示详情确认（暂不实现弹窗，直接购买）
-      createOrder(item, shortPlayId: shortPlayId, videoId: videoId);
+    if (isPopup) {
+      StorePopupBuy.show()
     } else {
       createOrder(item, shortPlayId: shortPlayId, videoId: videoId);
     }

@@ -1,6 +1,7 @@
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/page/el_store/sub_page/store_popup_buy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,7 +21,18 @@ class StoreCoinItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => controller.handlePay(item),
+      onTap: () {
+        // 如果是周包（sub_coins），显示弹窗
+        if (item.buyType == 'sub_coins') {
+          StorePopupBuy.show(
+            controller: controller,
+            item: item,
+          );
+        } else {
+          // 其他类型直接支付
+          controller.handlePay(item);
+        }
+      },
       child: Stack(
         clipBehavior: Clip.none,
         children: [
