@@ -1,12 +1,13 @@
-import 'package:elyra/routers/el_routers.dart';
-import 'package:elyra/utils/device_info.dart';
-import 'package:elyra/utils/el_utils.dart';
+import 'package:elyra/utils/KXMGlee.dart';
+import 'package:elyra/utils/PQXStatusRestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+import 'routers/QTVTitle.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +25,9 @@ void main() async {
 }
 
 Future<void> initSDK() async {
-  await DeviceInfoUtils().init();
+  await GBannerBanner().init();
   await WakelockPlus.enable();
-  await SpUtils().init();
+  await SPJiao().init();
   EasyLoading.init();
 }
 
@@ -51,8 +52,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           title: 'Elyra',
           navigatorKey: navigatorKey,
           navigatorObservers: [routeObserver],
-          getPages: AppRoutes.routes,
-          initialRoute: AppRoutes.splash,
+          getPages: IDetailGuan.routes,
+          initialRoute: IDetailGuan.splash,
           // 注册路由监听器
           debugShowCheckedModeBanner: false,
           locale: Get.deviceLocale,
