@@ -28,7 +28,7 @@ class WeekCoinItem extends StatelessWidget {
     final originalPriceObj = getOriginalPrice(item);
     return InkWell(
       onTap: () {
-        controller.createOrder(item);
+        controller.handlePay(item, isPopup: true);
       },
 
       child: Container(
@@ -116,26 +116,27 @@ class WeekCoinItem extends StatelessWidget {
                       SizedBox(width: 4.w),
 
                       /// +53% 背景标签
-                      Container(
-                        height: 18.h,
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.40),
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                        child: Text(
-                          '+${item.sendVal}%',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontFamily: 'PingFang SC',
-                            fontWeight: FontWeight.w400,
-                            height: 1,
-                            letterSpacing: -0,
+                      if (item.sendCoins > 0)
+                        Container(
+                          height: 18.h,
+                          padding: EdgeInsets.symmetric(horizontal: 8.w),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.40),
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                          child: Text(
+                            '+${item.sendCoins * 100 / item.coins.floor()}%',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w400,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],

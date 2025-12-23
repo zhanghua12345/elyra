@@ -1,7 +1,8 @@
-  // 支付详情，点击某个金币包/订阅，底部弹起
+// 支付详情，点击某个金币包/订阅，底部弹起
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/utils/store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -32,6 +33,7 @@ class StorePopupBuy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentPriceObj = getCurrentPrice(item);
     return ClipRRect(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(16.r),
@@ -231,7 +233,7 @@ class StorePopupBuy extends StatelessWidget {
             SizedBox(height: 12.h),
             // 价格
             Text(
-              '\$${item.price}/week',
+              '${currentPriceObj?.currencySymbol ?? ''}${currentPriceObj?.rawPrice ?? ''}/week',
               style: TextStyle(
                 color: const Color(0xFFFF0BBA),
                 fontSize: 18,

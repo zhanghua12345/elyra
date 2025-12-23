@@ -177,15 +177,15 @@ class _SplashPageState extends State<SplashPage> {
             fit: BoxFit.fill,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Image.asset('el_logo.png'.icon, height: 95.h),
-            SizedBox(height: 12.h),
-            Image.asset('el_name.png'.icon, height: 42.h),
-            SizedBox(height: 120.h),
-          ],
-        ),
+        // child: Column(
+        //   mainAxisAlignment: MainAxisAlignment.end,
+        //   children: [
+        //     Image.asset('el_logo.png'.icon, height: 95.h),
+        //     SizedBox(height: 12.h),
+        //     Image.asset('el_name.png'.icon, height: 42.h),
+        //     SizedBox(height: 120.h),
+        //   ],
+        // ),
       ),
     );
   }

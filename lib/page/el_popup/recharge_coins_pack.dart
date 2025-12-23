@@ -314,7 +314,6 @@ class _RechargeContent extends StatelessWidget {
         // Buy Now 按钮
         GestureDetector(
           onTap: () {
-            Get.back();
             // 调用支付
             controller.createOrder(item);
           },
