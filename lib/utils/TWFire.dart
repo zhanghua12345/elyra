@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:math' as Math;
 import 'package:elyra/bean/TBHistoryAgreementBean.dart';
 import 'package:elyra/utils/KXMGlee.dart';
-import 'package:elyra/utils/el_utils.dart';
 import 'package:flutter/foundation.dart';
 
 class ZJRegisterRecharge {
