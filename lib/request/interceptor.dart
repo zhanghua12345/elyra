@@ -11,7 +11,7 @@ class RequestInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     /// 不加密
     bool isRelease = kReleaseMode;
-    if (isRelease) {
+    if (!isRelease) {
       options.headers.addAll({'security': false});
     } else {
       options.headers.addAll({'security': true});
