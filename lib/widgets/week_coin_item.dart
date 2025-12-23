@@ -1,9 +1,9 @@
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/utils/store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 /// 周包金币 Item 组件
 class WeekCoinItem extends StatelessWidget {
@@ -24,10 +24,13 @@ class WeekCoinItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentPriceObj = getCurrentPrice(item);
+    final originalPriceObj = getOriginalPrice(item);
     return InkWell(
       onTap: () {
         controller.createOrder(item);
       },
+
       child: Container(
         width: width.w,
         height: height.h,
@@ -167,7 +170,7 @@ class WeekCoinItem extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              '${item.productDetails.currencySymbol}${item.productDetails.price}',
+                              '${currentPriceObj?.currencySymbol ?? ''}${currentPriceObj?.rawPrice ?? ''}',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -176,34 +179,48 @@ class WeekCoinItem extends StatelessWidget {
                                 height: 1,
                               ),
                             ),
-                            SizedBox(width: 2.w),
-                            Text(
-                              '/week',
-                              style: TextStyle(
-                                color: const Color(0xFFDFD1FA),
-                                fontSize: 12,
-                                fontFamily: 'DDinPro',
-                                fontWeight: FontWeight.w400,
-                                height: 1,
+                            if (currentPriceObj?.price !=
+                                originalPriceObj?.price) ...[
+                              SizedBox(width: 2.w),
+                              Text(
+                                '/week',
+                                style: TextStyle(
+                                  color: const Color(0xFFDFD1FA),
+                                  fontSize: 12,
+                                  fontFamily: 'DDinPro',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
 
                         /// 第二行：原价
-                        Text(
-                          '${item.productDetails.currencySymbol}${item.productDetails.rawPrice.toString()}',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.21),
-                            fontSize: 12,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            decoration: TextDecoration.lineThrough,
-                            decorationColor: Colors.white.withValues(
-                              alpha: 0.21,
+                        if (currentPriceObj?.price == originalPriceObj?.price)
+                          Text(
+                            '/week',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.80),
+                              fontSize: 12,
+                              fontFamily: 'D-DIN Exp',
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
-                        ),
+                        if (currentPriceObj?.price != originalPriceObj?.price)
+                          Text(
+                            originalPriceObj?.price ?? '',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.21),
+                              fontSize: 12,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Colors.white.withValues(
+                                alpha: 0.21,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

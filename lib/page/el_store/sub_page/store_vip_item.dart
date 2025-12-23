@@ -212,21 +212,22 @@ class StoreVipItem extends StatelessWidget {
             ),
 
             /// ================== 删除线原价（顶部浮层） ==================
-            Positioned(
-              top: 18.h,
-              left: 128.w,
-              child: Text(
-                item.productDetails.rawPrice.toString(),
-                style: TextStyle(
-                  color: theme.originalPrice,
-                  fontSize: 12,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  decoration: TextDecoration.lineThrough,
-                  decorationColor: theme.originalPrice,
+            if (currentPriceObj?.rawPrice != originalPriceObj?.rawPrice)
+              Positioned(
+                top: 18.h,
+                left: 128.w,
+                child: Text(
+                  '${originalPriceObj?.currencySymbol ?? ''}${originalPriceObj?.rawPrice ?? ''}',
+                  style: TextStyle(
+                    color: theme.originalPrice,
+                    fontSize: 12,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    decoration: TextDecoration.lineThrough,
+                    decorationColor: theme.originalPrice,
+                  ),
                 ),
               ),
-            ),
 
             /// ================== Bonus 区域（底部浮层） ==================
             Positioned(

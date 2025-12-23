@@ -7,8 +7,8 @@ import 'package:elyra/page/el_language/page.dart';
 import 'package:elyra/page/el_play/page.dart';
 import 'package:elyra/page/el_setting/page.dart';
 import 'package:elyra/page/el_store/page.dart';
+import 'package:elyra/page/el_tabbar/page.dart';
 import 'package:elyra/page/history/page.dart';
-import 'package:elyra/page/main_page.dart';
 import 'package:elyra/page/splash_page.dart';
 import 'package:elyra/page/el_home/sub_page/vampire/page.dart';
 import 'package:elyra/page/el_home/sub_page/search/page.dart';
@@ -38,7 +38,7 @@ class AppRoutes {
 
   static final routes = [
     GetPage(name: splash, page: () => const SplashPage()),
-    GetPage(name: main, page: () => const MainPage()),
+    GetPage(name: main, page: () => const TabbarPage()),
     GetPage(name: vampire, page: () => const VampirePage()),
     GetPage(name: search, page: () => const SearchPage()),
     GetPage(name: searchResult, page: () => const SearchResultPage()),
