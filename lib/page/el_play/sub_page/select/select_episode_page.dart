@@ -204,13 +204,7 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
 
                     return GestureDetector(
                       behavior: HitTestBehavior.translucent,
-                      onTap: () => {
-                        if (episode >= 2 &&
-                            widget.episodeList[episode - 2].isLock == true)
-                          {Message.show('Cannot jump episode')}
-                        else
-                          {_selectEpisode(episode)},
-                      },
+                      onTap: () => {_selectEpisode(episode)},
                       child: Stack(
                         children: [
                           Container(
@@ -247,15 +241,15 @@ class _SelectEpisodePageState extends State<SelectEpisodePage>
                             ),
                           ),
                           // 锁图标
-                          if (item.isLock != null && item.isLock!)
-                            Positioned(
-                              bottom: 1.h, // 距离顶部4个像素
-                              right: 4.h, // 距离右侧4个像素
-                              child: Image.asset(
-                                'ely_lock.png'.icon,
-                                width: 12.w,
-                              ),
-                            ),
+                          // if (item.isLock != null && item.isLock!)
+                          //   Positioned(
+                          //     bottom: 1.h, // 距离顶部4个像素
+                          //     right: 4.h, // 距离右侧4个像素
+                          //     child: Image.asset(
+                          //       'ely_lock.png'.icon,
+                          //       width: 12.w,
+                          //     ),
+                          //   ),
                         ],
                       ),
                     );

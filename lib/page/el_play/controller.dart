@@ -130,13 +130,13 @@ class PlayDetailController extends GetxController {
         );
 
         // 如果当前集是锁定状态，则只弹出锁定弹框，不初始化播放器
-        if (currentIndex >= 0 &&
-            state.episodeList[currentIndex].isLock == true) {
-          state.showLockDialog = true;
-          _preloadAdjacentVideos(); // 初始化上下播放器
-          update();
-          return;
-        }
+        // if (currentIndex >= 0 &&
+        //     state.episodeList[currentIndex].isLock == true) {
+        //   state.showLockDialog = true;
+        //   _preloadAdjacentVideos(); // 初始化上下播放器
+        //   update();
+        //   return;
+        // }
 
         // 初始化当前视频
         await _initializeController(currentIndex);
@@ -160,7 +160,7 @@ class PlayDetailController extends GetxController {
 
     final episode = state.episodeList[index];
     // 锁定剧集不初始化播放器，保持封面背景
-    if (episode.isLock == true) return;
+    // if (episode.isLock == true) return;
 
     if (controllers[index] != null) return;
     if (episode.videoUrl.isNullString) return;
@@ -268,17 +268,17 @@ class PlayDetailController extends GetxController {
     }
     // await Future.delayed(Duration(milliseconds: 200));
     // 检查当前集是否锁定
-    final currentEpisode = state.episodeList[index];
-    if (currentEpisode.isLock == true) {
-      // 集数被锁定，暂停视频并显示锁定蒙层
-      controllers[index]?.seekTo(Duration.zero);
-      controllers[index]?.pause();
-      update();
-      await Future.delayed(Duration(milliseconds: 200));
-      // 延迟300ms后自动检查金币并尝试解锁（不弹窗）
-      await autoCheckAndUnlock(currentEpisode.coins ?? 0, index);
-      return;
-    }
+    // final currentEpisode = state.episodeList[index];
+    // if (currentEpisode.isLock == true) {
+    //   // 集数被锁定，暂停视频并显示锁定蒙层
+    //   controllers[index]?.seekTo(Duration.zero);
+    //   controllers[index]?.pause();
+    //   update();
+    //   await Future.delayed(Duration(milliseconds: 200));
+    //   // 延迟300ms后自动检查金币并尝试解锁（不弹窗）
+    //   await autoCheckAndUnlock(currentEpisode.coins ?? 0, index);
+    //   return;
+    // }
 
     // 初始化并播放新视频
     if (controllers[index] == null) {
