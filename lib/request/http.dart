@@ -1,19 +1,24 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:get/get.dart' hide Response;
-import 'package:elyra/page/splash_page.dart';
+import 'package:elyra/request/el_decode.dart';
 import 'package:elyra/request/index.dart';
+import 'package:elyra/request/interceptor.dart';
+import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:elyra/utils/toast.dart';
+import 'package:elyra/utils/user_util.dart';
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 /// HTTP请求配置类
 class HttpConfig {
   static const String baseUrl = Apis.baseUrl;
-  static const int connectTimeout = 10000; // 连接超时时间(ms)
-  static const int receiveTimeout = 10000; // 接收超时时间(ms)
-  static const int sendTimeout = 10000; // 发送超时时间(ms)
+  static const int connectTimeout = 5000; // 连接超时时间(ms)
+  static const int receiveTimeout = 15000; // 接收超时时间(ms)
+  static const int sendTimeout = 5000; // 发送超时时间(ms)
 }
 
 /// API响应结果类
@@ -29,7 +34,7 @@ class ApiResponse<T> {
     return ApiResponse(
       success: json['success'] ?? false,
       data: json['data'],
-      message: json['message'],
+      message: json['msg'],
       code: json['code'],
     );
   }
@@ -73,39 +78,42 @@ class HttpClient {
       connectTimeout: Duration(seconds: HttpConfig.connectTimeout),
       receiveTimeout: Duration(seconds: HttpConfig.receiveTimeout),
       sendTimeout: Duration(seconds: HttpConfig.sendTimeout),
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'security': false,
-        'time-zone': 'GMT-08:00',
-        'lang-key': 'en', // 全局语言设置
-      },
       responseType: ResponseType.json,
     );
 
     _dio = Dio(options);
 
+    _dio.interceptors.add(RequestInterceptor());
     // 添加拦截器
-    _dio.interceptors
-      ..add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) {
-            return handler.next(options);
-          },
-          onResponse: (response, handler) {
-            return handler.next(response);
-          },
-          onError: (DioException e, handler) {
-            if (kDebugMode) {
-              print('请求错误: ${e.message}');
-              if (e.response != null) {
-                print('错误响应: ${e.response!.data}');
-              }
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          // TODO: implement onResponse
+          bool isRelease = kReleaseMode;
+          if (isRelease) {
+            // 如果是加密模式需要解密
+            final deStr = SpDecodeUtils.deStr(response.data);
+            response.data = jsonDecode(deStr);
+          }
+          return handler.next(response);
+        },
+        onError: (DioException e, handler) {
+          if (kDebugMode) {
+            print('请求错误: ${e.message}');
+            if (e.response != null) {
+              print('错误响应: ${e.response!.data}');
             }
-            return handler.next(_handleError(e));
-          },
-        ),
-      )
-      ..add(PrettyDioLogger(requestBody: true, requestHeader: true));
+          }
+          return handler.next(_handleError(e));
+        },
+      ),
+    );
+    _dio.interceptors.add(
+      PrettyDioLogger(requestBody: true, requestHeader: true),
+    );
   }
 
   /// 处理Dio错误
@@ -114,27 +122,21 @@ class HttpClient {
       case DioExceptionType.connectionTimeout:
         return DioException(
           requestOptions: e.requestOptions,
-          error: ApiException(code: -1, message: '连接超时，请检查网络连接'),
+          error: ApiException(code: -1, message: 'Connection timeout'),
         );
       case DioExceptionType.sendTimeout:
         return DioException(
           requestOptions: e.requestOptions,
-          error: ApiException(code: -2, message: '发送超时，请检查网络连接'),
+          error: ApiException(code: -2, message: 'Connection timeout'),
         );
       case DioExceptionType.receiveTimeout:
         return DioException(
           requestOptions: e.requestOptions,
-          error: ApiException(code: -3, message: '接收超时，请检查网络连接'),
-        );
-      case DioExceptionType.connectionError:
-        // 处理网络连接错误，如域名解析失败等
-        return DioException(
-          requestOptions: e.requestOptions,
-          error: ApiException(code: -1000, message: '网络连接失败，请检查网络设置', error: e.error),
+          error: ApiException(code: -3, message: 'Connection timeout'),
         );
       case DioExceptionType.badResponse:
         final int? statusCode = e.response?.statusCode;
-        String message = '服务器异常，请稍后再试';
+        String message = 'Connection failed';
 
         if (statusCode != null) {
           switch (statusCode) {
@@ -142,10 +144,21 @@ class HttpClient {
               message = '请求参数错误';
               break;
             case 401:
-              message = '未授权，请先登录';
+              message = 'Token已过期';
               SpUtils().remove(ElStoreKeys.token);
               clearAuthToken();
-              Get.offAll(() => SplashPage());
+              Get.offAllNamed(AppRoutes.splash);
+              break;
+            case 402:
+              message = '未授权，请先登录';
+              Message.show(
+                'Please log out of the account on other devices in time, otherwise the App on other devices will be unavailable.',
+              );
+              UserUtil().register(toHome: false);
+
+              // SpUtils().remove(SpKeys.token);
+              // clearAuthToken();
+              // Get.offAllNamed(AppRoutes.splash);
               break;
             case 403:
               message = '禁止访问，权限不足';
@@ -170,7 +183,11 @@ class HttpClient {
 
         return DioException(
           requestOptions: e.requestOptions,
-          error: ApiException(code: statusCode ?? -4, message: message, error: e.response?.data),
+          error: ApiException(
+            code: statusCode ?? -4,
+            message: message,
+            error: e.response?.data,
+          ),
         );
       case DioExceptionType.cancel:
         return DioException(
@@ -225,13 +242,28 @@ class HttpClient {
           );
           break;
         case HttpMethod.put:
-          response = await _dio.put(path, data: data, queryParameters: queryParameters, options: requestOptions);
+          response = await _dio.put(
+            path,
+            data: data,
+            queryParameters: queryParameters,
+            options: requestOptions,
+          );
           break;
         case HttpMethod.delete:
-          response = await _dio.delete(path, data: data, queryParameters: queryParameters, options: requestOptions);
+          response = await _dio.delete(
+            path,
+            data: data,
+            queryParameters: queryParameters,
+            options: requestOptions,
+          );
           break;
         case HttpMethod.patch:
-          response = await _dio.patch(path, data: data, queryParameters: queryParameters, options: requestOptions);
+          response = await _dio.patch(
+            path,
+            data: data,
+            queryParameters: queryParameters,
+            options: requestOptions,
+          );
           break;
       }
 
@@ -254,7 +286,11 @@ class HttpClient {
           }
         } else {
           if (showErrorToast) Message.show(responseData['msg']);
-          return ApiResponse(success: false, data: responseData as T?);
+          return ApiResponse(
+            success: false,
+            message: responseData['msg'],
+            data: responseData as T?,
+          );
         }
       } else {
         throw ApiException(
