@@ -157,7 +157,7 @@ class StoreVipItem extends StatelessWidget {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: 'USD\$',
+                            text: '${item.productDetails.currencyCode}${item.productDetails.currencySymbol}',
                             style: TextStyle(
                               color: theme.priceColor,
                               fontSize: 18,
@@ -167,7 +167,7 @@ class StoreVipItem extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: item.price,
+                            text: item.productDetails.rawPrice.toString(),
                             style: TextStyle(
                               color: theme.priceColor,
                               fontSize: 24,
@@ -212,7 +212,7 @@ class StoreVipItem extends StatelessWidget {
               top: 18.h,
               left: 128.w,
               child: Text(
-                '\$${item.price}',
+                item.productDetails.rawPrice.toString(),
                 style: TextStyle(
                   color: theme.originalPrice,
                   fontSize: 12,

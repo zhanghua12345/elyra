@@ -203,7 +203,11 @@ class StorePageController extends GetxController {
         Message.show(productDetailsResponse.error!.message);
         return;
       }
+      debugPrint('---未找到的商品: ${productDetailsResponse.notFoundIDs.join(', ')}');
 
+      debugPrint(
+        '----productDetailsResponse:${productDetailsResponse.productDetails.length}',
+      );
       if (productDetailsResponse.productDetails.isEmpty) {
         Message.show('Query store is empty');
         return;
@@ -264,15 +268,17 @@ class StorePageController extends GetxController {
   }
 
   /// 处理支付
-  void handlePay(PayItem item, {num? shortPlayId, num? videoId, bool isPopup = false}) {
+  void handlePay(
+    PayItem item, {
+    num? shortPlayId,
+    num? videoId,
+    bool isPopup = false,
+  }) {
     debugPrint('点击支付: ${item.buyType} - ${item.coins} coins');
 
     if (isPopup) {
       // 显示弹窗
-      StorePopupBuy.show(
-        controller: this,
-        item: item,
-      );
+      StorePopupBuy.show(controller: this, item: item);
     } else {
       // 直接拉起支付
       createOrder(item, shortPlayId: shortPlayId, videoId: videoId);

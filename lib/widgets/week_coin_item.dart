@@ -167,7 +167,7 @@ class WeekCoinItem extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              '\$${item.price}',
+                              '${item.productDetails.currencySymbol}${item.productDetails.price}',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -192,7 +192,7 @@ class WeekCoinItem extends StatelessWidget {
 
                         /// 第二行：原价
                         Text(
-                          '\$${item.price}',
+                          '${item.productDetails.currencySymbol}${item.productDetails.rawPrice.toString()}',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.21),
                             fontSize: 12,
