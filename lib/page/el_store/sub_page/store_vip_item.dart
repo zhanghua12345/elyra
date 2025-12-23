@@ -1,6 +1,7 @@
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/utils/store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -106,6 +107,8 @@ class StoreVipItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = VipThemes.of(item.vipType);
+    final currentPriceObj = getCurrentPrice(item);
+    final originalPriceObj = getOriginalPrice(item);
 
     return GestureDetector(
       onTap: () => controller.handlePay(item),
@@ -157,7 +160,8 @@ class StoreVipItem extends StatelessWidget {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: '${item.productDetails.currencyCode}${item.productDetails.currencySymbol}',
+                            text:
+                                '${currentPriceObj?.currencyCode ?? ''}${currentPriceObj?.currencySymbol ?? ''}',
                             style: TextStyle(
                               color: theme.priceColor,
                               fontSize: 18,
@@ -167,7 +171,7 @@ class StoreVipItem extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: item.productDetails.rawPrice.toString(),
+                            text: '${currentPriceObj?.rawPrice ?? ''}',
                             style: TextStyle(
                               color: theme.priceColor,
                               fontSize: 24,

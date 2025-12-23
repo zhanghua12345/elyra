@@ -1,9 +1,9 @@
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/utils/store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_utils/get_utils.dart';
 
 /// 金币商品Item组件（大金币/小金币通用）
 class StoreCoinItem extends StatelessWidget {
@@ -137,7 +137,7 @@ class StoreCoinItem extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              item.productDetails.currencySymbol,
+                              getCurrentPrice(item)?.currencySymbol ?? '',
                               style: TextStyle(
                                 color: const Color(0xFFFF0BBA),
                                 fontSize: 12,
@@ -159,7 +159,8 @@ class StoreCoinItem extends StatelessWidget {
                                 ).createShader(bounds);
                               },
                               child: Text(
-                                item.productDetails.rawPrice.toString(),
+                                getCurrentPrice(item)?.rawPrice.toString() ??
+                                    "",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
