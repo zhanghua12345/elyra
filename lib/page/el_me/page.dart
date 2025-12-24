@@ -78,7 +78,7 @@ class _MePageState extends State<MePage> {
       );
     }
 
-    return 
+    return
     _buildMainContent();
   }
 
@@ -93,9 +93,9 @@ class _MePageState extends State<MePage> {
 
           // 用户信息卡片
           _buildUserInfoCard(userInfo),
-          
+
           SizedBox(height: 16.h),
-          
+
           // 菜单列表
           _buildMenuList(),
         ],
@@ -184,7 +184,7 @@ class _MePageState extends State<MePage> {
                 ),
             ],
           ),
-          
+
           // 金币和Top Up
           Container(
             padding: EdgeInsets.only(top: 40.w),
@@ -283,22 +283,24 @@ class _MePageState extends State<MePage> {
           _buildMenuItem(
             'assets/ely_my_feedback.png',
             'Feedback',
-            'feedback',
+            id: 'feedback',
           ),
           //  _buildMenuItem(
           //   'assets/ely_my_language.png',
           //   'Language',
-          //   'language',
+          //   id: 'language',
           // ),
           _buildMenuItem(
             'assets/ely_my_about.png',
-            'About',
-            'about',
+            'About ElyraTV',
+            onTap: () {
+              _showAboutElyraTvDialog();
+            },
           ),
           // _buildMenuItem(
           //   'assets/ely_my_setting.png',
           //   'Setting',
-          //   'setting',
+          //   id: 'setting',
           //   isLast: true,
           // ),
           _buildMenuItemWithUrl(
@@ -328,9 +330,10 @@ class _MePageState extends State<MePage> {
   /// 菜单项
   Widget _buildMenuItem(
     dynamic icon,
-    String title,
-    String id, {
+    String title, {
+    String? id, // id is now optional
     bool isLast = false,
+    VoidCallback? onTap, // Add onTap callback
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -360,8 +363,10 @@ class _MePageState extends State<MePage> {
           ),
         ),
         trailing: Icon(Icons.chevron_right, color: Colors.white70),
-        onTap: () {
-          Get.toNamed('/$id');
+        onTap: onTap ?? () { // Use onTap if provided, otherwise navigate by id
+          if (id != null) {
+            Get.toNamed('/$id');
+          }
         },
       ),
     );
@@ -424,5 +429,75 @@ class _MePageState extends State<MePage> {
     } else {
       // debugPrint('无法打开链接: $url');
     }
+  }
+
+  /// 显示关于ElyraTV的弹窗
+  void _showAboutElyraTvDialog() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.w),
+        ),
+        backgroundColor: Colors.white,
+        child: Container(
+          width: 280.w,
+          padding: EdgeInsets.symmetric(vertical: 20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'el_name.png'.icon, // Using the user-specified image name
+                width: 100.w,
+                height: 100.w,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'ElyraTV',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                // TODO: Get actual app version, e.g., from package_info_plus or an AppController
+                'Version 1.0.0',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14.sp,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              GestureDetector(
+                onTap: () {
+                  Get.back(); // Close the dialog
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.w),
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
