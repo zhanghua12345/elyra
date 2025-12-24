@@ -26,8 +26,11 @@ class StorePageController extends GetxController {
     initialRefresh: false,
   );
 
-  // 🔥 新增：标记是否是对话框中的实例
+  // 🔥 新增:标记是否是对话框中的实例
   bool isDialogInstance = false;
+    
+  // 🔥 支付成功回调(用于通知外部)
+  VoidCallback? onPaymentSuccess;
 
   @override
   void onReady() {
@@ -617,6 +620,9 @@ class StorePageController extends GetxController {
           Future.delayed(Duration(seconds: 1), () => loadData());
           // 充值成功后更新 el_me 页面的用户信息
           _refreshMePageUserInfo();
+          
+          // 🔥 触发支付成功回调
+          onPaymentSuccess?.call();
         }
 
         // 移除缓存

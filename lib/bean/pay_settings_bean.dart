@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+
 /// 支付配置响应数据模型
 class PaySettingsBean {
   final int payMode;
@@ -35,6 +38,7 @@ class PaySettingsBean {
 class PayItem {
   final int id;
   final String buyType; // coins, sub_coins, sub_vip
+  final String title;
   final String? size; // big, small
   final int coins;
   final int sendCoins;
@@ -65,6 +69,7 @@ class PayItem {
   PayItem({
     required this.id,
     required this.buyType,
+    required this.title,
     this.size,
     required this.coins,
     required this.sendCoins,
@@ -87,9 +92,29 @@ class PayItem {
   });
 
   factory PayItem.fromJson(Map<String, dynamic> json) {
+    // 🔥 处理 ext_info 可能是字符串的情况
+    ExtInfo? extInfoObj;
+    if (json['ext_info'] != null) {
+      if (json['ext_info'] is String) {
+        // 如果是字符串，尝试解析为 JSON
+        try {
+          final extInfoMap = jsonDecode(json['ext_info']);
+          if (extInfoMap is Map<String, dynamic>) {
+            extInfoObj = ExtInfo.fromJson(extInfoMap);
+          }
+        } catch (e) {
+          debugPrint('解析 ext_info 失败: $e');
+        }
+      } else if (json['ext_info'] is Map) {
+        // 如果已经是 Map，直接解析
+        extInfoObj = ExtInfo.fromJson(json['ext_info']);
+      }
+    }
+    
     return PayItem(
       id: json['id'] ?? 0,
       buyType: json['buy_type'] ?? '',
+      title: json['title'] ?? '',
       size: json['size'],
       coins: json['coins'] ?? 0,
       sendCoins: json['send_coins'] ?? 0,
@@ -104,9 +129,7 @@ class PayItem {
       sort: json['sort'] ?? 0,
       discountType: json['discount_type'],
       cornerMarker: json['corner_marker'],
-      extInfo: json['ext_info'] != null
-          ? ExtInfo.fromJson(json['ext_info'])
-          : null,
+      extInfo: extInfoObj,
     );
   }
   
@@ -114,6 +137,7 @@ class PayItem {
     return {
       'id': id,
       'buy_type': buyType,
+      'title': title,
       'size': size,
       'coins': coins,
       'send_coins': sendCoins,
@@ -141,6 +165,7 @@ class PayItem {
     return PayItem(
       id: id,
       buyType: buyType,
+      title: title,
       size: size,
       coins: coins,
       sendCoins: sendCoins,

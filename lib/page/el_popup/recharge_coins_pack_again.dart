@@ -2,19 +2,28 @@
 import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
+import 'package:elyra/utils/store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class RechargeCoinsPackAgainPopup extends StatefulWidget {
   final PayItem item;
+  final VoidCallback? onPaymentSuccess; // 🔥 支付成功回调
 
-  const RechargeCoinsPackAgainPopup({super.key, required this.item});
+  const RechargeCoinsPackAgainPopup({
+    super.key,
+    required this.item,
+    this.onPaymentSuccess,
+  });
 
   /// 显示弹窗
-  static void show(PayItem item) {
+  static void show(PayItem item, {VoidCallback? onPaymentSuccess}) {
     Get.dialog(
-      RechargeCoinsPackAgainPopup(item: item),
+      RechargeCoinsPackAgainPopup(
+        item: item,
+        onPaymentSuccess: onPaymentSuccess,
+      ),
       barrierColor: Colors.black.withValues(alpha: 0.7),
       barrierDismissible: true,
     );
@@ -35,9 +44,19 @@ class _RechargeCoinsPackAgainPopupState
 
     // 初始化 Controller（只创建一次）
     storeController = Get.put(
-      StorePageController()..isDialogInstance = true,
+      StorePageController()
+        ..isDialogInstance = true
+        ..onPaymentSuccess = _handlePaymentSuccess, // 🔥 设置支付成功回调
       tag: 'coins_pack_again_dialog',
     );
+  }
+
+  /// 🔥 处理支付成功
+  void _handlePaymentSuccess() {
+    // 关闭弹窗
+    Get.back();
+    // 触发外部回调
+    widget.onPaymentSuccess?.call();
   }
 
   @override
@@ -90,6 +109,7 @@ class _RechargeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentPriceObj = getCurrentPrice(item);
     return Column(
       children: [
         // 标题
@@ -185,7 +205,7 @@ class _RechargeContent extends StatelessWidget {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            'Weekly VIP',
+                            item?.title ?? '',
                             style: TextStyle(
                               color: const Color(0xFFFF0BBA),
                               fontSize: 18,
@@ -221,6 +241,7 @@ class _RechargeContent extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 12.w),
+
                 /// 右侧价格区（顶到最右）
                 Flexible(
                   fit: FlexFit.loose,
@@ -250,7 +271,7 @@ class _RechargeContent extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '\$' + item.price, // $9.99
+                                '${currentPriceObj?.currencySymbol ?? ''}${currentPriceObj?.rawPrice ?? ''}', // $9.99
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -296,11 +317,10 @@ class _RechargeContent extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         // Buy Now 按钮
-        // Buy Now 按钮
         GestureDetector(
           onTap: () {
             // 调用支付
-            controller.createOrder(item);
+            controller.handlePay(item, isPopup: false);
           },
           child: Container(
             width: 279.w,

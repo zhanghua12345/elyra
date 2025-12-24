@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/page/el_store/sub_page/store_content_widget.dart';
@@ -100,27 +101,26 @@ class _StorePageState extends State<StorePage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(width: 30.w,)
-          // GestureDetector(
-          //   onTap: () {
-          //     EasyThrottle.throttle(
-          //       'restore-tap',
-          //       Duration(seconds: 3),
-          //       () => controller.restorePay(),
-          //     );
-          //   },
-          //   child: Padding(
-          //     padding: EdgeInsets.all(5.w),
-          //     child: Text(
-          //       'Restore',
-          //       style: TextStyle(
-          //         fontSize: 14,
-          //         fontWeight: FontWeight.w500,
-          //         color: Color(0xFF999999),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          InkWell(
+            onTap: () {
+              EasyThrottle.throttle(
+                'restore-tap',
+                Duration(seconds: 3),
+                () => controller.restorePay(),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.all(5.w),
+              child: Text(
+                'Restore',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF999999),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
