@@ -159,7 +159,7 @@ class TabbarPageController extends GetxController {
     
     showElConfirmModal(
       context,
-      image: AssetImage('el_model_check_version.png.png'.icon),
+      image: AssetImage('el_model_check_version.png'.icon),
       title: 'Discover A New Version',
       child: Text(
         'Stay informed with popular\nrecommendations and latest updates!',
