@@ -1,5 +1,6 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_me/controller.dart';
+import 'package:elyra/page/el_me/login_popup.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -160,7 +161,7 @@ class _MePageState extends State<MePage> {
               if (userInfo?.isTourist == true)
                 GestureDetector(
                   onTap: () {
-                    // TODO: 跳转登录页
+                    ElLoginPopup.show();
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
@@ -208,7 +209,7 @@ class _MePageState extends State<MePage> {
                 ),
                 // Top Up 按钮
                 GestureDetector(
-                  onTap: () => {Get.toNamed('/store')},
+                  onTap: () => {Get.toNamed('/my_history')},
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.w,
