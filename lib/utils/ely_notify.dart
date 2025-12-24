@@ -25,7 +25,7 @@ class ElyNotifyUtils {
   }
 
   void setPermissionTime(int time) {
-    SpUtils().setObject(
+    SpUtils().setInt(
       "${notifySettingManageStoreKey}_$keyOfPermission",
       time,
     );

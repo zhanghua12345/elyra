@@ -35,8 +35,10 @@ class TabbarPageController extends GetxController {
       // checkVersionUpgrade();
     });
     if (Platform.isIOS) {
-      // 刷新苹果收据
-      SKRequestMaker().startRefreshReceiptRequest();
+      // 刷新苹果收据（模拟器会失败，正常现象）
+      SKRequestMaker().startRefreshReceiptRequest().catchError((error) {
+        debugPrint('刷新收据失败（模拟器正常）: $error');
+      });
     }
   }
 
