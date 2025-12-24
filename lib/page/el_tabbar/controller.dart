@@ -176,16 +176,7 @@ class TabbarPageController extends GetxController {
       cancelText: 'Later',
       confirmText: 'Open',
       onCancel: () {
-        if (!isForce) {
-          Navigator.of(context).pop();
-        }
-        if (Platform.isAndroid) {
-          launchURL(
-            "https://play.google.com/store/apps/details?id=com.sanpplay.wzkmrf.app",
-          );
-        } else if (Platform.isIOS) {
-          launchURL('https://apps.apple.com/us/app/sanpplay/id6756033969');
-        }
+        Navigator.of(context).pop();
       },
       onConfirm: () async {
         Navigator.of(context).pop();
