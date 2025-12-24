@@ -4,7 +4,6 @@ import 'package:elyra/page/main_page.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/utils/device_info.dart';
-import 'package:elyra/utils/el_info_utils.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
 import 'package:flutter/material.dart';

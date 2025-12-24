@@ -29,5 +29,5 @@ class Apis {
   static const String applePaid = "/applePaid";  // post applePaid（iOS金币、订阅支付结果调用这个）
   static const String buyVideo = "/buy_video";  // post 购买单集短剧  short_play_id   video_id
   static const String getRetainVipPaySetting = "/getRetainVipPaySetting";  // get 详情页退出支付弹框
-
+  static const String versionControl = "/customer/versionControl";  // get 版本检查更新
 }

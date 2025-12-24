@@ -175,11 +175,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
     if (controller.state.loadStatus == LoadStatusType.loadNoData) {
       return ElNoDataWidget(
-        imagePath: 'ely_nodata.png',
-        imageWidth: 180,
-        imageHeight: 223,
+        imagePath: 'ely_nosearch.png',
+        imageWidth: 207,
+        imageHeight: 180,
         title: null,
-        description: 'There is no data for the moment.',
+        description: 'No search results',
         buttonText: null,
       );
     }
