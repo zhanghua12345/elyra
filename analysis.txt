@@ -1,0 +1,175 @@
+Analyzing elyra...                                              
+
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:109:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:111:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:113:18 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:115:22 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:117:26 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:119:18 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:121:13 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:123:13 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:125:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:127:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:129:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:131:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:133:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:135:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:281:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:283:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:285:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:287:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:289:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:291:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:293:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:295:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:297:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:299:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:301:13 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:303:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:492:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:494:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:496:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:498:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:500:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:502:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:504:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:506:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:508:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:510:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:512:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:514:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:516:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:518:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:520:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:522:13 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:524:13 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:526:21 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:684:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:686:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:688:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:690:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:692:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:694:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:696:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:698:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:700:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:702:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_play_detail_bean.dart:704:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:173:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:175:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:177:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:179:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:181:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:183:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:185:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:187:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:189:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:191:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:193:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:195:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:197:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:199:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:201:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:203:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:205:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:207:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:209:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:211:21 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:213:18 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:215:13 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:217:23 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:299:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:301:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:418:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:420:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:422:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:424:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:426:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:428:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:430:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:432:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:434:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:436:12 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:438:19 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:440:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:508:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:510:15 • unnecessary_getters_setters
+   info • Unnecessary use of getter and setter to wrap a field • lib/bean/short_video_bean.dart:512:15 • unnecessary_getters_setters
+warning • Unused import: 'package:pull_to_refresh/pull_to_refresh.dart' • lib/page/el_about/page.dart:9:8 • unused_import
+   info • Unnecessary override • lib/page/el_collect/controller.dart:17:8 • unnecessary_overrides
+   info • Don't invoke 'print' in production code • lib/page/el_collect/controller.dart:83:15 • avoid_print
+   info • Don't invoke 'print' in production code • lib/page/el_collect/controller.dart:102:15 • avoid_print
+   info • Unnecessary instance of 'Container' • lib/page/el_collect/page.dart:168:12 • avoid_unnecessary_containers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_collect/page.dart:259:37 • deprecated_member_use
+warning • Unused import: 'package:flutter/material.dart' • lib/page/el_feedback/feedback_detail/controller.dart:7:8 • unused_import
+warning • Unused import: 'package:flutter/material.dart' • lib/page/el_feedback/feedback_list/controller.dart:8:8 • unused_import
+   info • Unnecessary override • lib/page/el_home/controller.dart:9:8 • unnecessary_overrides
+warning • Unused import: 'package:elyra/page/el_popup/recharge_coins_pack_again.dart' • lib/page/el_home/page.dart:7:8 • unused_import
+warning • Unused import: 'package:elyra/bean/pay_settings_bean.dart' • lib/page/el_home/page.dart:8:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_home/page.dart:194:62 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/page/el_home/page.dart:259:9 • use_super_parameters
+warning • Unused import: 'package:elyra/bean/short_video_bean.dart' • lib/page/el_home/state.dart:1:8 • unused_import
+   info • Unnecessary override • lib/page/el_home/sub_page/genres/controller.dart:18:8 • unnecessary_overrides
+   info • Unnecessary override • lib/page/el_home/sub_page/new/controller.dart:19:8 • unnecessary_overrides
+   info • Unnecessary override • lib/page/el_home/sub_page/popular/controller.dart:19:8 • unnecessary_overrides
+   info • Unnecessary instance of 'Container' • lib/page/el_home/sub_page/popular/page.dart:672:59 • avoid_unnecessary_containers
+   info • Unnecessary override • lib/page/el_home/sub_page/ranking/controller.dart:19:8 • unnecessary_overrides
+   info • Use 'isNotEmpty' instead of 'length' to test whether the collection is empty • lib/page/el_home/sub_page/ranking/page.dart:113:17 • prefer_is_empty
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead • lib/page/el_home/sub_page/search/page.dart:426:35 • deprecated_member_use
+   info • Unnecessary instance of 'Container' • lib/page/el_home/sub_page/search_result/page.dart:200:12 • avoid_unnecessary_containers
+   info • Unnecessary instance of 'Container' • lib/page/el_home/sub_page/vampire/page.dart:149:12 • avoid_unnecessary_containers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_me/page.dart:340:48 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_me/page.dart:383:48 • deprecated_member_use
+warning • Unused import: 'package:elyra/bean/short_video_bean.dart' • lib/page/el_play/controller.dart:4:8 • unused_import
+warning • Unused import: 'package:elyra/bean/user_info.dart' • lib/page/el_play/controller.dart:5:8 • unused_import
+warning • Unused import: 'package:elyra/page/el_home/controller.dart' • lib/page/el_play/controller.dart:8:8 • unused_import
+warning • Unused import: 'package:flutter_easyloading/flutter_easyloading.dart' • lib/page/el_play/controller.dart:20:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_play/page.dart:149:33 • deprecated_member_use
+   info • Unnecessary instance of 'Container' • lib/page/el_play/page.dart:316:24 • avoid_unnecessary_containers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_play/page.dart:401:48 • deprecated_member_use
+warning • The declaration '_StoreWeekCoins' isn't referenced • lib/page/el_play/sub_page/buy_coins/next_buy.dart:345:7 • unused_element
+warning • Unused import: 'package:elyra/bean/pay_settings_bean.dart' • lib/page/el_play/sub_page/buy_coins_dialog.dart:1:8 • unused_import
+warning • Unused import: 'package:elyra/page/el_me/controller.dart' • lib/page/el_play/sub_page/buy_coins_dialog.dart:5:8 • unused_import
+   info • Use a 'SizedBox' to add whitespace to a layout • lib/page/el_popup/recharge_coins_pack_again.dart:78:13 • sized_box_for_whitespace
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/page/el_popup/recharge_coins_pack_again.dart:208:33 • invalid_null_aware_operator
+warning • The value of the local variable 'video' isn't used • lib/page/el_recommend/controller.dart:279:11 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_recommend/page.dart:538:58 • deprecated_member_use
+   info • Unnecessary instance of 'Container' • lib/page/el_recommend/page.dart:605:28 • avoid_unnecessary_containers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/el_recommend/page.dart:703:52 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/page/el_tabbar/controller.dart:148:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/page/el_tabbar/controller.dart:209:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/page/el_tabbar/controller.dart:212:7 • avoid_print
+   info • Unnecessary override • lib/page/el_web_view/controller.dart:57:8 • unnecessary_overrides
+   info • Unnecessary override • lib/page/history/controller.dart:14:8 • unnecessary_overrides
+   info • Unnecessary instance of 'Container' • lib/page/history/page.dart:148:12 • avoid_unnecessary_containers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/page/history/page.dart:183:31 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/page/splash_page.dart:66:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/page/splash_page.dart:129:7 • avoid_print
+   info • The constant name 'BF_SIZE' isn't a lowerCamelCase identifier • lib/request/el_decode.dart:7:20 • constant_identifier_names
+   info • The constant name 'EN_STR_TAG' isn't a lowerCamelCase identifier • lib/request/el_decode.dart:8:23 • constant_identifier_names
+warning • Unused import: 'dart:io' • lib/request/interceptor.dart:1:8 • unused_import
+   info • The local variable '_getTimeZoneOffset' starts with an underscore • lib/request/interceptor.dart:26:12 • no_leading_underscores_for_local_identifiers
+warning • Unused import: 'package:flutter/material.dart' • lib/utils/el_utils.dart:3:8 • unused_import
+   info • Don't invoke 'print' in production code • lib/utils/jump_detail.dart:18:7 • avoid_print
+warning • The value of the field '_cacheKeyPrefix' isn't used • lib/utils/purchase_restore_util.dart:9:23 • unused_field
+warning • Unused import: 'package:in_app_purchase/in_app_purchase.dart' • lib/utils/store_utils.dart:4:8 • unused_import
+warning • Unused import: 'package:in_app_purchase_android/billing_client_wrappers.dart' • lib/utils/store_utils.dart:5:8 • unused_import
+warning • Unused import: 'package:in_app_purchase_android/in_app_purchase_android.dart' • lib/utils/store_utils.dart:6:8 • unused_import
+warning • Unused import: 'package:in_app_purchase_storekit/store_kit_wrappers.dart' • lib/utils/store_utils.dart:8:8 • unused_import
+warning • Dead code • lib/utils/store_utils.dart:67:57 • dead_code
+warning • The left operand can't be null, so the right operand is never executed • lib/utils/store_utils.dart:67:60 • dead_null_aware_expression
+warning • The left operand can't be null, so the right operand is never executed • lib/utils/store_utils.dart:68:64 • dead_null_aware_expression
+warning • Dead code • lib/utils/store_utils.dart:89:55 • dead_code
+warning • The left operand can't be null, so the right operand is never executed • lib/utils/store_utils.dart:89:58 • dead_null_aware_expression
+warning • The left operand can't be null, so the right operand is never executed • lib/utils/store_utils.dart:90:62 • dead_null_aware_expression
+warning • Dead code • lib/utils/store_utils.dart:119:54 • dead_code
+warning • The left operand can't be null, so the right operand is never executed • lib/utils/store_utils.dart:119:57 • dead_null_aware_expression
+warning • The left operand can't be null, so the right operand is never executed • lib/utils/store_utils.dart:120:61 • dead_null_aware_expression
+warning • Unused import: 'package:easy_debounce/easy_throttle.dart' • lib/utils/user_util.dart:2:8 • unused_import
+warning • Unused import: 'package:permission_handler/permission_handler.dart' • lib/utils/user_util.dart:10:8 • unused_import
+   info • The type name 'versionUtils' isn't an UpperCamelCase identifier • lib/utils/version_utils.dart:8:7 • camel_case_types
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/el_confirm_modal.dart:56:50 • deprecated_member_use
+   info • The 'child' argument should be last in widget constructor invocations • lib/widgets/el_confirm_modal.dart:257:9 • sort_child_properties_last
+   info • Parameter 'key' could be a super parameter • lib/widgets/el_network_image.dart:36:9 • use_super_parameters
+
+171 issues found. (ran in 3.9s)

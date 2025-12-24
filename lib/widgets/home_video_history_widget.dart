@@ -23,7 +23,7 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
   bool _isLoading = true;
   bool _isHidden = false; // 用户是否手动关闭了历史记录模块
   String? _lastHistoryKey; // 记录最后一次显示的历史记录标识
-  
+
   // 用于取消异步操作
   bool _isDisposed = false;
 
@@ -42,7 +42,7 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
   /// 加载历史记录
   Future<void> _loadHistory() async {
     if (_isDisposed) return;
-    
+
     if (mounted) setState(() => _isLoading = true);
 
     try {
@@ -51,26 +51,33 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
 
       if (localHistory != null && localHistory.isNotEmpty) {
         // 本地有历史记录
-        final historyData = jsonDecode(localHistory);
-        _historyVideo = ShortVideoBean()
-          ..shortPlayId = historyData['short_play_id']
-          ..name = historyData['name']
-          ..imageUrl = historyData['image_url']
-          ..process = historyData['episode']
-          ..playTime = historyData['play_seconds'] ?? 0;
+        final dynamic historyData = jsonDecode(localHistory);
+        if (historyData is Map<String, dynamic>) {
+          _historyVideo = ShortVideoBean()
+            ..shortPlayId = historyData['short_play_id']
+            ..id = historyData['video_id'] // Fix: assigned missing videoId
+            ..name = historyData['name']
+            ..imageUrl = historyData['image_url']
+            ..process = historyData['episode']
+            ..playTime = historyData['play_seconds'] ?? 0;
 
-        // 生成当前历史记录的唯一标识
-        String currentHistoryKey =
-            '${historyData['short_play_id']}_${historyData['episode']}_${historyData['timestamp']}';
+          // 生成当前历史记录的唯一标识
+          String currentHistoryKey =
+              '${historyData['short_play_id']}_${historyData['episode']}_${historyData['timestamp']}';
 
-        // 检查是否有新数据
-        if (_lastHistoryKey != currentHistoryKey) {
-          // 有新数据，重新显示模块
-          _isHidden = false;
-          _lastHistoryKey = currentHistoryKey;
+          // 检查是否有新数据
+          if (_lastHistoryKey != currentHistoryKey) {
+            // 有新数据，重新显示模块
+            _isHidden = false;
+            _lastHistoryKey = currentHistoryKey;
+          }
+
+          if (mounted && !_isDisposed) setState(() => _isLoading = false);
+        } else {
+          // 数据格式错误，清除并尝试从接口获取
+          SpUtils().remove(ElStoreKeys.videoHistory);
+          await _fetchHistoryFromApi();
         }
-
-        if (mounted && !_isDisposed) setState(() => _isLoading = false);
       } else {
         // 本地没有,从接口获取
         await _fetchHistoryFromApi();
@@ -84,7 +91,7 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
   /// 从API获取历史记录
   Future<void> _fetchHistoryFromApi() async {
     if (_isDisposed) return;
-    
+
     try {
       ApiResponse res = await HttpClient().request(
         Apis.history,
@@ -93,8 +100,9 @@ class _HomeVideoHistoryWidgetState extends State<HomeVideoHistoryWidget> {
       );
 
       if (res.success &&
-          res.data['list'] != null &&
-          res.data['list'].isNotEmpty) {
+          res.data is Map &&
+          res.data['list'] is List &&
+          (res.data['list'] as List).isNotEmpty) {
         final historyItem = res.data['list'][0];
         _historyVideo = ShortVideoBean.fromJson(historyItem);
 

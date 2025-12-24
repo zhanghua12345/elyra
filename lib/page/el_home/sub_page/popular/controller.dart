@@ -24,7 +24,7 @@ class PopularController extends GetxController {
   List<ShortVideoBean> getTop3Items(List<ShortVideoBean> list) {
     if (list.isEmpty) return [];
     if (list.length >= 3) return list.sublist(0, 3);
-    
+
     List<ShortVideoBean> result = [];
     int index = 0;
     while (result.length < 3) {
@@ -46,49 +46,54 @@ class PopularController extends GetxController {
       if (refreshCtrl != null) {
         refreshCtrl.refreshCompleted();
       }
-      
-      if (response.success) {
+
+      if (response.success && response.data is Map && response.data['list'] is List) {
         state.bannerList.clear();
         state.popularWeekList.clear();
         state.trendingList.clear();
         state.collectionsList.clear();
-        
-        response.data['list'].forEach((item) {
-          String moduleType = item['module_key'];
+
+        final List list = response.data['list'];
+        for (var item in list) {
+          if (item is! Map) continue;
+          String? moduleType = item['module_key'];
+          dynamic moduleData = item['data'];
+          if (moduleData == null) continue;
+
           switch (moduleType) {
             case 'home_banner':
-              state.bannerList = [
-                ...item['data']
-                    .map((item) => ShortVideoBean.fromJson(item))
-                    .toList(),
-              ];
+              if (moduleData is List) {
+                state.bannerList = moduleData
+                    .map((i) => ShortVideoBean.fromJson(i))
+                    .toList();
+              }
               break;
             case 'week_ranking':
-              state.popularWeekList = [
-                ...item['data']
-                    .map((item) => ShortVideoBean.fromJson(item))
-                    .toList(),
-              ];
+              if (moduleData is List) {
+                state.popularWeekList = moduleData
+                    .map((i) => ShortVideoBean.fromJson(i))
+                    .toList();
+              }
               break;
             case 'new_recommand':
-              state.trendingList = [
-                ...item['data']['list']
-                    .map((item) => ShortVideoBean.fromJson(item))
-                    .toList(),
-              ];
+              if (moduleData is Map && moduleData['list'] is List) {
+                state.trendingList = (moduleData['list'] as List)
+                    .map((i) => ShortVideoBean.fromJson(i))
+                    .toList();
+              }
               break;
             case 'highest_payment_hot_video':
-              state.collectionsList = [
-                ...item['data']
-                    .map((item) => ShortVideoBean.fromJson(item))
-                    .toList(),
-              ];
+              if (moduleData is List) {
+                state.collectionsList = moduleData
+                    .map((i) => ShortVideoBean.fromJson(i))
+                    .toList();
+              }
               break;
             default:
               break;
           }
-        });
-        
+        }
+
         if (state.bannerList.isEmpty &&
             state.popularWeekList.isEmpty &&
             state.trendingList.isEmpty &&

@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage>
                               ),
                               Row(
                                 children: [
-                                  
+
                                   GestureDetector(
                                     behavior: HitTestBehavior.translucent,
                                     onTap: () {
@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage>
                                         style: TextStyle(
                                           color: _currentTab == index
                                               ? Colors.white
-                                              : Colors.white.withOpacity(0.6),
+                                              : Colors.white.withValues(alpha: 0.6),
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w900,
                                           fontFamily: 'DDinPro',
