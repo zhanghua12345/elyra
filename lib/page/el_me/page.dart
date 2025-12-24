@@ -157,31 +157,31 @@ class _MePageState extends State<MePage> {
                 ),
               ),
               // 登录按钮
-              // if (userInfo?.isTourist == true)
-              //   GestureDetector(
-              //     onTap: () {
-              //       // TODO: 跳转登录页
-              //     },
-              //     child: Container(
-              //       padding: EdgeInsets.symmetric(
-              //         horizontal: 17.w,
-              //         vertical: 5.w,
-              //       ),
-              //       decoration: BoxDecoration(
-              //         borderRadius: BorderRadius.circular(20.w),
-              //         border: Border.all(color: Colors.white, width: 1),
-              //       ),
-              //       child: Text(
-              //         'Log in',
-              //         style: TextStyle(
-              //           color: Colors.white,
-              //           fontSize: 14.sp,
-              //           fontWeight: FontWeight.w500,
-              //           height: 1.3,
-              //         ),
-              //       ),
-              //     ),
-              //   ),
+              if (userInfo?.isTourist == true)
+                GestureDetector(
+                  onTap: () {
+                    // TODO: 跳转登录页
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 17.w,
+                      vertical: 5.w,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.w),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    child: Text(
+                      'Log in',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
           
