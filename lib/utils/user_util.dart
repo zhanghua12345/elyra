@@ -1,24 +1,40 @@
 import 'dart:async';
-import 'package:easy_debounce/easy_throttle.dart';
 import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
 import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../bean/register_bean.dart';
 
-class UserUtil {
+class UserUtil with WidgetsBindingObserver {
   static final UserUtil _instance = UserUtil._internal();
 
   factory UserUtil() => _instance;
 
-  UserUtil._internal();
+  UserUtil._internal() {
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   String? get token => SpUtils().getString(ElStoreKeys.token);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        leaveApp();
+        break;
+      case AppLifecycleState.resumed:
+        enterTheApp();
+        break;
+      default:
+        break;
+    }
+  }
 
   // 在线上报定时器
   Timer? _onlineTimer;
@@ -142,6 +158,7 @@ class UserUtil {
 
   /// 进入应用
   Future<void> enterTheApp() async {
+    if (token == null || token!.isEmpty) return;
     await HttpClient().request(Apis.enterTheApp);
   }
 
@@ -157,6 +174,9 @@ class UserUtil {
   void startOnlineTimer() {
     // 先停止旧的定时器
     stopOnlineTimer();
+
+    // 立即执行一次上报
+    onLine();
 
     // 启动新的定时器，每10分钟执行一次
     _onlineTimer = Timer.periodic(const Duration(minutes: 10), (timer) {

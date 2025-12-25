@@ -95,6 +95,10 @@ class _SplashPageState extends State<SplashPage> {
       });
       HttpClient().setAuthToken(token!);
 
+      // 调用 UserUtil 的方法来管理生命周期
+      await UserUtil().enterTheApp();
+      UserUtil().startOnlineTimer();
+
       if (mounted) {
         // 使用 offAll 清空路由栈，直接跳转到主页
         Get.offAll(() => const MainPage());
