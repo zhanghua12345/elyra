@@ -22,8 +22,8 @@ class Apis {
   static const String customerInfo = "/customer/info";
   static const String login = "/customer/login";  // post 登录  avator  email  family_name  platform  third_id
   static const String enterTheApp = "/customer/enterTheApp";  // post 进入应用
-  static const String leaveApp = "/event/leaveApp";  // post 离开应用  PostAuthorization
-  static const String onLine = "/event/onLine"; //在线用户统计(10分钟1次)
+  static const String leaveApp = "/customer/leaveApp";  // post 离开应用  PostAuthorization
+  static const String onLine = "/customer/onLine"; //在线用户统计(10分钟1次)
   static const String signOut = "/customer/signout"; // 退出登录
   static const String logOff = "/customer/logoff";  // 注销账号
   static const String register = "/customer/register";  // 401/402/初始化进入app 要传device_id等设备信息
