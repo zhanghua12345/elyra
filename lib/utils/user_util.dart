@@ -27,21 +27,37 @@ class UserUtil with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint('🔄 [UserUtil] App生命周期变化: $state');
+    
     if (state == AppLifecycleState.resumed) {
+      // App回到前台：检查token → 检查!isInApp → 调用enterTheApp（不启动定时器）
+      if (token == null || token!.isEmpty) {
+        debugPrint('⚠️ [UserUtil] token为空，跳过回到前台处理');
+        return;
+      }
+      
       if (!_isInApp) {
+        debugPrint('🟢 [UserUtil] App回到前台，调用enterTheApp');
         enterTheApp();
-        startOnlineTimer();
+        // 注意：不调用 startOnlineTimer()，定时器继续运行
       }
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
+      // App退到后台：检查token → 检查isInApp → 调用leaveApp（不停止定时器）
       // 节流处理，防止在 inactive 和 paused 状态间切换时重复调用 leaveApp
       EasyThrottle.throttle(
         'lifecycle_leave_throttle',
         const Duration(milliseconds: 1000),
         () {
+          if (token == null || token!.isEmpty) {
+            debugPrint('⚠️ [UserUtil] token为空，跳过退到后台处理');
+            return;
+          }
+          
           if (_isInApp) {
+            debugPrint('🔴 [UserUtil] App退到后台，调用leaveApp');
             leaveApp();
-            stopOnlineTimer();
+            // 注意：不停止定时器，定时器继续运行
           }
         },
       );
@@ -54,24 +70,42 @@ class UserUtil with WidgetsBindingObserver {
   /// 游客注册
   /// [toHome] 是否跳转到主页
   /// [refreshUserInfo] 是否刷新用户信息
+  /// [isAccountLogout] 是否是账号注销（需要先用旧token调用leaveApp）
   Future<bool> register({
     bool toHome = true,
     bool refreshUserInfo = true,
+    bool isAccountLogout = false,
   }) async {
     try {
+      debugPrint('🔵 [UserUtil] 开始游客注册，isAccountLogout: $isAccountLogout');
+      
+      // 如果是账号注销，先用旧token调用leaveApp
+      if (isAccountLogout) {
+        final oldToken = token ?? '';
+        if (oldToken.isNotEmpty) {
+          debugPrint('🔴 [UserUtil] 账号注销：用旧token调用leaveApp');
+          await leaveApp(postAuthorization: oldToken);
+          stopOnlineTimer();
+        }
+      }
+      
       ApiResponse res = await HttpClient().request(Apis.register);
       if (res.success) {
         RegisterBean data = RegisterBean.fromJson(res.data);
         final newToken = data.token ?? '';
+        debugPrint('🔵 [UserUtil] 注册成功，获取新token');
 
         // 保存新token
         await SpUtils().setString(ElStoreKeys.token, newToken);
         HttpClient().setAuthToken(newToken);
+        debugPrint('🔵 [UserUtil] 新token已保存');
 
         // 调用 enterTheApp
+        debugPrint('🟢 [UserUtil] 调用enterTheApp');
         await enterTheApp();
 
-        // 启动在线上报定时器（每10分钟）
+        // 启动在线上报定时器（每10分钟，不立即调用onLine）
+        debugPrint('⏰ [UserUtil] 启动定时器（不立即调用onLine）');
         startOnlineTimer();
 
         if (refreshUserInfo) {
@@ -85,6 +119,7 @@ class UserUtil with WidgetsBindingObserver {
       if (toHome) Get.offNamed(AppRoutes.main);
       return Future.value(false);
     } catch (e) {
+      debugPrint('❌ [UserUtil] 注册失败: $e');
       if (toHome) Get.offNamed(AppRoutes.main);
       return Future.value(false);
     }
@@ -189,15 +224,16 @@ class UserUtil with WidgetsBindingObserver {
   }
 
   /// 启动在线上报定时器（每10分钟）
+  /// 注意：不会立即调用onLine，只在10分钟后才首次执行
   void startOnlineTimer() {
+    debugPrint('⏰ [UserUtil] 启动在线上报定时器（10分钟周期，不立即执行）');
     // 先停止旧的定时器
     stopOnlineTimer();
 
-    // 立即执行一次上报
-    onLine();
-
     // 启动新的定时器，每10分钟执行一次
+    // 注意：移除立即执行的 onLine() 调用
     _onlineTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
+      debugPrint('⏰ [UserUtil] 定时器触发，执行onLine');
       onLine();
     });
   }
