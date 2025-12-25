@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:easy_debounce/easy_throttle.dart';
+import 'package:elyra/page/el_collect/controller.dart';
 import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
@@ -245,4 +246,45 @@ class UserUtil with WidgetsBindingObserver {
   static String payRestore = 'pay_restore';
   static String payPlatformTimeout = 'pay_platform_timeout';
   static String videoError = 'video_error';
+
+  /// 刷新个人中心和收藏页面
+  void refreshMeAndCollectPage() {
+    debugPrint('🔄 [UserUtil] 刷新个人中心和收藏页面...');
+    
+    // 刷新个人中心页面
+    _refreshMePage();
+    
+    // 刷新收藏页面
+    _refreshCollectPage();
+  }
+
+  /// 刷新个人中心页面数据
+  void _refreshMePage() {
+    try {
+      if (Get.isRegistered<MePageController>()) {
+        final meController = Get.find<MePageController>();
+        meController.onRefresh();
+        debugPrint('✅ [UserUtil] 个人中心页面刷新成功');
+      } else {
+        debugPrint('⚠️ [UserUtil] 个人中心页面未初始化');
+      }
+    } catch (e) {
+      debugPrint('❌ [UserUtil] 刷新个人中心页面失败: $e');
+    }
+  }
+
+  /// 刷新收藏页面数据
+  void _refreshCollectPage() {
+    try {
+      if (Get.isRegistered<CollectController>()) {
+        final collectController = Get.find<CollectController>();
+        collectController.onRefresh();
+        debugPrint('✅ [UserUtil] 收藏页面刷新成功');
+      } else {
+        debugPrint('⚠️ [UserUtil] 收藏页面未初始化');
+      }
+    } catch (e) {
+      debugPrint('❌ [UserUtil] 刷新收藏页面失败: $e');
+    }
+  }
 }

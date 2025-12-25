@@ -114,10 +114,13 @@ class AccountLogoutPageController extends GetxController {
     debugPrint('账户注销回调');
     
     // 调用 UserUtil.register 重新注册游客账号
-    await UserUtil().register(toHome: false, refreshUserInfo: true);
+    await UserUtil().register(toHome: false, refreshUserInfo: false);
     
     // 回到个人中心
     Get.back();
+    
+    // 刷新个人中心和收藏页面
+    UserUtil().refreshMeAndCollectPage();
   }
 
   /// WebView 加载完成

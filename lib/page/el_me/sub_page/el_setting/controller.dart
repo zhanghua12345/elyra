@@ -99,9 +99,9 @@ class SettingPageController extends GetxController {
     // 获取旧token
     final oldToken = UserUtil().token ?? '';
     
-    // Call signOut API (退出登录)
+    // Call logOff API (退出登录)
     final res = await HttpClient().request(
-      Apis.signOut,
+      Apis.logOff,
       method: HttpMethod.post,
     );
 
@@ -110,18 +110,17 @@ class SettingPageController extends GetxController {
       final newToken = res.data['token'] ?? '';
       
       // 调用 UserUtil.logOut 处理退出登录逻辑
-      await UserUtil().logOut(oldToken: '', newToken: newToken);
+      await UserUtil().logOut(oldToken: oldToken, newToken: newToken);
       
       Message.show('Log out success');
-      // 重启应用到启动页
-      restartPage();
+      
+      // 关闭当前页面，返回个人中心
+      Get.back();
+      
+      // 刷新个人中心和收藏页面
+      UserUtil().refreshMeAndCollectPage();
     } else {
       Message.show(res.message ?? 'Operation failed, Please try again.');
     }
-  }
-
-  restartPage() {
-    // 不需要再次清除token，因为 UserUtil.logOut 已经处理过了
-    Get.offAll(SplashPage());
   }
 }

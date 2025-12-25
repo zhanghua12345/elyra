@@ -41,11 +41,12 @@ class LoginController extends GetxController {
         // 关闭弹窗
         Get.back();
 
-        // 重启应用
-        Get.offAllNamed(
-          AppRoutes.splash,
-          arguments: {'isRestart': true},
-        );
+        // 刷新个人中心和收藏页面
+        UserUtil().refreshMeAndCollectPage();
+
+        // 如果当前不在个人中心页面，则跳转到个人中心
+        // 注意：这里不使用 Get.offAllNamed，避免清空所有路由栈
+        // 如果已经在个人中心页面，则不需要跳转
       } else {
         Message.show(res.message ?? 'Login Failed');
       }
