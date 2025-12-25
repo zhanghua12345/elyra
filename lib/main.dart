@@ -1,6 +1,7 @@
 import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_utils.dart';
+import 'package:elyra/utils/user_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -41,6 +42,39 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    // 注册应用生命周期监听
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // 移除应用生命周期监听
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        // App退到后台，调用 leaveApp
+        UserUtil().leaveApp();
+        break;
+      case AppLifecycleState.resumed:
+        // App回到前台，调用 enterTheApp
+        UserUtil().enterTheApp();
+        break;
+      default:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

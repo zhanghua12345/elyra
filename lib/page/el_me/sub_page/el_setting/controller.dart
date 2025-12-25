@@ -96,18 +96,24 @@ class SettingPageController extends GetxController {
   }
 
   Future<void> _signOut() async {
-    // Call leaveApp
-    await UserUtil().leaveApp();
-
-    // Call logOff API (退出登录)
+    // 获取旧token
+    final oldToken = UserUtil().token ?? '';
+    
+    // Call signOut API (退出登录)
     final res = await HttpClient().request(
       Apis.signOut,
       method: HttpMethod.post,
     );
 
     if (res.success) {
+      // 获取后端返回的新游客token
+      final newToken = res.data['token'] ?? '';
+      
+      // 调用 UserUtil.logOut 处理退出登录逻辑
+      await UserUtil().logOut(oldToken: oldToken, newToken: newToken);
+      
       Message.show('Log out success');
-      // 清除token并重启应用
+      // 重启应用到启动页
       restartPage();
     } else {
       Message.show(res.message ?? 'Operation failed, Please try again.');
@@ -115,7 +121,7 @@ class SettingPageController extends GetxController {
   }
 
   restartPage() {
-    SpUtils().remove(ElStoreKeys.token);
+    // 不需要再次清除token，因为 UserUtil.logOut 已经处理过了
     Get.offAll(SplashPage());
   }
 }

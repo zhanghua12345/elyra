@@ -20,21 +20,35 @@ class UserUtil {
 
   String? get token => SpUtils().getString(ElStoreKeys.token);
 
-  Timer? timer;
+  // 在线上报定时器
+  Timer? _onlineTimer;
 
-  register({bool toHome = true}) async {
+  /// 游客注册
+  /// [toHome] 是否跳转到主页
+  /// [refreshUserInfo] 是否刷新用户信息
+  Future<bool> register({bool toHome = true, bool refreshUserInfo = true}) async {
     try {
       ApiResponse res = await HttpClient().request(Apis.register);
       if (res.success) {
         RegisterBean data = RegisterBean.fromJson(res.data);
-        SpUtils().setString(ElStoreKeys.token, data.token ?? '');
-        HttpClient().setAuthToken(data.token ?? '');
+        final newToken = data.token ?? '';
+        
+        // 保存新token
+        SpUtils().setString(ElStoreKeys.token, newToken);
+        HttpClient().setAuthToken(newToken);
+        
+        // 调用 enterTheApp
+        await enterTheApp();
+        
+        // 启动在线上报定时器（每10分钟）
+        startOnlineTimer();
+        
+        if (refreshUserInfo) {
+          Get.put(MePageController());
+          Get.find<MePageController>().getUserInfo();
+        }
+        
         if (toHome) Get.offNamed(AppRoutes.main);
-        // UserUtil().enterAppPost();
-        // FirebaseCommon.reportFirebaseToken();
-        Get.put(MePageController());
-        Get.find<MePageController>().getUserInfo();
-
         return Future.value(true);
       }
       if (toHome) Get.offNamed(AppRoutes.main);
@@ -45,7 +59,7 @@ class UserUtil {
     }
   }
 
-  /// 登录
+  /// 切换账号登录
   Future<ApiResponse> login({
     required String type,
     required String openid,
@@ -53,7 +67,7 @@ class UserUtil {
     String? name,
     String? avator,
   }) async {
-    // 获取原用户/游客 token
+    // 1. 获取旧token
     final String oldToken = token ?? '';
 
     Map<String, dynamic> params = {
@@ -64,26 +78,52 @@ class UserUtil {
     if (name != null) params['family_name'] = name;
     if (avator != null) params['avator'] = avator;
 
+    // 2. 调用登录接口获取新token
     ApiResponse res = await HttpClient().request(Apis.login, data: params);
     if (res.success) {
-      // 1. 调用 leaveApp 使用之前的 token 把之前的退出
-      if (oldToken.isNotEmpty) {
-        leaveApp(postAuthorization: oldToken);
-      }
-
-      // 2. 保存新的 token
       final result = res.data as Map<String, dynamic>;
       final String newToken = result['token'] ?? '';
+      
+      // 3. 用旧token调用 leaveApp
+      if (oldToken.isNotEmpty) {
+        await leaveApp(postAuthorization: oldToken);
+        // 删除旧的在线上报定时器
+        stopOnlineTimer();
+      }
+
+      // 4. 保存新token
       SpUtils().setString(ElStoreKeys.token, newToken);
       HttpClient().setAuthToken(newToken);
 
-      // 3. 调用 enterTheApp
-      enterTheApp();
+      // 5. 用新token调用 enterTheApp
+      await enterTheApp();
 
-      // 4. 调用 onLine
-      onLine();
+      // 6. 启动新的在线上报定时器（每10分钟）
+      startOnlineTimer();
     }
     return res;
+  }
+
+  /// 退出登录（返回新游客token）
+  /// [oldToken] 旧的token，用于调用leaveApp
+  /// [newToken] 后端返回的新游客token
+  Future<void> logOut({required String oldToken, required String newToken}) async {
+    // 1. 用旧token调用 leaveApp
+    if (oldToken.isNotEmpty) {
+      await leaveApp(postAuthorization: oldToken);
+      // 删除旧的在线上报定时器
+      stopOnlineTimer();
+    }
+
+    // 2. 保存新token
+    SpUtils().setString(ElStoreKeys.token, newToken);
+    HttpClient().setAuthToken(newToken);
+
+    // 3. 用新token调用 enterTheApp
+    await enterTheApp();
+
+    // 4. 启动新的在线上报定时器（每10分钟）
+    startOnlineTimer();
   }
 
   /// 离开应用
@@ -91,7 +131,7 @@ class UserUtil {
     String? auth = postAuthorization ?? token;
     if (auth == null || auth.isEmpty) return;
 
-    HttpClient().request(
+    await HttpClient().request(
       Apis.leaveApp,
       data: {'PostAuthorization': auth},
     );
@@ -99,29 +139,35 @@ class UserUtil {
 
   /// 进入应用
   Future<void> enterTheApp() async {
-    HttpClient().request(Apis.enterTheApp);
+    await HttpClient().request(Apis.enterTheApp);
   }
 
-  /// 在线上报
+  /// 在线上报（上报当前用户在线状态）
   Future<void> onLine({String? postAuthorization}) async {
     String? auth = postAuthorization ?? token;
     if (auth == null || auth.isEmpty) return;
 
-    HttpClient().request(
+    await HttpClient().request(
       Apis.onLine,
       data: {'PostAuthorization': auth},
     );
   }
 
- //离线上报
-  Future<void> offLine({String? postAuthorization}) async {
-    String? auth = postAuthorization ?? token;
-    if (auth == null || auth.isEmpty) return;
+  /// 启动在线上报定时器（每10分钟）
+  void startOnlineTimer() {
+    // 先停止旧的定时器
+    stopOnlineTimer();
+    
+    // 启动新的定时器，每10分钟执行一次
+    _onlineTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
+      onLine();
+    });
+  }
 
-    HttpClient().request(
-      Apis.onLine,
-      data: {'PostAuthorization': auth},
-    );
+  /// 停止在线上报定时器
+  void stopOnlineTimer() {
+    _onlineTimer?.cancel();
+    _onlineTimer = null;
   }
 
   // 上报错误信息

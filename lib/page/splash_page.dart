@@ -6,6 +6,7 @@ import 'package:elyra/request/index.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
+import 'package:elyra/utils/user_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:async';
@@ -113,8 +114,13 @@ class _SplashPageState extends State<SplashPage> {
       ApiResponse res = await HttpClient().request(Apis.register);
       if (res.success) {
         RegisterBean data = RegisterBean.fromJson(res.data);
-        SpUtils().setString(ElStoreKeys.token, data.token ?? '');
-        HttpClient().setAuthToken(data.token ?? '');
+        final newToken = data.token ?? '';
+        SpUtils().setString(ElStoreKeys.token, newToken);
+        HttpClient().setAuthToken(newToken);
+
+        // 调用 UserUtil 的方法来管理生命周期
+        await UserUtil().enterTheApp();
+        UserUtil().startOnlineTimer();
 
         if (mounted) {
           // 使用 offAll 清空路由栈，直接跳转到主页

@@ -5,6 +5,7 @@ import 'package:elyra/page/el_me/sub_page/el_account_logout/state.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';
+import 'package:elyra/utils/user_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
@@ -108,13 +109,15 @@ class AccountLogoutPageController extends GetxController {
     );
   }
 
-  /// 处理注销回调
-  void handleAccountLogout() {
+  /// 处理账号注销回调
+  Future<void> handleAccountLogout() async {
     debugPrint('账户注销回调');
-    // 这里执行注销逻辑，比如清除token、跳转到登录页等
-    // 示例：
-    // SpUtils().remove(ElStoreKeys.token);
-    // Get.offAllNamed('/login');
+    
+    // 调用 UserUtil.register 重新注册游客账号
+    await UserUtil().register(toHome: false, refreshUserInfo: true);
+    
+    // 回到个人中心
+    Get.back();
   }
 
   /// WebView 加载完成
