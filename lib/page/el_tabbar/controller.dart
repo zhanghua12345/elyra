@@ -9,6 +9,7 @@ import 'package:elyra/page/el_me/page.dart';
 import 'package:elyra/utils/ely_notify.dart';
 import 'package:elyra/utils/version_utils.dart';
 import 'package:elyra/widgets/el_confirm_modal.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
@@ -34,7 +35,7 @@ class TabbarPageController extends GetxController {
       // 这个就是暂时不在这里谈
       // checkVersionUpgrade();
     });
-    if (Platform.isIOS) {
+    if (Platform.isIOS&& !kDebugMode) {
       // 刷新苹果收据（模拟器会失败，正常现象）
       SKRequestMaker().startRefreshReceiptRequest().catchError((error) {
         debugPrint('刷新收据失败（模拟器正常）: $error');
