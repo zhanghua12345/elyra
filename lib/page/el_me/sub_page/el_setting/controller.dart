@@ -1,7 +1,18 @@
+import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_me/sub_page/el_setting/state.dart';
+import 'package:elyra/page/splash_page.dart';
+import 'package:elyra/request/http.dart';
+import 'package:elyra/request/index.dart';
+import 'package:elyra/utils/el_store.dart';
+import 'package:elyra/utils/el_utils.dart';
+import 'package:elyra/utils/toast.dart';
+import 'package:elyra/utils/user_util.dart';
+import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_confirm_modal.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:elyra/widgets/bad_status_widget.dart';
 
 class SettingPageController extends GetxController {
   final state = SettingState();
@@ -27,8 +38,6 @@ class SettingPageController extends GetxController {
     if (state.isLoading) return;
     state.isLoading = true;
     try {
-      // 模拟加载数据
-
       // 加载成功
       state.loadStatus = LoadStatusType.loadSuccess;
       update();
@@ -48,5 +57,65 @@ class SettingPageController extends GetxController {
   // 下拉刷新
   void onRefresh() {
     loadData();
+  }
+
+  void logOut() {
+    final meController = Get.find<MePageController>();
+    // Default to true (isTourist) if null to be safe
+    final isTourist = meController.state.customerInfo?.isTourist ?? true;
+    final isLogin = !UserUtil().token.isNullString && !isTourist;
+
+    final context = Get.context;
+    if (context == null) return;
+
+    showElConfirmModal(
+      context,
+      image: AssetImage('el_model_logout.png'.icon),
+      title: 'Leaving So Soon?',
+      child: Text(
+        "You'll need to sign in again",
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontFamily: 'PingFang SC',
+          fontWeight: FontWeight.w400,
+          height: 1.50,
+        ),
+      ),
+      cancelText: 'Cancel',
+      confirmText: 'Log Out',
+      onCancel: () {
+        Navigator.of(context).pop();
+      },
+      onConfirm: () async {
+        Navigator.of(context).pop();
+        await _signOut();
+      },
+    );
+  }
+
+  Future<void> _signOut() async {
+    // Call leaveApp
+    await UserUtil().leaveApp();
+
+    // Call logOff API (退出登录)
+    final res = await HttpClient().request(
+      Apis.signOut,
+      method: HttpMethod.post,
+    );
+
+    if (res.success) {
+      Message.show('Log out success');
+      // 清除token并重启应用
+      restartPage();
+    } else {
+      Message.show(res.message ?? 'Operation failed, Please try again.');
+    }
+  }
+
+  restartPage() {
+    SpUtils().remove(ElStoreKeys.token);
+    Get.offAll(SplashPage());
   }
 }

@@ -113,6 +113,17 @@ class UserUtil {
     );
   }
 
+ //离线上报
+  Future<void> offLine({String? postAuthorization}) async {
+    String? auth = postAuthorization ?? token;
+    if (auth == null || auth.isEmpty) return;
+
+    HttpClient().request(
+      Apis.onLine,
+      data: {'PostAuthorization': auth},
+    );
+  }
+
   // 上报错误信息
   reportErrorEvent(
     String eventName,

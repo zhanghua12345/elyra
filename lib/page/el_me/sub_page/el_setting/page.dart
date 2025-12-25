@@ -175,8 +175,7 @@ class _SettingPageState extends State<SettingPage> {
   Widget _buildLogOutButton() {
     return GestureDetector(
       onTap: () {
-        // Implement logout functionality here
-        // controller.logOut();
+        controller.logOut();
       },
       child: Container(
         height: 48.h,
