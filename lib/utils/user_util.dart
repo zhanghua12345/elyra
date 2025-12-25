@@ -26,28 +26,31 @@ class UserUtil {
   /// 游客注册
   /// [toHome] 是否跳转到主页
   /// [refreshUserInfo] 是否刷新用户信息
-  Future<bool> register({bool toHome = true, bool refreshUserInfo = true}) async {
+  Future<bool> register({
+    bool toHome = true,
+    bool refreshUserInfo = true,
+  }) async {
     try {
       ApiResponse res = await HttpClient().request(Apis.register);
       if (res.success) {
         RegisterBean data = RegisterBean.fromJson(res.data);
         final newToken = data.token ?? '';
-        
+
         // 保存新token
-        SpUtils().setString(ElStoreKeys.token, newToken);
+        await SpUtils().setString(ElStoreKeys.token, newToken);
         HttpClient().setAuthToken(newToken);
-        
+
         // 调用 enterTheApp
         await enterTheApp();
-        
+
         // 启动在线上报定时器（每10分钟）
         startOnlineTimer();
-        
+
         if (refreshUserInfo) {
           Get.put(MePageController());
           Get.find<MePageController>().getUserInfo();
         }
-        
+
         if (toHome) Get.offNamed(AppRoutes.main);
         return Future.value(true);
       }
@@ -70,10 +73,7 @@ class UserUtil {
     // 1. 获取旧token
     final String oldToken = token ?? '';
 
-    Map<String, dynamic> params = {
-      'platform': type,
-      'third_id': openid,
-    };
+    Map<String, dynamic> params = {'platform': type, 'third_id': openid};
     if (email != null) params['email'] = email;
     if (name != null) params['family_name'] = name;
     if (avator != null) params['avator'] = avator;
@@ -83,7 +83,7 @@ class UserUtil {
     if (res.success) {
       final result = res.data as Map<String, dynamic>;
       final String newToken = result['token'] ?? '';
-      
+
       // 3. 用旧token调用 leaveApp
       if (oldToken.isNotEmpty) {
         await leaveApp(postAuthorization: oldToken);
@@ -92,7 +92,7 @@ class UserUtil {
       }
 
       // 4. 保存新token
-      SpUtils().setString(ElStoreKeys.token, newToken);
+      await SpUtils().setString(ElStoreKeys.token, newToken);
       HttpClient().setAuthToken(newToken);
 
       // 5. 用新token调用 enterTheApp
@@ -107,7 +107,10 @@ class UserUtil {
   /// 退出登录（返回新游客token）
   /// [oldToken] 旧的token，用于调用leaveApp
   /// [newToken] 后端返回的新游客token
-  Future<void> logOut({required String oldToken, required String newToken}) async {
+  Future<void> logOut({
+    required String oldToken,
+    required String newToken,
+  }) async {
     // 1. 用旧token调用 leaveApp
     if (oldToken.isNotEmpty) {
       await leaveApp(postAuthorization: oldToken);
@@ -116,7 +119,7 @@ class UserUtil {
     }
 
     // 2. 保存新token
-    SpUtils().setString(ElStoreKeys.token, newToken);
+    await SpUtils().setString(ElStoreKeys.token, newToken);
     HttpClient().setAuthToken(newToken);
 
     // 3. 用新token调用 enterTheApp
@@ -147,17 +150,14 @@ class UserUtil {
     String? auth = postAuthorization ?? token;
     if (auth == null || auth.isEmpty) return;
 
-    await HttpClient().request(
-      Apis.onLine,
-      data: {'PostAuthorization': auth},
-    );
+    await HttpClient().request(Apis.onLine, data: {'PostAuthorization': auth});
   }
 
   /// 启动在线上报定时器（每10分钟）
   void startOnlineTimer() {
     // 先停止旧的定时器
     stopOnlineTimer();
-    
+
     // 启动新的定时器，每10分钟执行一次
     _onlineTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
       onLine();
@@ -196,7 +196,8 @@ class UserUtil {
     if (type != null) params.putIfAbsent('type', () => type);
     if (orderCode != null) params.putIfAbsent('order_code', () => orderCode);
     if (payData != null) params.putIfAbsent('pay_data', () => payData);
-    if (transactionId != null) params.putIfAbsent('transaction_id', () => transactionId);
+    if (transactionId != null)
+      params.putIfAbsent('transaction_id', () => transactionId);
     if (extendData != null) params.addAll(extendData);
     params.putIfAbsent('error_msg', () => errMsg);
     HttpClient().request(Apis.reportEvent, data: params);

@@ -19,7 +19,12 @@ class RequestInterceptor extends Interceptor {
     final deviceInfo = DeviceInfoUtils();
     String token = SpUtils().getString(ElStoreKeys.token) ?? '';
     if (token.isNotEmpty) {
-      options.headers.addAll({'Authorization': token});
+      options.headers.putIfAbsent('Authorization', () => token);
+    }
+
+    if (kDebugMode) {
+      print('Dio Request: ${options.method} ${options.path}');
+      print('Auth Header: ${options.headers['Authorization']}');
     }
 
     /// 获取时区偏移
@@ -31,9 +36,7 @@ class RequestInterceptor extends Interceptor {
       return '$sign${hours.abs().toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
     }
 
-    // String idfa = SpUtils().getString(ElStoreKeys.iosIDFA) ?? '';
-    // String gaid = Platform.isIOS ? (deviceInfo.deviceIdfv ?? '') : SpUtils().getString(ElStoreKeys.googleAid) ?? '';
-    options.headers.addAll({
+    final Map<String, dynamic> commonHeaders = {
       'lang-key': 'en',
       'device-id': deviceInfo.deviceId ?? 'unknown',
       'system-type': deviceInfo.systemType ?? 'unknown',
@@ -44,9 +47,10 @@ class RequestInterceptor extends Interceptor {
       'app-name': 'PandaLoom',
       'product-prefix': 'pandaloom',
       "time-zone": _getTimeZoneOffset(DateTime.now()),
-      // 'idfa': idfa,
-      // 'idfv': deviceInfo.deviceIdfv,
-      // "device-gaid": gaid,
+    };
+
+    commonHeaders.forEach((key, value) {
+      options.headers.putIfAbsent(key, () => value);
     });
 
     super.onRequest(options, handler);

@@ -48,9 +48,14 @@ class _SplashPageState extends State<SplashPage> {
 
   /// 监听网络状态变化
   void _listenToNetworkChanges() {
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
       // 当网络状态变为可用时，尝试执行请求
-      if (results.isNotEmpty && results.first != ConnectivityResult.none && !_hasProcessed && mounted) {
+      if (results.isNotEmpty &&
+          results.first != ConnectivityResult.none &&
+          !_hasProcessed &&
+          mounted) {
         _tryExecuteRequest();
       }
     });
@@ -62,7 +67,8 @@ class _SplashPageState extends State<SplashPage> {
 
     // 检查网络连接状态
     final connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult.isEmpty || connectivityResult.first == ConnectivityResult.none) {
+    if (connectivityResult.isEmpty ||
+        connectivityResult.first == ConnectivityResult.none) {
       // 没有网络,等待网络连接
       print('等待网络连接...');
       return;
@@ -70,7 +76,7 @@ class _SplashPageState extends State<SplashPage> {
 
     // 标记已处理，防止重复执行
     _hasProcessed = true;
-    
+
     // 取消网络监听，防止重复触发
     await _connectivitySubscription?.cancel();
 
@@ -88,7 +94,7 @@ class _SplashPageState extends State<SplashPage> {
         'app-version': deviceInfo.appVersion ?? 'unknown',
       });
       HttpClient().setAuthToken(token!);
-      
+
       if (mounted) {
         // 使用 offAll 清空路由栈，直接跳转到主页
         Get.offAll(() => const MainPage());
@@ -115,7 +121,7 @@ class _SplashPageState extends State<SplashPage> {
       if (res.success) {
         RegisterBean data = RegisterBean.fromJson(res.data);
         final newToken = data.token ?? '';
-        SpUtils().setString(ElStoreKeys.token, newToken);
+        await SpUtils().setString(ElStoreKeys.token, newToken);
         HttpClient().setAuthToken(newToken);
 
         // 调用 UserUtil 的方法来管理生命周期
@@ -140,7 +146,7 @@ class _SplashPageState extends State<SplashPage> {
   /// 处理注册错误
   void _handleRegisterError(String message) {
     if (!mounted) return;
-    
+
     // 显示错误对话框
     showDialog(
       context: context,
