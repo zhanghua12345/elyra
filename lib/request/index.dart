@@ -25,7 +25,7 @@ class Apis {
   static const String leaveApp = "/customer/leaveApp";  // post 离开应用  PostAuthorization
   static const String onLine = "/customer/onLine"; //在线用户统计(10分钟1次)
   static const String signOut = "/customer/signout"; // 退出登录
-  static const String logOff = "/customer/logoff";  // 注销账号
+  static const String logOff = "/customer/logoff";  // 注销账号 已经修改为H5注销
   static const String register = "/customer/register";  // 401/402/初始化进入app 要传device_id等设备信息
 
   static const String reportEvent = "/event/add";

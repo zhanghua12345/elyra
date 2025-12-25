@@ -99,9 +99,9 @@ class SettingPageController extends GetxController {
     // 获取旧token
     final oldToken = UserUtil().token ?? '';
     
-    // Call logOff API (退出登录)
+    // Call signOut API (退出登录)
     final res = await HttpClient().request(
-      Apis.logOff,
+      Apis.signOut,
       method: HttpMethod.post,
     );
 
