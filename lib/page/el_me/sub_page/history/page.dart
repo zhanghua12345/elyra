@@ -1,4 +1,3 @@
-import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_me/sub_page/history/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -181,7 +180,7 @@ class MyHistoryPage extends StatelessWidget {
                   color: const Color(0xFFFF0BBA),
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w900,
-                  fontFamily: 'DIN Black',
+                  fontFamily: 'DDinPro',
                 ),
               ),
             ],
