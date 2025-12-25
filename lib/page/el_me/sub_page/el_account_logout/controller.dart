@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:elyra/page/el_account_logout/state.dart';
+import 'package:elyra/page/el_me/sub_page/el_account_logout/state.dart';
 import 'package:elyra/utils/device_info.dart';
 import 'package:elyra/utils/el_store.dart';
 import 'package:elyra/utils/el_utils.dart';

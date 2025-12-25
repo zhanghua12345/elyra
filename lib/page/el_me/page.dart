@@ -1,6 +1,6 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_me/controller.dart';
-import 'package:elyra/page/el_me/login_popup.dart';
+import 'package:elyra/page/el_me/sub_page/login_popup/login_popup.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -286,41 +286,21 @@ class _MePageState extends State<MePage> {
             'Feedback',
             id: 'feedback',
           ),
-          //  _buildMenuItem(
-          //   'assets/ely_my_language.png',
-          //   'Language',
-          //   id: 'language',
-          // ),
+           _buildMenuItem(
+            'assets/ely_my_language.png',
+            'Language',
+            id: 'language',
+          ),
           _buildMenuItem(
             'assets/ely_my_about.png',
-            'About ElyraTV',
-            onTap: () {
-              _showAboutElyraTvDialog();
-            },
+            'About',
+            id: 'about',
+
           ),
-          // _buildMenuItem(
-          //   'assets/ely_my_setting.png',
-          //   'Setting',
-          //   id: 'setting',
-          //   isLast: true,
-          // ),
-          _buildMenuItemWithUrl(
-            'assets/icon_privacy.png',
-            'Privacy Policy',
-            'https://www.csyib.com/private',
-            openInWebView: true,
-          ),
-          _buildMenuItemWithUrl(
-            'assets/icon_user.png',
-            'User Agreement',
-            'https://www.csyib.com/user_policy',
-            openInWebView: true,
-          ),
-          _buildMenuItemWithUrl(
-            'assets/icon_visit.png',
-            'Visit Website',
-            'https://www.csyib.com',
-            openInWebView: false,
+          _buildMenuItem(
+            'assets/ely_my_setting.png',
+            'Setting',
+            id: 'setting',
             isLast: true,
           ),
         ],

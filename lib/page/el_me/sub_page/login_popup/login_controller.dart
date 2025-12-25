@@ -1,12 +1,14 @@
-import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/routers/el_routers.dart';
 import 'package:elyra/utils/toast.dart';
 import 'package:elyra/utils/user_util.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class LoginController extends GetxController {
+  bool isLoading = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -14,6 +16,9 @@ class LoginController extends GetxController {
 
   /// Apple 登录
   Future<void> loginWithApple() async {
+    if (isLoading) return;
+    isLoading = true;
+    EasyLoading.show(status: 'Loading...');
     try {
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -46,7 +51,11 @@ class LoginController extends GetxController {
       }
     } catch (e) {
       // 用户取消登录或其它错误
-      // debugPrint('Apple Login Error: $e');
+      print('Apple Login Error: $e');
+      Message.show('Operation Failed');
+    } finally {
+      isLoading = false;
+      EasyLoading.dismiss();
     }
   }
 

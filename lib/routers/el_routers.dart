@@ -1,12 +1,12 @@
 import 'package:elyra/page/el_about/page.dart';
-import 'package:elyra/page/el_account_logout/page.dart';
+import 'package:elyra/page/el_me/sub_page/el_account_logout/page.dart';
 import 'package:elyra/page/el_feedback/feedback_detail/page.dart';
 import 'package:elyra/page/el_feedback/feedback_index/page.dart';
 import 'package:elyra/page/el_feedback/feedback_list/page.dart';
 import 'package:elyra/page/el_language/page.dart';
 import 'package:elyra/page/el_me/sub_page/history/page.dart';
 import 'package:elyra/page/el_play/page.dart';
-import 'package:elyra/page/el_setting/page.dart';
+import 'package:elyra/page/el_me/sub_page/el_setting/page.dart';
 import 'package:elyra/page/el_store/page.dart';
 import 'package:elyra/page/el_tabbar/page.dart';
 import 'package:elyra/page/history/page.dart';

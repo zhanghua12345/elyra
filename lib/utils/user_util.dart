@@ -45,6 +45,74 @@ class UserUtil {
     }
   }
 
+  /// 登录
+  Future<ApiResponse> login({
+    required String type,
+    required String openid,
+    String? email,
+    String? name,
+    String? avator,
+  }) async {
+    // 获取原用户/游客 token
+    final String oldToken = token ?? '';
+
+    Map<String, dynamic> params = {
+      'platform': type,
+      'third_id': openid,
+    };
+    if (email != null) params['email'] = email;
+    if (name != null) params['family_name'] = name;
+    if (avator != null) params['avator'] = avator;
+
+    ApiResponse res = await HttpClient().request(Apis.login, data: params);
+    if (res.success) {
+      // 1. 调用 leaveApp 使用之前的 token 把之前的退出
+      if (oldToken.isNotEmpty) {
+        leaveApp(postAuthorization: oldToken);
+      }
+
+      // 2. 保存新的 token
+      final result = res.data as Map<String, dynamic>;
+      final String newToken = result['token'] ?? '';
+      SpUtils().setString(ElStoreKeys.token, newToken);
+      HttpClient().setAuthToken(newToken);
+
+      // 3. 调用 enterTheApp
+      enterTheApp();
+
+      // 4. 调用 onLine
+      onLine();
+    }
+    return res;
+  }
+
+  /// 离开应用
+  Future<void> leaveApp({String? postAuthorization}) async {
+    String? auth = postAuthorization ?? token;
+    if (auth == null || auth.isEmpty) return;
+
+    HttpClient().request(
+      Apis.leaveApp,
+      data: {'PostAuthorization': auth},
+    );
+  }
+
+  /// 进入应用
+  Future<void> enterTheApp() async {
+    HttpClient().request(Apis.enterTheApp);
+  }
+
+  /// 在线上报
+  Future<void> onLine({String? postAuthorization}) async {
+    String? auth = postAuthorization ?? token;
+    if (auth == null || auth.isEmpty) return;
+
+    HttpClient().request(
+      Apis.onLine,
+      data: {'PostAuthorization': auth},
+    );
+  }
+
   // 上报错误信息
   reportErrorEvent(
     String eventName,

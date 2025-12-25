@@ -1,6 +1,6 @@
 import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/page/el_account_logout/page.dart';
-import 'package:elyra/page/el_setting/controller.dart';
+import 'package:elyra/page/el_me/sub_page/el_account_logout/page.dart';
+import 'package:elyra/page/el_me/sub_page/el_setting/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';

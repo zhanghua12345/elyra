@@ -1,4 +1,5 @@
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_me/sub_page/login_popup/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ class ElLoginPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LoginController());
     return ClipRRect(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(24.w),
@@ -44,28 +46,19 @@ class ElLoginPopup extends StatelessWidget {
             _buildLoginItem(
               icon: 'el_login_apple.png',
               label: 'Continue with Apple',
-              onTap: () {
-                // TODO: 调用 Apple 登录逻辑
-                Get.back();
-              },
+              onTap: controller.loginWithApple,
             ),
             SizedBox(height: 18.h),
             _buildLoginItem(
               icon: 'el_login_facebook.png',
               label: 'Continue with Facebook',
-              onTap: () {
-                // TODO: 调用 Facebook 登录逻辑
-                Get.back();
-              },
+              onTap: controller.loginWithFacebook,
             ),
             SizedBox(height: 18.h),
             _buildLoginItem(
               icon: 'el_login_google.png',
               label: 'Continue with Google',
-              onTap: () {
-                // TODO: 调用 Google 登录逻辑
-                Get.back();
-              },
+              onTap: controller.loginWithGoogle,
             ),
             SizedBox(height: 24.h),
           ],
