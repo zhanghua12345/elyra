@@ -1,10 +1,10 @@
-import 'package:elyra/page/test/state.dart';
+import 'package:elyra/page/el_coins_pack/state.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 
-class TestPageController extends GetxController {
-  final state = TestState();
+class ElCoinsPackController extends GetxController {
+  final state = ElCoinsPackState();
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );
@@ -28,7 +28,7 @@ class TestPageController extends GetxController {
     state.isLoading = true;
     try {
       // 模拟加载数据
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
 
       // 加载成功
       state.loadStatus = LoadStatusType.loadSuccess;

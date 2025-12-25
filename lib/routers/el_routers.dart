@@ -1,4 +1,5 @@
 import 'package:elyra/page/el_about/page.dart';
+import 'package:elyra/page/el_coins_pack/page.dart';
 import 'package:elyra/page/el_me/sub_page/el_account_logout/page.dart';
 import 'package:elyra/page/el_feedback/feedback_detail/page.dart';
 import 'package:elyra/page/el_feedback/feedback_index/page.dart';
@@ -37,6 +38,8 @@ class AppRoutes {
   static const String accountLogout = '/account_logout';
   static const String store = '/store';
   static const String myHistory = '/my_history';
+  static const String coinsPack = '/coins_pack';
+  
 
   static final routes = [
     GetPage(name: splash, page: () => const SplashPage()),
@@ -57,5 +60,6 @@ class AppRoutes {
     GetPage(name: accountLogout, page: () => const AccountLogoutPage()),
     GetPage(name: store, page: () => const StorePage()),
     GetPage(name: myHistory, page: () => const MyHistoryPage()),
+    GetPage(name: coinsPack, page: () => const ElCoinsPackPage()),
   ];
 }

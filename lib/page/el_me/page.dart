@@ -275,7 +275,7 @@ class _MePageState extends State<MePage> {
   /// 金币签到
   Widget _buildDaily() {
     return GestureDetector(
-      onTap: () => Get.toNamed('/daily'),
+      onTap: () => Get.toNamed('/coins_pack'),
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16.w),
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
