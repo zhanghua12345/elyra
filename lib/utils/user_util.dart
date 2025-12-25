@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
@@ -21,18 +22,28 @@ class UserUtil with WidgetsBindingObserver {
 
   String? get token => SpUtils().getString(ElStoreKeys.token);
 
+  bool _isInApp = false;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.paused:
-      case AppLifecycleState.inactive:
-        leaveApp();
-        break;
-      case AppLifecycleState.resumed:
+    if (state == AppLifecycleState.resumed) {
+      if (!_isInApp) {
         enterTheApp();
-        break;
-      default:
-        break;
+        startOnlineTimer();
+      }
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // 节流处理，防止在 inactive 和 paused 状态间切换时重复调用 leaveApp
+      EasyThrottle.throttle(
+        'lifecycle_leave_throttle',
+        const Duration(milliseconds: 1000),
+        () {
+          if (_isInApp) {
+            leaveApp();
+            stopOnlineTimer();
+          }
+        },
+      );
     }
   }
 
@@ -150,16 +161,22 @@ class UserUtil with WidgetsBindingObserver {
     String? auth = postAuthorization ?? token;
     if (auth == null || auth.isEmpty) return;
 
-    await HttpClient().request(
+    final res = await HttpClient().request(
       Apis.leaveApp,
       data: {'PostAuthorization': auth},
     );
+    if (res.success) {
+      _isInApp = false;
+    }
   }
 
   /// 进入应用
   Future<void> enterTheApp() async {
     if (token == null || token!.isEmpty) return;
-    await HttpClient().request(Apis.enterTheApp);
+    final res = await HttpClient().request(Apis.enterTheApp);
+    if (res.success) {
+      _isInApp = true;
+    }
   }
 
   /// 在线上报（上报当前用户在线状态）
