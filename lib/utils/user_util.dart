@@ -28,14 +28,14 @@ class UserUtil with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     debugPrint('🔄 [UserUtil] App生命周期变化: $state');
-    
+
     if (state == AppLifecycleState.resumed) {
       // App回到前台：检查token → 检查!isInApp → 调用enterTheApp（不启动定时器）
       if (token == null || token!.isEmpty) {
         debugPrint('⚠️ [UserUtil] token为空，跳过回到前台处理');
         return;
       }
-      
+
       if (!_isInApp) {
         debugPrint('🟢 [UserUtil] App回到前台，调用enterTheApp');
         enterTheApp();
@@ -53,7 +53,7 @@ class UserUtil with WidgetsBindingObserver {
             debugPrint('⚠️ [UserUtil] token为空，跳过退到后台处理');
             return;
           }
-          
+
           if (_isInApp) {
             debugPrint('🔴 [UserUtil] App退到后台，调用leaveApp');
             leaveApp();
@@ -78,7 +78,7 @@ class UserUtil with WidgetsBindingObserver {
   }) async {
     try {
       debugPrint('🔵 [UserUtil] 开始游客注册，isAccountLogout: $isAccountLogout');
-      
+
       // 如果是账号注销，先用旧token调用leaveApp
       if (isAccountLogout) {
         final oldToken = token ?? '';
@@ -88,7 +88,7 @@ class UserUtil with WidgetsBindingObserver {
           stopOnlineTimer();
         }
       }
-      
+
       ApiResponse res = await HttpClient().request(Apis.register);
       if (res.success) {
         RegisterBean data = RegisterBean.fromJson(res.data);
@@ -175,11 +175,10 @@ class UserUtil with WidgetsBindingObserver {
     required String newToken,
   }) async {
     // 1. 用旧token调用 leaveApp
-    if (oldToken.isNotEmpty) {
-      await leaveApp(postAuthorization: oldToken);
-      // 删除旧的在线上报定时器
-      stopOnlineTimer();
-    }
+    // if (oldToken.isNotEmpty) {
+    //   await leaveApp(postAuthorization: oldToken);
+    //   stopOnlineTimer();
+    // }
 
     // 2. 保存新token
     await SpUtils().setString(ElStoreKeys.token, newToken);
@@ -229,7 +228,7 @@ class UserUtil with WidgetsBindingObserver {
     debugPrint('⏰ [UserUtil] 启动在线上报定时器（10分钟周期，不立即执行）');
     // 先停止旧的定时器
     stopOnlineTimer();
-
+    onLine();
     // 启动新的定时器，每10分钟执行一次
     // 注意：移除立即执行的 onLine() 调用
     _onlineTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
@@ -286,10 +285,10 @@ class UserUtil with WidgetsBindingObserver {
   /// 刷新个人中心和收藏页面
   void refreshMeAndCollectPage() {
     debugPrint('🔄 [UserUtil] 刷新个人中心和收藏页面...');
-    
+
     // 刷新个人中心页面
     _refreshMePage();
-    
+
     // 刷新收藏页面
     _refreshCollectPage();
   }

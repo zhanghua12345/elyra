@@ -98,7 +98,13 @@ class SettingPageController extends GetxController {
   Future<void> _signOut() async {
     // 获取旧token
     final oldToken = UserUtil().token ?? '';
-    
+
+    // 1. 用旧token调用 leaveApp
+    if (oldToken.isNotEmpty) {
+      await UserUtil().leaveApp(postAuthorization: oldToken);
+      // 删除旧的在线上报定时器
+      UserUtil().stopOnlineTimer();
+    }
     // Call signOut API (退出登录)
     final res = await HttpClient().request(
       Apis.signOut,
@@ -108,15 +114,15 @@ class SettingPageController extends GetxController {
     if (res.success) {
       // 获取后端返回的新游客token
       final newToken = res.data['token'] ?? '';
-      
+
       // 调用 UserUtil.logOut 处理退出登录逻辑
       await UserUtil().logOut(oldToken: oldToken, newToken: newToken);
-      
+
       Message.show('Log out success');
-      
+
       // 关闭当前页面，返回个人中心
       Get.back();
-      
+
       // 刷新个人中心和收藏页面
       UserUtil().refreshMeAndCollectPage();
     } else {

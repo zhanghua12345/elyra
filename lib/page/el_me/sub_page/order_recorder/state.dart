@@ -17,10 +17,6 @@ class OrderRecorderState {
   bool hasMore = true;
 
   // 订单记录数据列表
-  List<OrderRecordBean> coinRecords = [];
-  List<OrderRecordBean> vipRecords = [];
+  List<OrderRecordBean> recordsList = [];
 
-  // 获取当前Tab对应的列表
-  List<OrderRecordBean> get currentList =>
-      tabIndex == 0 ? coinRecords : vipRecords;
 }

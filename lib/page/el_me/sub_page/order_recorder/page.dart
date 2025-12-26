@@ -43,9 +43,8 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar('Reward Coins'),
-                SizedBox(height: 20.h),
+                SizedBox(height: 10.h),
                 _buildTabSwitcher(controller),
-                SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
@@ -132,9 +131,9 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
 
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: controller.state.coinRecords.length,
+      itemCount: controller.state.recordsList.length,
       itemBuilder: (context, index) {
-        return _buildRewardItem(controller.state.coinRecords[index]);
+        return _buildRewardItem(controller.state.recordsList[index]);
       },
     );
   }

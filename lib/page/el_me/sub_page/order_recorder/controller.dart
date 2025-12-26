@@ -24,10 +24,7 @@ class OrderRecorderController extends GetxController {
     super.onClose();
   }
 
-  getOrderData({
-    RefreshController? refreshCtrl,
-    bool loadMore = false,
-  }) async {
+  getOrderData({RefreshController? refreshCtrl, bool loadMore = false}) async {
     // 如果正在加载，或者加载更多时没有更多数据，则直接返回
     if (state.isLoading || (loadMore && !state.hasMore)) return;
 
@@ -83,11 +80,7 @@ class OrderRecorderController extends GetxController {
                   )
                   .toList();
 
-              if (state.tabIndex == 0) {
-                state.coinRecords.addAll(newItems);
-              } else {
-                state.vipRecords.addAll(newItems);
-              }
+              state.recordsList.addAll(newItems);
             } catch (e) {
               print('Error mapping new items: $e');
               // 如果解析失败，我们仍然更新状态以停止加载
@@ -96,8 +89,7 @@ class OrderRecorderController extends GetxController {
           }
         } else {
           // 刷新数据
-          state.coinRecords.clear();
-          state.vipRecords.clear();
+          state.recordsList.clear();
 
           if (response.data['list'] != null &&
               response.data['list'].length > 0) {
@@ -107,11 +99,7 @@ class OrderRecorderController extends GetxController {
                     (item) => OrderRecordBean.fromJson(item),
                   )
                   .toList();
-              if (state.tabIndex == 0) {
-                state.coinRecords = newItems;
-              } else {
-                state.vipRecords = newItems;
-              }
+              state.recordsList = newItems;
               state.loadStatus = LoadStatusType.loadSuccess;
             } catch (e) {
               print('Error mapping items: $e');
@@ -153,6 +141,7 @@ class OrderRecorderController extends GetxController {
       refreshController.loadNoData(); // 没有更多数据
     }
   }
+
   // 切换 Tab
   void switchTab(int index) {
     if (state.tabIndex == index) return;
