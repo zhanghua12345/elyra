@@ -1,7 +1,9 @@
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_coins_pack/controller.dart';
+import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
+import 'package:elyra/widgets/week_coin_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,11 +18,16 @@ class ElCoinsPackPage extends StatefulWidget {
 
 class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
   late final ElCoinsPackController controller;
+  late final StorePageController storeController;
 
   @override
   void initState() {
     super.initState();
     controller = Get.put(ElCoinsPackController());
+    // WeekCoinItem requires StorePageController
+    storeController = Get.isRegistered<StorePageController>()
+        ? Get.find<StorePageController>()
+        : Get.put(StorePageController());
   }
 
   @override
@@ -38,6 +45,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
               ),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar('My Refills'),
                 SizedBox(height: 6.h),
@@ -50,11 +58,6 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                     header: const ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
-                      idleText: 'Pull to refresh',
-                      releaseText: 'Release to refresh',
-                      refreshingText: 'Refreshing...',
-                      completeText: 'Refresh completed',
-                      failedText: 'Refresh failed',
                     ),
                     child: _buildContent(),
                   ),
@@ -78,7 +81,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Padding(
-              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              padding: EdgeInsets.all(5.w),
               child: Image.asset('ely_back.png'.icon, height: 20.h),
             ),
           ),
@@ -91,7 +94,6 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // 右侧可以放置其他操作按钮，暂时留空
           SizedBox(width: 30.w),
         ],
       ),
@@ -134,9 +136,10 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 20.h),
-          _buildSectionDivider('REWARDS OVERVIEW'),
+          _buildSectionTitle('REWARDS OVERVIEW', 'left'),
           SizedBox(height: 24.h),
           _buildRewardsDisplay(),
           SizedBox(height: 24.h),
@@ -144,21 +147,9 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           SizedBox(height: 12.h),
           _buildClaimPlaceholder(),
           SizedBox(height: 40.h),
-          _buildSectionDivider('WEEKLY REFILL'),
+          _buildSectionTitle('WEEKLY REFILL', 'center'),
           SizedBox(height: 20.h),
-          _buildRefillItem(
-            title: 'Weekly Refill',
-            coins: '4800',
-            bonus: '+140%',
-            price: '\$19.99',
-          ),
-          SizedBox(height: 16.h),
-          _buildRefillItem(
-            title: 'Weekly Refill',
-            coins: '2000',
-            bonus: '+53%',
-            price: '\$9.99',
-          ),
+          _buildRefillList(),
           SizedBox(height: 32.h),
           _buildRulesSection(),
           SizedBox(height: 40.h),
@@ -167,9 +158,11 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
     );
   }
 
-  Widget _buildSectionDivider(String title) {
+  Widget _buildSectionTitle(String title, String align) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: align == 'center'
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.start,
       children: [
         Container(
           width: 6.w,
@@ -209,23 +202,21 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       child: Row(
         children: [
-          Expanded(
-            child: _buildStatTile(
-              'Weekly Total',
-              controller.state.weeklyTotal.toString(),
-            ),
+          _buildStatTile(
+            'Weekly Total',
+            controller.state.weeklyTotal.toString(),
           ),
+          SizedBox(width: 18.w),
+
           Container(
             width: 1.w,
             height: 32.h,
             color: Colors.white.withOpacity(0.25),
           ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: _buildStatTile(
-              'Claimable Coins',
-              controller.state.claimableCoins.toString(),
-            ),
+          SizedBox(width: 18.w),
+          _buildStatTile(
+            'Claimable Coins',
+            controller.state.claimableCoins.toString(),
           ),
         ],
       ),
@@ -317,149 +308,25 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
     );
   }
 
-  Widget _buildRefillItem({
-    required String title,
-    required String coins,
-    required String bonus,
-    required String price,
-  }) {
-    return Container(
-      height: 84.h,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [Color(0xFFFFDCE0), Color(0xFFFFD8F4)],
-        ),
-        borderRadius: BorderRadius.circular(12.w),
-        border: Border.all(color: const Color(0xFFFF0BBA), width: 2),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          // White glow shadow effect from HTML
-          Positioned(
-            right: 40.w,
-            top: -10.h,
-            child: Container(
-              width: 104.w,
-              height: 104.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.5),
-                    blurRadius: 40.w,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            child: Row(
-              children: [
-                // Gift/Refill icon
-                Image.asset('el_me_gift.png'.icon, width: 44.w, height: 44.w),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: Color(0xFFDF23B8),
-                          fontSize: 14.sp,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 16.w,
-                            height: 16.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            coins,
-                            style: TextStyle(
-                              color: Color(0xFFFF0BBA),
-                              fontSize: 18.sp,
-                              fontFamily: 'DDinPro',
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          SizedBox(width: 6.w),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6.w,
-                              vertical: 2.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(4.w),
-                            ),
-                            child: Text(
-                              bonus,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontFamily: 'PingFang SC',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 88.w,
-                  height: 48.h,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [Color(0xFFFF0BBA), Color(0xFF6018E6)],
-                    ),
-                    borderRadius: BorderRadius.circular(24.w),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        price,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.sp,
-                          fontFamily: 'DDinPro',
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Text(
-                        '/week',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12.sp,
-                          fontFamily: 'DDinPro',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+  Widget _buildRefillList() {
+    if (controller.state.coinsWeekList.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      itemCount: controller.state.coinsWeekList.length,
+      separatorBuilder: (context, index) => SizedBox(height: 16.h),
+      itemBuilder: (context, index) {
+        final item = controller.state.coinsWeekList[index];
+        return WeekCoinItem(
+          item: item,
+          controller: storeController,
+          width: 343,
+          isOldPrice: true,
+        );
+      },
     );
   }
 

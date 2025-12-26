@@ -61,4 +61,6 @@ class Apis {
       "/getCustomerBuyRecords"; // 消费列表 get current_page page_size
   static const String purchaseList =
       "/getCustomerOrder"; // 充值列表 get current_page page_size buy_type
+  static const String getReceiveDayCoinInfo =
+      "/getReceiveDayCoinInfo"; // 获取领取金币详情 get
 }

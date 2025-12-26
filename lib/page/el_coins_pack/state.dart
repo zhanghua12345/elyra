@@ -1,3 +1,4 @@
+import 'package:elyra/bean/pay_settings_bean.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 
 class ElCoinsPackState {
@@ -6,10 +7,11 @@ class ElCoinsPackState {
   LoadStatusType loadStatus = LoadStatusType.loading;
   bool isLoading = false;
 
-  // Weekly total and claimable coins
-  int weeklyTotal = 0;
-  int claimableCoins = 0;
-  int activeRefills = 0;
+  // 奖励概览数据
+  num weeklyTotal = 0;
+  num claimableCoins = 0;
+  num activeRefills = 0;
 
-  // You can add list of refill packages here once the model is defined
+  // 周包金币列表
+  List<PayItem> coinsWeekList = [];
 }
