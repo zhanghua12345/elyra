@@ -6,7 +6,7 @@ class RewardCoinsState {
 
   LoadStatusType loadStatus = LoadStatusType.loading;
   // 奖励金币数据列表
-  List<RewardCoinItem> rewardList = [];
+  List<RewardCoinBean> rewardList = [];
 
   // 分页参数
   int currentPage = 1;

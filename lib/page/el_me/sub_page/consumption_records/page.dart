@@ -133,7 +133,7 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
     );
   }
 
-  Widget _buildConsumptionItem(ConsumptionRecordItem record) {
+  Widget _buildConsumptionItem(ConsumptionRecordBean record) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 32.w),
@@ -230,7 +230,7 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
       );
     } else if (mode == LoadStatus.failed) {
       body = const Text(
-        "Load Failed!Click retry!",
+        "Load Failed! Click retry!",
         style: TextStyle(color: Colors.white54),
       );
     } else if (mode == LoadStatus.canLoading) {

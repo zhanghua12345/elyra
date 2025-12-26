@@ -15,7 +15,7 @@ class ConsumptionRecordsController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    loadData();
+    getConsumptionData();
   }
 
   @override
@@ -24,80 +24,93 @@ class ConsumptionRecordsController extends GetxController {
     super.onClose();
   }
 
-  // 加载数据的方法
-  Future<void> loadData({bool isRefresh = true}) async {
-    if (state.isLoading) return;
+  getConsumptionData({
+    RefreshController? refreshCtrl,
+    bool loadMore = false,
+  }) async {
+    // 如果正在加载，或者加载更多时没有更多数据，则直接返回
+    if (state.isLoading || (loadMore && !state.hasMore)) return;
 
-    if (isRefresh) {
-      state.currentPage = 1;
-      state.hasMore = true;
+    // 更新状态
+    if (!loadMore) {
       state.loadStatus = LoadStatusType.loading;
-      update();
-      await Future.delayed(Duration(milliseconds: 500));
     }
     state.isLoading = true;
+    update();
     try {
-      final response = await HttpClient().request(
+      // 构造请求参数
+      Map<String, dynamic> params = {
+        'current_page': loadMore ? state.currentPage + 1 : 1,
+        'page_size': state.pageSize,
+      };
+
+      ApiResponse response = await HttpClient().request(
         Apis.consumptionList,
         method: HttpMethod.get,
-        queryParameters: {
-          "current_page": state.currentPage,
-          "page_size": state.pageSize,
-        },
+        queryParameters: params,
       );
 
-      if (response.success && response.data != null) {
-        final recordBean = ConsumptionRecordBean.fromJson(response.data);
-        final list = recordBean.list ?? [];
+      final rCtrl = refreshCtrl ?? refreshController;
 
-        if (isRefresh) {
-          state.consumptionList = list;
+      if (response.success) {
+        // 解析分页信息
+        var pagination = response.data['pagination'];
+        state.currentPage = pagination['current_page'] ?? 1;
+        state.totalPages = pagination['page_total'] ?? 0;
+        state.hasMore = state.currentPage < state.totalPages;
+
+        List<dynamic> listData = response.data['list'] ?? [];
+        List<ConsumptionRecordBean> newItems = listData
+            .map<ConsumptionRecordBean>(
+              (item) => ConsumptionRecordBean.fromJson(item),
+            )
+            .toList();
+
+        if (loadMore) {
+          state.consumptionList.addAll(newItems);
+          rCtrl.loadComplete();
         } else {
-          state.consumptionList.addAll(list);
+          state.consumptionList = newItems;
+          rCtrl.refreshCompleted();
+          state.loadStatus = state.consumptionList.isEmpty
+              ? LoadStatusType.loadNoData
+              : LoadStatusType.loadSuccess;
         }
 
-        // 判断是否还有更多数据
-        state.hasMore = list.length >= state.pageSize;
-        state.currentPage++;
-
-        state.loadStatus = state.consumptionList.isEmpty
-            ? LoadStatusType.loadNoData
-            : LoadStatusType.loadSuccess;
+        if (!state.hasMore) {
+          rCtrl.loadNoData();
+        }
       } else {
-        if (isRefresh) {
+        if (loadMore) {
+          rCtrl.loadFailed();
+        } else {
+          rCtrl.refreshFailed();
           state.loadStatus = LoadStatusType.loadFailed;
         }
       }
       update();
-    } catch (err) {
-      if (isRefresh) {
+    } catch (e) {
+      final rCtrl = refreshCtrl ?? refreshController;
+      if (loadMore) {
+        rCtrl.loadFailed();
+      } else {
+        rCtrl.refreshFailed();
         state.loadStatus = LoadStatusType.loadFailed;
       }
       update();
     } finally {
       state.isLoading = false;
-      if (isRefresh) {
-        refreshController.refreshCompleted();
-      } else {
-        if (state.hasMore) {
-          refreshController.loadComplete();
-        } else {
-          refreshController.loadNoData();
-        }
-      }
       update();
     }
   }
 
-  // 下拉刷新
   void onRefresh() {
-    loadData(isRefresh: true);
+    getConsumptionData();
   }
 
-  // 上拉加载更多
   void onLoadMore() {
     if (state.hasMore) {
-      loadData(isRefresh: false);
+      getConsumptionData(loadMore: true);
     } else {
       refreshController.loadNoData();
     }

@@ -5,13 +5,13 @@ class ConsumptionRecordsState {
   ConsumptionRecordsState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
-  bool isLoading = false;
+  // 消费记录数据列表
+  List<ConsumptionRecordBean> consumptionList = [];
 
-  // 分页信息
+  // 分页参数
   int currentPage = 1;
   int pageSize = 20;
+  int totalPages = 0;
+  bool isLoading = false;
   bool hasMore = true;
-
-  // 消费记录数据列表
-  List<ConsumptionRecordItem> consumptionList = [];
 }

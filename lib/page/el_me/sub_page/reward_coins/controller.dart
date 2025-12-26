@@ -38,7 +38,7 @@ class RewardCoinsController extends GetxController {
     state.isLoading = true;
     update();
     try {
- // 构造请求参数
+      // 构造请求参数
       Map<String, dynamic> params = {
         'current_page': loadMore ? state.currentPage + 1 : 1,
         'page_size': state.pageSize,
@@ -47,7 +47,7 @@ class RewardCoinsController extends GetxController {
       ApiResponse response = await HttpClient().request(
         Apis.sendCoinList,
         method: HttpMethod.post,
-         data: params,
+        data: params,
       );
 
       if (refreshCtrl != null) {
@@ -74,8 +74,8 @@ class RewardCoinsController extends GetxController {
           if (response.data['list'] != null &&
               response.data['list'].length > 0) {
             try {
-              List<RewardCoinItem> newItems = response.data['list']
-                  .map<RewardCoinItem>((item) => RewardCoinItem.fromJson(item))
+              List<RewardCoinBean> newItems = response.data['list']
+                  .map<RewardCoinBean>((item) => RewardCoinBean.fromJson(item))
                   .toList();
               state.rewardList.addAll(newItems);
             } catch (e) {
@@ -91,8 +91,8 @@ class RewardCoinsController extends GetxController {
           if (response.data['list'] != null &&
               response.data['list'].length > 0) {
             try {
-              List<RewardCoinItem> newItems = response.data['list']
-                  .map<RewardCoinItem>((item) => RewardCoinItem.fromJson(item))
+              List<RewardCoinBean> newItems = response.data['list']
+                  .map<RewardCoinBean>((item) => RewardCoinBean.fromJson(item))
                   .toList();
               state.rewardList = newItems;
 
@@ -126,7 +126,6 @@ class RewardCoinsController extends GetxController {
     }
   }
 
- 
   void onRefresh() {
     getRewardCoinsData();
   }

@@ -136,7 +136,7 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
     );
   }
 
-  Widget _buildRewardItem(RewardCoinItem record) {
+  Widget _buildRewardItem(RewardCoinBean record) {
     bool isExpired =
         record.diffDatetime?.toString().contains("Expired") ?? false;
 
@@ -200,12 +200,7 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
                       else
                         Row(
                           children: [
-                            Image.asset(
-                              'el_time_order.png'.icon,
-                              width: 12.w,
-                              height: 12.w,
-                              color: const Color(0xFFFFB6EA),
-                            ),
+                            Image.asset('el_time_order.png'.icon, width: 18.w, height: 18.w),
                             SizedBox(width: 4.w),
                             Text(
                               'Expires in ${record.diffDatetime ?? ""}',

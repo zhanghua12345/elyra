@@ -164,7 +164,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
-        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+        child: Image.asset('loading.gif'.icon, width: 80.w, height: 80.w),
       );
     }
 
@@ -193,7 +193,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
     return _buildContentArea(records);
   }
 
-  Widget _buildContentArea(List<OrderRecordItem> records) {
+  Widget _buildContentArea(List<OrderRecordBean> records) {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 20.h),
       itemCount: records.length,
@@ -214,9 +214,10 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                   children: [
                     Text(
                       record.title ?? (isCoin ? "Top Up" : "Purchase VIP"),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14.sp,
+                        fontSize: 14,
+                        fontFamily: 'PingFang SC',
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -224,8 +225,9 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                     Text(
                       record.createdAt ?? '',
                       style: TextStyle(
-                        color: const Color(0xFF999999),
+                        color: Colors.white.withOpacity(0.5),
                         fontSize: 12.sp,
+                        fontFamily: 'PingFang SC',
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -239,8 +241,8 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                     isCoin
                         ? '+${record.coins ?? 0}'
                         : '+${record.vipDays ?? 0} days',
-                    style: TextStyle(
-                      color: const Color(0xFFFF0BBA),
+                    style:  TextStyle(
+                      color: Color(0xFFFF0BBA),
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'DDinPro',

@@ -7,39 +7,44 @@ String orderRecordBeanToJson(OrderRecordBean data) =>
     json.encode(data.toJson());
 
 class OrderRecordBean {
-  OrderRecordBean({List<OrderRecordItem>? list, num? total}) {
-    _list = list;
-    _total = total;
-  }
+  String? id;
+  String? customerId;
+  num? coins;
+  String? payMoney;
+  String? payCurrency;
+  String? buyType;
+  String? createdAt;
+  num? vipDays;
+  String? status;
+  String? title;
+
+  OrderRecordBean({
+    this.id,
+    this.customerId,
+    this.coins,
+    this.payMoney,
+    this.payCurrency,
+    this.buyType,
+    this.createdAt,
+    this.vipDays,
+    this.status,
+    this.title,
+  });
 
   OrderRecordBean.fromJson(dynamic json) {
-    if (json['list'] != null) {
-      _list = [];
-      json['list'].forEach((v) {
-        _list?.add(OrderRecordItem.fromJson(v));
-      });
-    }
-    _total = json['total'];
+    id = json['id']?.toString();
+    customerId = json['customer_id']?.toString();
+    coins = json['coins'];
+    payMoney = json['pay_money']?.toString();
+    payCurrency = json['pay_currency']?.toString();
+    buyType = json['buy_type']?.toString();
+    createdAt = json['created_at']?.toString();
+    vipDays = json['vip_days'];
+    status = json['status']?.toString();
+    title = json['title']?.toString();
   }
 
-  List<OrderRecordItem>? _list;
-  num? _total;
-
-  List<OrderRecordItem>? get list => _list;
-  num? get total => _total;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    if (_list != null) {
-      map['list'] = _list?.map((v) => v.toJson()).toList();
-    }
-    map['total'] = _total;
-    return map;
-  }
-}
-
-class OrderRecordItem {
-  OrderRecordItem({
+  OrderRecordBean copyWith({
     String? id,
     String? customerId,
     num? coins,
@@ -50,66 +55,31 @@ class OrderRecordItem {
     num? vipDays,
     String? status,
     String? title,
-  }) {
-    _id = id;
-    _customerId = customerId;
-    _coins = coins;
-    _payMoney = payMoney;
-    _payCurrency = payCurrency;
-    _buyType = buyType;
-    _createdAt = createdAt;
-    _vipDays = vipDays;
-    _status = status;
-    _title = title;
-  }
-
-  OrderRecordItem.fromJson(dynamic json) {
-    _id = json['id']?.toString();
-    _customerId = json['customer_id']?.toString();
-    _coins = json['coins'];
-    _payMoney = json['pay_money']?.toString();
-    _payCurrency = json['pay_currency']?.toString();
-    _buyType = json['buy_type']?.toString();
-    _createdAt = json['created_at']?.toString();
-    _vipDays = json['vip_days'];
-    _status = json['status']?.toString();
-    _title = json['title']?.toString();
-  }
-
-  String? _id;
-  String? _customerId;
-  num? _coins;
-  String? _payMoney;
-  String? _payCurrency;
-  String? _buyType;
-  String? _createdAt;
-  num? _vipDays;
-  String? _status;
-  String? _title;
-
-  String? get id => _id;
-  String? get customerId => _customerId;
-  num? get coins => _coins;
-  String? get payMoney => _payMoney;
-  String? get payCurrency => _payCurrency;
-  String? get buyType => _buyType;
-  String? get createdAt => _createdAt;
-  num? get vipDays => _vipDays;
-  String? get status => _status;
-  String? get title => _title;
+  }) => OrderRecordBean(
+    id: id ?? this.id,
+    customerId: customerId ?? this.customerId,
+    coins: coins ?? this.coins,
+    payMoney: payMoney ?? this.payMoney,
+    payCurrency: payCurrency ?? this.payCurrency,
+    buyType: buyType ?? this.buyType,
+    createdAt: createdAt ?? this.createdAt,
+    vipDays: vipDays ?? this.vipDays,
+    status: status ?? this.status,
+    title: title ?? this.title,
+  );
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['id'] = _id;
-    map['customer_id'] = _customerId;
-    map['coins'] = _coins;
-    map['pay_money'] = _payMoney;
-    map['pay_currency'] = _payCurrency;
-    map['buy_type'] = _buyType;
-    map['created_at'] = _createdAt;
-    map['vip_days'] = _vipDays;
-    map['status'] = _status;
-    map['title'] = _title;
+    map['id'] = id;
+    map['customer_id'] = customerId;
+    map['coins'] = coins;
+    map['pay_money'] = payMoney;
+    map['pay_currency'] = payCurrency;
+    map['buy_type'] = buyType;
+    map['created_at'] = createdAt;
+    map['vip_days'] = vipDays;
+    map['status'] = status;
+    map['title'] = title;
     return map;
   }
 }
