@@ -1,3 +1,4 @@
+import 'package:elyra/bean/order_record_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_me/sub_page/order_recorder/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -47,8 +48,9 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                   child: SmartRefresher(
                     controller: controller.refreshController,
                     enablePullDown: true,
-                    enablePullUp: false,
+                    enablePullUp: true,
                     onRefresh: controller.onRefresh,
+                    onLoading: controller.onLoadMore,
                     header: const ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
@@ -58,6 +60,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                       completeText: 'Refresh completed',
                       failedText: 'Refresh failed',
                     ),
+                    footer: const CustomFooter(builder: _buildFooter),
                     child: _buildContent(),
                   ),
                 ),
@@ -175,9 +178,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
       );
     }
 
-    final records = controller.state.tabIndex == 0
-        ? controller.state.coinRecords
-        : controller.state.vipRecords;
+    final records = controller.state.currentList;
 
     if (records.isEmpty) {
       return ElNoDataWidget(
@@ -191,7 +192,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
     return _buildContentArea(records);
   }
 
-  Widget _buildContentArea(List<Map<String, dynamic>> records) {
+  Widget _buildContentArea(List<OrderRecordItem> records) {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 20.h),
       itemCount: records.length,
@@ -199,46 +200,100 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
           Divider(color: Colors.white.withOpacity(0.1), height: 1.h),
       itemBuilder: (context, index) {
         final record = records[index];
+        final isCoin = controller.state.tabIndex == 0;
+
         return Container(
           padding: EdgeInsets.symmetric(vertical: 16.h),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      record.title ?? (isCoin ? "Top Up" : "Purchase VIP"),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      record.createdAt ?? '',
+                      style: TextStyle(
+                        color: const Color(0xFF999999),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    record['title'] ?? '',
+                    isCoin
+                        ? '+${record.coins ?? 0}'
+                        : '+${record.vipDays ?? 0} days',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: const Color(0xFFFF0BBA),
                       fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'DDinPro',
                     ),
                   ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    record['time'] ?? '',
-                    style: TextStyle(
-                      color: const Color(0xFF999999),
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
+                  if (record.payMoney != null)
+                    Padding(
+                      padding: EdgeInsets.only(top: 4.h),
+                      child: Text(
+                        '${record.payCurrency ?? '\$'}${record.payMoney}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 10.sp,
+                        ),
+                      ),
                     ),
-                  ),
                 ],
-              ),
-              Text(
-                record['value'] ?? '',
-                style: TextStyle(
-                  color: const Color(0xFFFF0BBA),
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'DDinPro',
-                ),
               ),
             ],
           ),
         );
       },
     );
+  }
+
+  static Widget _buildFooter(BuildContext context, LoadStatus? mode) {
+    Widget body;
+    if (mode == LoadStatus.idle) {
+      body = const Text(
+        "Pull up load",
+        style: TextStyle(color: Colors.white54),
+      );
+    } else if (mode == LoadStatus.loading) {
+      body = const SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    } else if (mode == LoadStatus.failed) {
+      body = const Text(
+        "Load Failed! Click retry!",
+        style: TextStyle(color: Colors.white54),
+      );
+    } else if (mode == LoadStatus.canLoading) {
+      body = const Text(
+        "Release to load more",
+        style: TextStyle(color: Colors.white54),
+      );
+    } else {
+      body = const Text(
+        "No more data",
+        style: TextStyle(color: Colors.white54),
+      );
+    }
+    return SizedBox(height: 55.0, child: Center(child: body));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:elyra/bean/order_record_bean.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 
 class OrderRecorderState {
@@ -6,14 +7,19 @@ class OrderRecorderState {
   LoadStatusType loadStatus = LoadStatusType.loading;
   bool isLoading = false;
 
-  // 0: Coin Record, 1: VIP Record
+  // 0: Coin Record (coins), 1: VIP Record (vip)
   int tabIndex = 0;
 
-  // 添加你需要的其他状态变量
-  List<Map<String, dynamic>> coinRecords = [];
-  List<Map<String, dynamic>> vipRecords = [];
+  // 分页信息
+  int currentPage = 1;
+  int pageSize = 20;
+  bool hasMore = true;
 
-  // 示例：用于分页
-  // int currentPage = 1;
-  // bool hasMore = true;
+  // 订单记录数据列表
+  List<OrderRecordItem> coinRecords = [];
+  List<OrderRecordItem> vipRecords = [];
+
+  // 获取当前Tab对应的列表
+  List<OrderRecordItem> get currentList =>
+      tabIndex == 0 ? coinRecords : vipRecords;
 }
