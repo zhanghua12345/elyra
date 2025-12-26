@@ -31,6 +31,9 @@ class OrderRecorderPageController extends GetxController {
     if (isRefresh) {
       state.currentPage = 1;
       state.hasMore = true;
+      state.loadStatus = LoadStatusType.loading;
+      update();
+      await Future.delayed(Duration(milliseconds: 500));
     }
 
     state.isLoading = true;

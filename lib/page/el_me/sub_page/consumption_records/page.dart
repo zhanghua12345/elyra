@@ -99,7 +99,7 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
-        child: Image.asset('loading.gif'.icon, width: 80.w, height: 80.w),
+        child: Image.asset('loading.gif'.icon, width: 120.w, height: 120.w),
       );
     }
 
@@ -118,7 +118,9 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
         imagePath: 'ely_nodata.png',
         imageWidth: 180,
         imageHeight: 223,
+        title: null,
         description: 'There is no data for the moment.',
+        buttonText: null,
       );
     }
 

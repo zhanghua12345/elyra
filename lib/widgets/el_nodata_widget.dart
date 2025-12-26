@@ -95,6 +95,8 @@ class ElNoDataWidget extends StatelessWidget {
               ),
             ),
           ],
+            SizedBox(height: 200.h),
+          
         ],
       ),
     );

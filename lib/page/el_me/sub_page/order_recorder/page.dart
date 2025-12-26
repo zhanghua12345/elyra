@@ -164,7 +164,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
-        child: Image.asset('loading.gif'.icon, width: 80.w, height: 80.w),
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
       );
     }
 
@@ -178,17 +178,18 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
       );
     }
 
-    final records = controller.state.currentList;
-
-    if (records.isEmpty) {
+    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
       return ElNoDataWidget(
         imagePath: 'ely_nodata.png',
         imageWidth: 180,
         imageHeight: 223,
+        title: null,
         description: 'There is no data for the moment.',
+        buttonText: null,
       );
     }
 
+    final records = controller.state.currentList;
     return _buildContentArea(records);
   }
 
