@@ -57,4 +57,8 @@ class Apis {
   static const String versionControl = "/customer/versionControl"; // get 版本检查更新
   static const String sendCoinList =
       "/sendCoinList"; // 赠币列表 post current_page page_size
+  static const String consumptionList =
+      "/getCustomerBuyRecords"; // 消费列表 get current_page page_size
+  static const String purchaseList =
+      "/getCustomerOrder"; // 充值列表 get current_page page_size buy_type
 }
