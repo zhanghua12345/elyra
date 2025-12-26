@@ -369,7 +369,7 @@ class _MePageState extends State<MePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                isVip ? 'VIP Activated' : 'Not Activated',
+                                isVip ? 'Activated' : 'Not Activated',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16.sp,
@@ -381,8 +381,11 @@ class _MePageState extends State<MePage> {
                                 'All Dramas Free with VIP',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
+                                  fontFamily: 'DIN Black',
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.50,
+                                  letterSpacing: -0,
                                 ),
                               ),
                             ],
@@ -419,16 +422,23 @@ class _MePageState extends State<MePage> {
                           ),
                         ),
                       ),
-                    )
-                  else
-                    Image.asset(
-                      'el_me_guan.png'.icon,
-                      width: 87.w,
-                      height: 76.h,
                     ),
                 ],
               ),
             ),
+            if (isVip)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 20.w),
+                  child: Image.asset(
+                    'el_me_guan.png'.icon,
+                    width: 87.w,
+                    height: 76.h,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
             // Bottom elements
             if (!isVip)
               Positioned(
@@ -484,21 +494,24 @@ class _MePageState extends State<MePage> {
               )
             else
               Positioned(
-                left: 35.w,
+                left: 20.w,
                 bottom: 12.h,
                 child: Row(
                   children: [
                     Image.asset(
                       'el_me_time.png'.icon,
-                      width: 14.w,
-                      height: 14.w,
+                      width: 10.w,
+                      height: 10.w,
                     ),
                     SizedBox(width: 4.w),
                     Text(
                       'Expiration Time：${_formatVipTime(userInfo?.vipEndTime)}',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 11.sp,
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w500,
+                        height: 1,
                       ),
                     ),
                   ],
