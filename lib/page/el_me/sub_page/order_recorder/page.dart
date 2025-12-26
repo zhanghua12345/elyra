@@ -1,63 +1,64 @@
+import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_me/sub_page/order_recorder/controller.dart';
+import 'package:elyra/widgets/bad_status_widget.dart';
+import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class OrderRecorderPage extends StatelessWidget {
+class OrderRecorderPage extends StatefulWidget {
   const OrderRecorderPage({super.key});
+
+  @override
+  State<OrderRecorderPage> createState() => _OrderRecorderPageState();
+}
+
+class _OrderRecorderPageState extends State<OrderRecorderPage> {
+  late final OrderRecorderPageController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(OrderRecorderPageController());
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<OrderRecorderPageController>(
-      init: OrderRecorderPageController(),
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: GestureDetector(
-              onTap: () => Get.back(),
-              child: Container(
-                padding: EdgeInsets.all(12.w),
-                child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20.w),
-              ),
-            ),
-            title: Text(
-              'Order Records',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            centerTitle: true,
-          ),
           body: Container(
-            width: double.infinity,
-            height: double.infinity,
+            padding: EdgeInsets.only(top: ScreenUtil().statusBarHeight),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFFB0027C),
-                  const Color(0xFF44267C),
-                  const Color(0xFF280A62),
-                  const Color(0xFF16003E)
-                ],
+              image: DecorationImage(
+                image: AssetImage('ely_background_image.png'.icon),
+                fit: BoxFit.fill,
               ),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: ScreenUtil().statusBarHeight + 56.h),
+                _buildAppBar('Order Records'),
+                SizedBox(height: 6.h),
                 _buildTabSwitcher(controller),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
+                    enablePullDown: true,
+                    enablePullUp: false,
                     onRefresh: controller.onRefresh,
-                    child: _buildList(controller),
+                    header: const ClassicHeader(
+                      height: 40,
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull to refresh',
+                      releaseText: 'Release to refresh',
+                      refreshingText: 'Refreshing...',
+                      completeText: 'Refresh completed',
+                      failedText: 'Refresh failed',
+                    ),
+                    child: _buildContent(),
                   ),
                 ),
               ],
@@ -68,13 +69,43 @@ class OrderRecorderPage extends StatelessWidget {
     );
   }
 
+  Widget _buildAppBar(String title) {
+    return Container(
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top: 4.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => Get.back(),
+            child: Padding(
+              padding: EdgeInsets.all(5.w),
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
+          ),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(width: 30.w),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTabSwitcher(OrderRecorderPageController controller) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       width: 343.w,
       height: 48.h,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(40.w),
       ),
       child: Stack(
@@ -94,38 +125,8 @@ class OrderRecorderPage extends StatelessWidget {
           ),
           Row(
             children: [
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => controller.switchTab(0),
-                  child: Center(
-                    child: Text(
-                      'Coin Record',
-                      style: TextStyle(
-                        color: controller.state.tabIndex == 0 ? Colors.white : Colors.white.withValues(alpha: 0.5),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => controller.switchTab(1),
-                  child: Center(
-                    child: Text(
-                      'VIP Record',
-                      style: TextStyle(
-                        color: controller.state.tabIndex == 1 ? Colors.white : Colors.white.withValues(alpha: 0.5),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _buildTabItem(controller, 0, 'Coin Record'),
+              _buildTabItem(controller, 1, 'VIP Record'),
             ],
           ),
         ],
@@ -133,18 +134,69 @@ class OrderRecorderPage extends StatelessWidget {
     );
   }
 
-  Widget _buildList(OrderRecorderPageController controller) {
-    final records = controller.state.tabIndex == 0 
-        ? controller.state.coinRecords 
+  Widget _buildTabItem(
+    OrderRecorderPageController controller,
+    int index,
+    String title,
+  ) {
+    final isSelected = controller.state.tabIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => controller.switchTab(index),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    if (controller.state.loadStatus == LoadStatusType.loading) {
+      return Center(
+        child: Image.asset('loading.gif'.icon, width: 80.w, height: 80.w),
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
+      );
+    }
+
+    final records = controller.state.tabIndex == 0
+        ? controller.state.coinRecords
         : controller.state.vipRecords;
 
+    if (records.isEmpty) {
+      return ElNoDataWidget(
+        imagePath: 'ely_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        description: 'There is no data for the moment.',
+      );
+    }
+
+    return _buildContentArea(records);
+  }
+
+  Widget _buildContentArea(List<Map<String, dynamic>> records) {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 20.h),
       itemCount: records.length,
-      separatorBuilder: (context, index) => Divider(
-        color: Colors.white.withValues(alpha: 0.1),
-        height: 1.h,
-      ),
+      separatorBuilder: (context, index) =>
+          Divider(color: Colors.white.withOpacity(0.1), height: 1.h),
       itemBuilder: (context, index) {
         final record = records[index];
         return Container(
@@ -156,7 +208,7 @@ class OrderRecorderPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    record['title'],
+                    record['title'] ?? '',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14.sp,
@@ -165,7 +217,7 @@ class OrderRecorderPage extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    record['time'],
+                    record['time'] ?? '',
                     style: TextStyle(
                       color: const Color(0xFF999999),
                       fontSize: 12.sp,
@@ -175,7 +227,7 @@ class OrderRecorderPage extends StatelessWidget {
                 ],
               ),
               Text(
-                record['value'],
+                record['value'] ?? '',
                 style: TextStyle(
                   color: const Color(0xFFFF0BBA),
                   fontSize: 14.sp,

@@ -29,57 +29,41 @@ class _MyWalletPageState extends State<MyWalletPage> {
     return GetBuilder<MyWalletController>(
       builder: (controller) {
         return Scaffold(
-          backgroundColor: Colors.black,
-          body: Stack(
-            children: [
-              // Background Gradient matching a.html (135deg)
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment(-0.7, -0.7), // roughly 135deg
-                    end: Alignment(0.7, 0.7),
-                    colors: [
-                      Color(0xFFB0027C),
-                      Color(0xFF44267C),
-                      Color(0xFF280A62),
-                      Color(0xFF16003E),
-                    ],
+          extendBodyBehindAppBar: true,
+          body: Container(
+            padding: EdgeInsets.only(top: ScreenUtil().statusBarHeight),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('ely_background_image.png'.icon),
+                fit: BoxFit.fill,
+              ),
+            ),
+            child: Column(
+              children: [
+                _buildAppBar('My Wallet'),
+                SizedBox(height: 6.h),
+                Expanded(
+                  child: SmartRefresher(
+                    controller: controller.refreshController,
+                    enablePullDown: true,
+                    enablePullUp: false,
+                    onRefresh: () {
+                      controller.onRefresh();
+                    },
+                    header: const ClassicHeader(
+                      height: 40,
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull to refresh',
+                      releaseText: 'Release to refresh',
+                      refreshingText: 'Refreshing...',
+                      completeText: 'Refresh completed',
+                      failedText: 'Refresh failed',
+                    ),
+                    child: _buildContent(),
                   ),
                 ),
-              ),
-
-              // Content
-              SafeArea(
-                child: Column(
-                  children: [
-                    _buildAppBar('My Wallet'),
-                    SizedBox(height: 6.h),
-                    Expanded(
-                      child: SmartRefresher(
-                        controller: controller.refreshController,
-                        enablePullDown: true,
-                        enablePullUp: false,
-                        onRefresh: () {
-                          controller.onRefresh();
-                        },
-                        header: const ClassicHeader(
-                          height: 40,
-                          textStyle: TextStyle(color: Colors.white),
-                          idleText: 'Pull to refresh',
-                          releaseText: 'Release to refresh',
-                          refreshingText: 'Refreshing...',
-                          completeText: 'Refresh completed',
-                          failedText: 'Refresh failed',
-                        ),
-                        child: _buildContent(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -120,7 +104,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
-        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+        child: Image.asset('loading.gif'.icon, width: 80.w, height: 80.w),
       );
     }
 
@@ -214,7 +198,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
               alignment: Alignment.center,
               child: Text(
                 'Store',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontFamily: 'PingFang SC',
@@ -253,7 +237,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
             SizedBox(height: 4.h),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
                 fontFamily: 'PingFang SC',
@@ -294,7 +278,11 @@ class _MyWalletPageState extends State<MyWalletPage> {
     );
   }
 
-  Widget _buildMenuItem(String title, {VoidCallback? onTap,bool isLast = false,}) {
+  Widget _buildMenuItem(
+    String title, {
+    VoidCallback? onTap,
+    bool isLast = false,
+  }) {
     return Column(
       children: [
         GestureDetector(
@@ -308,7 +296,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontFamily: 'Inter',
@@ -316,7 +304,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
                   ),
                 ),
                 Image.asset(
-                  'ely_right.png'.icon, // Using the user-specified image name
+                  'ely_right.png'.icon,
                   width: 10.w,
                   height: 10.w,
                   fit: BoxFit.contain,
@@ -326,13 +314,13 @@ class _MyWalletPageState extends State<MyWalletPage> {
           ),
         ),
         if (!isLast)
-        Divider(
-          color: Colors.white.withOpacity(0.1),
-          height: 1,
-          thickness: 1,
-          indent: 16.w,
-          endIndent: 16.w,
-        ),
+          Divider(
+            color: Colors.white.withOpacity(0.1),
+            height: 1,
+            thickness: 1,
+            indent: 16.w,
+            endIndent: 16.w,
+          ),
       ],
     );
   }
