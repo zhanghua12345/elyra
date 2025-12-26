@@ -1,4 +1,4 @@
-import 'package:elyra/bean/reward_coin_bean.dart';
+import 'package:elyra/bean/order_record_bean.dart';
 import 'package:elyra/page/el_me/sub_page/order_recorder/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
@@ -15,7 +15,7 @@ class OrderRecorderController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    getRewardCoinsData();
+    getOrderData();
   }
 
   @override
@@ -24,7 +24,7 @@ class OrderRecorderController extends GetxController {
     super.onClose();
   }
 
-  getRewardCoinsData({
+  getOrderData({
     RefreshController? refreshCtrl,
     bool loadMore = false,
   }) async {
@@ -38,16 +38,19 @@ class OrderRecorderController extends GetxController {
     state.isLoading = true;
     update();
     try {
+      String buyType = state.tabIndex == 0 ? 'coins' : 'vip';
+
       // 构造请求参数
       Map<String, dynamic> params = {
         'current_page': loadMore ? state.currentPage + 1 : 1,
         'page_size': state.pageSize,
+        'buy_type': buyType,
       };
 
       ApiResponse response = await HttpClient().request(
-        Apis.sendCoinList,
-        method: HttpMethod.post,
-        data: params,
+        Apis.purchaseList,
+        method: HttpMethod.get,
+        queryParameters: params,
       );
 
       if (refreshCtrl != null) {
@@ -74,10 +77,17 @@ class OrderRecorderController extends GetxController {
           if (response.data['list'] != null &&
               response.data['list'].length > 0) {
             try {
-              List<RewardCoinBean> newItems = response.data['list']
-                  .map<RewardCoinBean>((item) => RewardCoinBean.fromJson(item))
+              List<OrderRecordBean> newItems = response.data['list']
+                  .map<OrderRecordBean>(
+                    (item) => OrderRecordBean.fromJson(item),
+                  )
                   .toList();
-              state.rewardList.addAll(newItems);
+
+              if (state.tabIndex == 0) {
+                state.coinRecords.addAll(newItems);
+              } else {
+                state.vipRecords.addAll(newItems);
+              }
             } catch (e) {
               print('Error mapping new items: $e');
               // 如果解析失败，我们仍然更新状态以停止加载
@@ -86,16 +96,22 @@ class OrderRecorderController extends GetxController {
           }
         } else {
           // 刷新数据
-          state.rewardList.clear();
+          state.coinRecords.clear();
+          state.vipRecords.clear();
 
           if (response.data['list'] != null &&
               response.data['list'].length > 0) {
             try {
-              List<RewardCoinBean> newItems = response.data['list']
-                  .map<RewardCoinBean>((item) => RewardCoinBean.fromJson(item))
+              List<OrderRecordBean> newItems = response.data['list']
+                  .map<OrderRecordBean>(
+                    (item) => OrderRecordBean.fromJson(item),
+                  )
                   .toList();
-              state.rewardList = newItems;
-
+              if (state.tabIndex == 0) {
+                state.coinRecords = newItems;
+              } else {
+                state.vipRecords = newItems;
+              }
               state.loadStatus = LoadStatusType.loadSuccess;
             } catch (e) {
               print('Error mapping items: $e');
@@ -127,14 +143,22 @@ class OrderRecorderController extends GetxController {
   }
 
   void onRefresh() {
-    getRewardCoinsData();
+    getOrderData();
   }
 
   void onLoadMore() {
     if (state.hasMore) {
-      getRewardCoinsData(loadMore: true);
+      getOrderData(loadMore: true);
     } else {
       refreshController.loadNoData(); // 没有更多数据
     }
+  }
+  // 切换 Tab
+  void switchTab(int index) {
+    if (state.tabIndex == index) return;
+    state.tabIndex = index;
+    state.loadStatus = LoadStatusType.loading;
+    update();
+    getOrderData();
   }
 }

@@ -8,15 +8,9 @@ String orderRecordBeanToJson(OrderRecordBean data) =>
 
 class OrderRecordBean {
   String? id;
-  String? customerId;
-  num? coins;
-  String? payMoney;
-  String? payCurrency;
-  String? buyType;
+   String? type;
   String? createdAt;
-  num? vipDays;
-  String? status;
-  String? title;
+  final String? value;
 
   OrderRecordBean({
     this.id,

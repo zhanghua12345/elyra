@@ -44,6 +44,8 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
               children: [
                 _buildAppBar('Reward Coins'),
                 SizedBox(height: 20.h),
+                _buildTabSwitcher(controller),
+                SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
@@ -170,7 +172,9 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            record.createdAt ?? "",
+                            record.type ?? "",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                             style: TextStyle(
                               color: const Color(0xFF999999),
                               fontSize: 12,
@@ -182,9 +186,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                           ),
                           SizedBox(height: 8.h),
                           Text(
-                            record.type ?? "",
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                            record.createdAt ?? "",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -199,7 +201,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                     ),
                     SizedBox(width: 30.w),
                     Text(
-                      '+${record.coins ?? 0}',
+                      '+${record.value ?? 0}',
                       style: TextStyle(
                         color: const Color(0xFFFF0BBA),
                         fontSize: 14,
@@ -211,68 +213,15 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 8.h),
-                // Bottom Row: Expiration (Left), Remaining (Right)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (isExpired)
-                      Text(
-                        'Expired',
-                        style: TextStyle(
-                          color: const Color(0xFF8B8B8B) /* 灰色 */,
-                          fontSize: 12,
-                          fontFamily: 'PingFang SC',
-                          fontWeight: FontWeight.w400,
-                          height: 1,
-                          letterSpacing: -0,
-                        ),
-                      )
-                    else
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            'el_time_order.png'.icon,
-                            width: 12.w,
-                            height: 12.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'Expires in ${record.diffDatetime ?? ""}',
-                            style: TextStyle(
-                              color: const Color(0xFFFF0BBA),
-                              fontSize: 12,
-                              fontFamily: 'PingFang SC',
-                              fontWeight: FontWeight.w400,
-                              height: 1,
-                              letterSpacing: -0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    Text(
-                      '${record.leftCoins ?? 0}',
-                      style: TextStyle(
-                        color: const Color(0xFF8B8B8B) /* 灰色 */,
-                        fontSize: 12,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w400,
-                        height: 1,
-                        letterSpacing: -0,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
         ],
       ),
     );
-  },
-   Widget _buildTabSwitcher(OrderRecorderController controller) {
+  }
+
+  Widget _buildTabSwitcher(OrderRecorderController controller) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       width: 343.w,
