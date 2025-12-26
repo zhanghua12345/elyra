@@ -156,6 +156,38 @@ class _MePageState extends State<MePage> {
                         'ID: ${userInfo?.customerId ?? ''}',
                         style: TextStyle(color: Colors.white, fontSize: 12.sp),
                       ),
+                      SizedBox(height: 4.w),
+                      if (userInfo?.isVip == true)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 2.h,
+                            horizontal: 9.w,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'el_me_vip_icon.png'.icon,
+                                width: 14.w,
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                'VIP',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontFamily: 'PingFang SC',
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.27,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -330,7 +362,7 @@ class _MePageState extends State<MePage> {
   /// VIP
   Widget _buildVip() {
     final userInfo = controller.state.customerInfo;
-    final bool isVip = userInfo?.isVip == true && userInfo?.isTourist != true;
+    final bool isVip = userInfo?.isVip == true;
 
     return GestureDetector(
       onTap: () => Get.toNamed('/store'),
