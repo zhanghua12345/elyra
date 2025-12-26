@@ -84,7 +84,7 @@ class UserUtil with WidgetsBindingObserver {
         final oldToken = token ?? '';
         if (oldToken.isNotEmpty) {
           debugPrint('🔴 [UserUtil] 账号注销：用旧token调用leaveApp');
-          await leaveApp(postAuthorization: oldToken);
+          // await leaveApp(postAuthorization: oldToken);
           stopOnlineTimer();
         }
       }

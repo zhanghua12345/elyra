@@ -60,11 +60,6 @@ class SettingPageController extends GetxController {
   }
 
   void logOut() {
-    final meController = Get.find<MePageController>();
-    // Default to true (isTourist) if null to be safe
-    final isTourist = meController.state.customerInfo?.isTourist ?? true;
-    final isLogin = !UserUtil().token.isNullString && !isTourist;
-
     final context = Get.context;
     if (context == null) return;
 

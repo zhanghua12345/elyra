@@ -1,6 +1,9 @@
 import 'package:elyra/extend/el_string.dart';
+import 'package:elyra/page/el_me/controller.dart';
 import 'package:elyra/page/el_me/sub_page/el_account_logout/page.dart';
 import 'package:elyra/page/el_me/sub_page/el_setting/controller.dart';
+import 'package:elyra/utils/toast.dart';
+import 'package:elyra/utils/user_util.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +63,7 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 11.w, right: 11.w, top:4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -128,6 +131,14 @@ class _SettingPageState extends State<SettingPage> {
           SizedBox(height: 20.h),
           // Account Deletion
           _buildListTile('Account Deletion', () {
+            final meController = Get.find<MePageController>();
+            // Default to true (isTourist) if null to be safe
+            final isTourist =
+                meController.state.customerInfo?.isTourist ?? true;
+            if (isTourist) {
+              Message.show('Log In First');
+              return;
+            }
             Get.to(() => AccountLogoutPage());
           }),
           SizedBox(height: 12.h),
@@ -175,6 +186,13 @@ class _SettingPageState extends State<SettingPage> {
   Widget _buildLogOutButton() {
     return GestureDetector(
       onTap: () {
+        final meController = Get.find<MePageController>();
+        // Default to true (isTourist) if null to be safe
+        final isTourist = meController.state.customerInfo?.isTourist ?? true;
+        if (isTourist) {
+          Message.show('Log In First');
+          return;
+        }
         controller.logOut();
       },
       child: Container(

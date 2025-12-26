@@ -112,18 +112,18 @@ class AccountLogoutPageController extends GetxController {
   /// 处理账号注销回调
   Future<void> handleAccountLogout() async {
     debugPrint('账户注销回调');
-    
+
     // 调用 UserUtil.register 重新注册游客账号
     // isAccountLogout: true 会先用旧token调用leaveApp，再注册新账号
     await UserUtil().register(
-      toHome: false, 
+      toHome: false,
       refreshUserInfo: false,
-      isAccountLogout: true,  // 标记为账号注销，会先清理旧会话
+      isAccountLogout: true, // 标记为账号注销，会先清理旧会话
     );
-    
+
     // 回到个人中心
-    Get.back();
-    
+    Get.back(); // 返回到第二页
+    Get.back(); // 返回到第一页
     // 刷新个人中心和收藏页面
     UserUtil().refreshMeAndCollectPage();
   }

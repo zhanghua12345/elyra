@@ -142,7 +142,9 @@ class _MePageState extends State<MePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        userInfo?.isTourist == true
+                        userInfo?.isTourist == true ||
+                                (userInfo?.familyName == '' &&
+                                    userInfo?.givingName == '')
                             ? 'Visitor'
                             : '${userInfo?.familyName ?? ''} ${userInfo?.givingName ?? ''}',
                         style: TextStyle(
