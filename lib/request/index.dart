@@ -3,38 +3,58 @@ class Apis {
 
   static const String homeData = "/home/all-modules";
   static const String rankingData = "/homeRanking";
-  static const String categoryListAppendShortPlay = "/categoryListAppendShortPlay";
+  static const String categoryListAppendShortPlay =
+      "/categoryListAppendShortPlay";
   static const String videoList = "/videoList";
   static const String searchHots = "/search/hots"; // 热搜短剧 get
   static const String search = "/search"; // 搜索接口 get search
-  static const String myCollections = "/myCollections"; // 客户收藏列表 get current_page  page_size
+  static const String myCollections =
+      "/myCollections"; // 客户收藏列表 get current_page  page_size
   static const String collect = "/collect"; // 收藏 post short_play_id  video_id
-  static const String cancelCollect = "/cancelCollect"; // 取消收藏 post short_play_id
-  static const String history = "/myHistorys"; // 历史记录列表 get current_page  page_size
-  static const String createHistory = "/createHistory"; // 创建历史 post short_play_id  video_id
-  static const String recommands = "/getRecommands"; // 推荐 get current_page  page_size
-  static const String getVideoDetails = "/getVideoDetails"; // 视频详情 get short_play_id  video_id
-  static const String uploadHistorySeconds = "/uploadHistorySeconds"; // 上传播放进度 post short_play_id  video_id  play_seconds
-  static const String collectVideo = "/collect"; // 收藏视频 post short_play_id  video_id
-  static const String cancelCollectVideo = "/cancelCollect"; // 取消收藏视频 post short_play_id
-  static const String reportActivity = "/activeAfterWatchingVideo"; // 上报活动 post short_play_id  short_play_video_id  activity_id
+  static const String cancelCollect =
+      "/cancelCollect"; // 取消收藏 post short_play_id
+  static const String history =
+      "/myHistorys"; // 历史记录列表 get current_page  page_size
+  static const String createHistory =
+      "/createHistory"; // 创建历史 post short_play_id  video_id
+  static const String recommands =
+      "/getRecommands"; // 推荐 get current_page  page_size
+  static const String getVideoDetails =
+      "/getVideoDetails"; // 视频详情 get short_play_id  video_id
+  static const String uploadHistorySeconds =
+      "/uploadHistorySeconds"; // 上传播放进度 post short_play_id  video_id  play_seconds
+  static const String collectVideo =
+      "/collect"; // 收藏视频 post short_play_id  video_id
+  static const String cancelCollectVideo =
+      "/cancelCollect"; // 取消收藏视频 post short_play_id
+  static const String reportActivity =
+      "/activeAfterWatchingVideo"; // 上报活动 post short_play_id  short_play_video_id  activity_id
 
   static const String customerInfo = "/customer/info";
-  static const String login = "/customer/login";  // post 登录  avator  email  family_name  platform  third_id
-  static const String enterTheApp = "/customer/enterTheApp";  // post 进入应用
-  static const String leaveApp = "/customer/leaveApp";  // post 离开应用  PostAuthorization
+  static const String login =
+      "/customer/login"; // post 登录  avator  email  family_name  platform  third_id
+  static const String enterTheApp = "/customer/enterTheApp"; // post 进入应用
+  static const String leaveApp =
+      "/customer/leaveApp"; // post 离开应用  PostAuthorization
   static const String onLine = "/customer/onLine"; //在线用户统计(10分钟1次)
   static const String signOut = "/customer/signout"; // 退出登录
-  static const String logOff = "/customer/logoff";  // 注销账号 已经修改为H5注销
-  static const String register = "/customer/register";  // 401/402/初始化进入app 要传device_id等设备信息
+  static const String logOff = "/customer/logoff"; // 注销账号 已经修改为H5注销
+  static const String register =
+      "/customer/register"; // 401/402/初始化进入app 要传device_id等设备信息
 
   static const String reportEvent = "/event/add";
-  static const String getNoticeNum = "/noticeNum";  // 获取反馈通知数量
+  static const String getNoticeNum = "/noticeNum"; // 获取反馈通知数量
 
-  static const String paySettingsV4 = "/paySettingsV4";  // get 获取反馈通知数量 没参数
-  static const String createOrder = "/createOrder";  // post 创建订单（安卓/IOS金币、订阅支付动作调用这个）
-  static const String applePaid = "/applePaid";  // post applePaid（iOS金币、订阅支付结果调用这个）
-  static const String buyVideo = "/buy_video";  // post 购买单集短剧  short_play_id   video_id
-  static const String getRetainVipPaySetting = "/getRetainVipPaySetting";  // get 详情页退出支付弹框
-  static const String versionControl = "/customer/versionControl";  // get 版本检查更新
+  static const String paySettingsV4 = "/paySettingsV4"; // get 获取反馈通知数量 没参数
+  static const String createOrder =
+      "/createOrder"; // post 创建订单（安卓/IOS金币、订阅支付动作调用这个）
+  static const String applePaid =
+      "/applePaid"; // post applePaid（iOS金币、订阅支付结果调用这个）
+  static const String buyVideo =
+      "/buy_video"; // post 购买单集短剧  short_play_id   video_id
+  static const String getRetainVipPaySetting =
+      "/getRetainVipPaySetting"; // get 详情页退出支付弹框
+  static const String versionControl = "/customer/versionControl"; // get 版本检查更新
+  static const String sendCoinList =
+      "/sendCoinList"; // 赠币列表 post current_page page_size
 }

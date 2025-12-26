@@ -262,7 +262,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
         children: [
           _buildMenuItem(
             'Consumption records',
-            onTap: () => Get.toNamed(AppRoutes.orderRecorder),
+            onTap: () => Get.toNamed(AppRoutes.consumptionRecords),
           ),
           _buildMenuItem(
             'Purchase records',
@@ -270,7 +270,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
           ),
           _buildMenuItem(
             'Reward Coins',
-            onTap: () => Get.toNamed(AppRoutes.coinsPack),
+            onTap: () => Get.toNamed(AppRoutes.rewardCoins),
             isLast: true,
           ),
         ],

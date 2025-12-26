@@ -1,5 +1,6 @@
+import 'package:elyra/bean/reward_coin_bean.dart';
 import 'package:elyra/extend/el_string.dart';
-import 'package:elyra/page/test/controller.dart';
+import 'package:elyra/page/el_me/sub_page/reward_coins/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:flutter/material.dart';
@@ -8,31 +9,24 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class RewardCoinsPage extends StatefulWidget {
-  const TestPage({super.key});
+  const RewardCoinsPage({super.key});
 
   @override
-  State<TestPage> createState() => _TestPageState();
+  State<RewardCoinsPage> createState() => _RewardCoinsPageState();
 }
 
-class _TestPageState extends State<TestPage> {
-  late final TestPageController controller;
-  final TextEditingController _testController = TextEditingController();
+class _RewardCoinsPageState extends State<RewardCoinsPage> {
+  late final RewardCoinsController controller;
 
   @override
   void initState() {
     super.initState();
-    controller = Get.put(TestPageController());
-  }
-
-  @override
-  void dispose() {
-    _testController.dispose();
-    super.dispose();
+    controller = Get.put(RewardCoinsController());
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<TestPageController>(
+    return GetBuilder<RewardCoinsController>(
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -47,13 +41,13 @@ class _TestPageState extends State<TestPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('Test Page'),
+                _buildAppBar('Reward Coins'),
                 SizedBox(height: 6.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
                     enablePullDown: true,
-                    enablePullUp: false,
+                    enablePullUp: true,
                     onRefresh: controller.onRefresh,
                     header: ClassicHeader(
                       height: 40,
@@ -77,7 +71,7 @@ class _TestPageState extends State<TestPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 11.w, right: 11.w, top:4.h),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,7 +80,7 @@ class _TestPageState extends State<TestPage> {
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Padding(
-              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              padding: EdgeInsets.all(5.w),
               child: Image.asset('ely_back.png'.icon, height: 20.h),
             ),
           ),
@@ -99,7 +93,6 @@ class _TestPageState extends State<TestPage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // 右侧可以放置其他操作按钮，暂时留空
           SizedBox(width: 30.w),
         ],
       ),
@@ -134,16 +127,127 @@ class _TestPageState extends State<TestPage> {
       );
     }
 
-    return _buildContentArea();
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: controller.state.rewardList.length,
+      itemBuilder: (context, index) {
+        return _buildRewardItem(controller.state.rewardList[index]);
+      },
+    );
   }
 
-  Widget _buildContentArea() {
-    return SizedBox.expand(
-      child: Center(
-        child: Text(
-          'Content goes here',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
-        ),
+  Widget _buildRewardItem(RewardCoinItem record) {
+    bool isExpired =
+        record.diffDatetime?.toString().contains("Expired") ?? false;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 32.w),
+      child: Column(
+        children: [
+          // Top Line Divider
+          Container(
+            width: 343.w,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  width: 1,
+                  strokeAlign: BorderSide.strokeAlignCenter,
+                  color: Colors.white.withOpacity(0.10),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Left Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        record.createdAt ?? "",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 12.sp,
+                          fontFamily: 'PingFang SC',
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        record.type ?? "",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'PingFang SC',
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      if (isExpired)
+                        Text(
+                          'Expired',
+                          style: TextStyle(
+                            color: const Color(0xFFFF0BBA),
+                            fontSize: 12.sp,
+                            fontFamily: 'PingFang SC',
+                          ),
+                        )
+                      else
+                        Row(
+                          children: [
+                            Image.asset(
+                              'el_time_order.png'.icon,
+                              width: 12.w,
+                              height: 12.w,
+                              color: const Color(0xFFFFB6EA),
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              'Expires in ${record.diffDatetime ?? ""}',
+                              style: TextStyle(
+                                color: const Color(0xFFFFB6EA),
+                                fontSize: 12.sp,
+                                fontFamily: 'PingFang SC',
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                // Right Column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${record.coins ?? 0}',
+                      style: TextStyle(
+                        color: const Color(0xFFFF0BBA),
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'DDinPro',
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Remaining: ${record.leftCoins ?? 0}',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12.sp,
+                        fontFamily: 'PingFang SC',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

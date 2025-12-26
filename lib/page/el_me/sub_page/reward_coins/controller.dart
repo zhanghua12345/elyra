@@ -1,10 +1,13 @@
-import 'package:elyra/page/test/state.dart';
+import 'package:elyra/bean/reward_coin_bean.dart';
+import 'package:elyra/page/el_me/sub_page/reward_coins/state.dart';
+import 'package:elyra/request/http.dart';
+import 'package:elyra/request/index.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 
-class TestPageController extends GetxController {
-  final state = TestState();
+class RewardCoinsController extends GetxController {
+  final state = RewardCoinsState();
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );
@@ -12,7 +15,6 @@ class TestPageController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    // 页面准备完成后执行的操作
     loadData();
   }
 
@@ -23,31 +25,76 @@ class TestPageController extends GetxController {
   }
 
   // 加载数据的方法
-  void loadData() async {
+  Future<void> loadData({bool isRefresh = true}) async {
     if (state.isLoading) return;
+
+    if (isRefresh) {
+      state.currentPage = 1;
+      state.hasMore = true;
+    }
+
     state.isLoading = true;
     try {
-      // 模拟加载数据
-      await Future.delayed(Duration(seconds: 2));
+      final response = await HttpClient().request(
+        Apis.sendCoinList,
+        method: HttpMethod.post,
+        data: {"current_page": state.currentPage, "page_size": state.pageSize},
+      );
 
-      // 加载成功
-      state.loadStatus = LoadStatusType.loadSuccess;
+      if (response.success && response.data != null) {
+        final rewardBean = RewardCoinBean.fromJson(response.data);
+        final list = rewardBean.list ?? [];
+
+        if (isRefresh) {
+          state.rewardList = list;
+        } else {
+          state.rewardList.addAll(list);
+        }
+
+        // 判断是否还有更多数据
+        state.hasMore = list.length >= state.pageSize;
+        state.currentPage++;
+
+        state.loadStatus = state.rewardList.isEmpty
+            ? LoadStatusType.loadNoData
+            : LoadStatusType.loadSuccess;
+      } else {
+        if (isRefresh) {
+          state.loadStatus = LoadStatusType.loadFailed;
+        }
+      }
       update();
     } catch (err) {
-      // 错误处理
-      state.loadStatus = LoadStatusType.loadFailed;
+      if (isRefresh) {
+        state.loadStatus = LoadStatusType.loadFailed;
+      }
       update();
     } finally {
       state.isLoading = false;
-
-      // 确保刷新控制器正确完成
-      refreshController.refreshCompleted();
+      if (isRefresh) {
+        refreshController.refreshCompleted();
+      } else {
+        if (state.hasMore) {
+          refreshController.loadComplete();
+        } else {
+          refreshController.loadNoData();
+        }
+      }
       update();
     }
   }
 
   // 下拉刷新
   void onRefresh() {
-    loadData();
+    loadData(isRefresh: true);
+  }
+
+  // 上拉加载更多
+  void onLoadMore() {
+    if (state.hasMore) {
+      loadData(isRefresh: false);
+    } else {
+      refreshController.loadNoData();
+    }
   }
 }
