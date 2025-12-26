@@ -42,7 +42,7 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar('Reward Coins'),
-                SizedBox(height: 6.h),
+                SizedBox(height: 20.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
@@ -159,7 +159,7 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h,horizontal: 16.w),
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
             child: Column(
               children: [
                 // Top Row: time & type (Left), coins (Right)
@@ -167,34 +167,39 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          record.createdAt ?? "",
-                          style: TextStyle(
-                            color: const Color(0xFF999999),
-                            fontSize: 12,
-                            fontFamily: 'PingFang SC',
-                            fontWeight: FontWeight.w400,
-                            height: 1,
-                            letterSpacing: -0,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            record.createdAt ?? "",
+                            style: TextStyle(
+                              color: const Color(0xFF999999),
+                              fontSize: 12,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w400,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          record.type ?? "",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontFamily: 'PingFang SC',
-                            fontWeight: FontWeight.w600,
-                            height: 1,
-                            letterSpacing: -0,
+                          SizedBox(height: 8.h),
+                          Text(
+                            record.type ?? "",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w600,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    SizedBox(width: 30.w),
                     Text(
                       '+${record.coins ?? 0}',
                       style: TextStyle(

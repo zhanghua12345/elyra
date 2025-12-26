@@ -1,4 +1,5 @@
 import 'package:elyra/bean/order_record_bean.dart';
+import 'package:elyra/bean/reward_coin_bean.dart';
 import 'package:elyra/extend/el_string.dart';
 import 'package:elyra/page/el_me/sub_page/order_recorder/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
@@ -16,17 +17,17 @@ class OrderRecorderPage extends StatefulWidget {
 }
 
 class _OrderRecorderPageState extends State<OrderRecorderPage> {
-  late final OrderRecorderPageController controller;
+  late final OrderRecorderController controller;
 
   @override
   void initState() {
     super.initState();
-    controller = Get.put(OrderRecorderPageController());
+    controller = Get.put(OrderRecorderController());
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<OrderRecorderPageController>(
+    return GetBuilder<OrderRecorderController>(
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -41,17 +42,15 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAppBar('Order Records'),
-                SizedBox(height: 6.h),
-                _buildTabSwitcher(controller),
+                _buildAppBar('Reward Coins'),
+                SizedBox(height: 20.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
                     enablePullDown: true,
                     enablePullUp: true,
                     onRefresh: controller.onRefresh,
-                    onLoading: controller.onLoadMore,
-                    header: const ClassicHeader(
+                    header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
                       idleText: 'Pull to refresh',
@@ -60,7 +59,6 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
                       completeText: 'Refresh completed',
                       failedText: 'Refresh failed',
                     ),
-                    footer: const CustomFooter(builder: _buildFooter),
                     child: _buildContent(),
                   ),
                 ),
@@ -89,7 +87,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
           ),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontFamily: 'PingFang SC',
@@ -102,7 +100,179 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
     );
   }
 
-  Widget _buildTabSwitcher(OrderRecorderPageController controller) {
+  Widget _buildContent() {
+    if (controller.state.loadStatus == LoadStatusType.loading) {
+      return Center(
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
+      return ElNoDataWidget(
+        imagePath: 'ely_error.png',
+        title: 'No connection',
+        description: 'Please check your network',
+        buttonText: 'Try again',
+        onButtonPressed: controller.onRefresh,
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
+      return ElNoDataWidget(
+        imagePath: 'ely_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        title: null,
+        description: 'There is no data for the moment.',
+        buttonText: null,
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: controller.state.coinRecords.length,
+      itemBuilder: (context, index) {
+        return _buildRewardItem(controller.state.coinRecords[index]);
+      },
+    );
+  }
+
+  Widget _buildRewardItem(OrderRecordBean record) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        children: [
+          // Top Line Divider
+          Container(
+            width: 343.w,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  width: 1,
+                  strokeAlign: BorderSide.strokeAlignCenter,
+                  color: Colors.white.withOpacity(0.10),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+            child: Column(
+              children: [
+                // Top Row: time & type (Left), coins (Right)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            record.createdAt ?? "",
+                            style: TextStyle(
+                              color: const Color(0xFF999999),
+                              fontSize: 12,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w400,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            record.type ?? "",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w600,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 30.w),
+                    Text(
+                      '+${record.coins ?? 0}',
+                      style: TextStyle(
+                        color: const Color(0xFFFF0BBA),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: -0,
+                        fontFamily: 'DDinPro',
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.h),
+                // Bottom Row: Expiration (Left), Remaining (Right)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (isExpired)
+                      Text(
+                        'Expired',
+                        style: TextStyle(
+                          color: const Color(0xFF8B8B8B) /* 灰色 */,
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                          height: 1,
+                          letterSpacing: -0,
+                        ),
+                      )
+                    else
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'el_time_order.png'.icon,
+                            width: 12.w,
+                            height: 12.w,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Expires in ${record.diffDatetime ?? ""}',
+                            style: TextStyle(
+                              color: const Color(0xFFFF0BBA),
+                              fontSize: 12,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w400,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    Text(
+                      '${record.leftCoins ?? 0}',
+                      style: TextStyle(
+                        color: const Color(0xFF8B8B8B) /* 灰色 */,
+                        fontSize: 12,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                        letterSpacing: -0,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  },
+   Widget _buildTabSwitcher(OrderRecorderController controller) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       width: 343.w,
@@ -138,7 +308,7 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
   }
 
   Widget _buildTabItem(
-    OrderRecorderPageController controller,
+    OrderRecorderController controller,
     int index,
     String title,
   ) {
@@ -159,144 +329,5 @@ class _OrderRecorderPageState extends State<OrderRecorderPage> {
         ),
       ),
     );
-  }
-
-  Widget _buildContent() {
-    if (controller.state.loadStatus == LoadStatusType.loading) {
-      return Center(
-        child: Image.asset('loading.gif'.icon, width: 80.w, height: 80.w),
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadFailed) {
-      return ElNoDataWidget(
-        imagePath: 'ely_error.png',
-        title: 'No connection',
-        description: 'Please check your network',
-        buttonText: 'Try again',
-        onButtonPressed: controller.onRefresh,
-      );
-    }
-
-    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
-      return ElNoDataWidget(
-        imagePath: 'ely_nodata.png',
-        imageWidth: 180,
-        imageHeight: 223,
-        title: null,
-        description: 'There is no data for the moment.',
-        buttonText: null,
-      );
-    }
-
-    final records = controller.state.currentList;
-    return _buildContentArea(records);
-  }
-
-  Widget _buildContentArea(List<OrderRecordBean> records) {
-    return ListView.separated(
-      padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 20.h),
-      itemCount: records.length,
-      separatorBuilder: (context, index) =>
-          Divider(color: Colors.white.withOpacity(0.1), height: 1.h),
-      itemBuilder: (context, index) {
-        final record = records[index];
-        final isCoin = controller.state.tabIndex == 0;
-
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      record.title ?? (isCoin ? "Top Up" : "Purchase VIP"),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      record.createdAt ?? '',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 12.sp,
-                        fontFamily: 'PingFang SC',
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    isCoin
-                        ? '+${record.coins ?? 0}'
-                        : '+${record.vipDays ?? 0} days',
-                    style:  TextStyle(
-                      color: Color(0xFFFF0BBA),
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'DDinPro',
-                    ),
-                  ),
-                  if (record.payMoney != null)
-                    Padding(
-                      padding: EdgeInsets.only(top: 4.h),
-                      child: Text(
-                        '${record.payCurrency ?? '\$'}${record.payMoney}',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 10.sp,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  static Widget _buildFooter(BuildContext context, LoadStatus? mode) {
-    Widget body;
-    if (mode == LoadStatus.idle) {
-      body = const Text(
-        "Pull up load",
-        style: TextStyle(color: Colors.white54),
-      );
-    } else if (mode == LoadStatus.loading) {
-      body = const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      );
-    } else if (mode == LoadStatus.failed) {
-      body = const Text(
-        "Load Failed! Click retry!",
-        style: TextStyle(color: Colors.white54),
-      );
-    } else if (mode == LoadStatus.canLoading) {
-      body = const Text(
-        "Release to load more",
-        style: TextStyle(color: Colors.white54),
-      );
-    } else {
-      body = const Text(
-        "No more data",
-        style: TextStyle(color: Colors.white54),
-      );
-    }
-    return SizedBox(height: 55.0, child: Center(child: body));
   }
 }

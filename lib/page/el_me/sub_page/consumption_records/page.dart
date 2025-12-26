@@ -42,19 +42,22 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildAppBar('Consumption Records'),
-                SizedBox(height: 6.h),
+                SizedBox(height: 20.h),
                 Expanded(
                   child: SmartRefresher(
                     controller: controller.refreshController,
                     enablePullDown: true,
                     enablePullUp: true,
                     onRefresh: controller.onRefresh,
-                    onLoading: controller.onLoadMore,
-                    header: const ClassicHeader(
+                    header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull to refresh',
+                      releaseText: 'Release to refresh',
+                      refreshingText: 'Refreshing...',
+                      completeText: 'Refresh completed',
+                      failedText: 'Refresh failed',
                     ),
-                    footer: const CustomFooter(builder: _buildFooter),
                     child: _buildContent(),
                   ),
                 ),
@@ -83,7 +86,7 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
           ),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontFamily: 'PingFang SC',
@@ -99,7 +102,7 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
   Widget _buildContent() {
     if (controller.state.loadStatus == LoadStatusType.loading) {
       return Center(
-        child: Image.asset('loading.gif'.icon, width: 120.w, height: 120.w),
+        child: Image.asset('loading.gif'.icon, width: 120, height: 120),
       );
     }
 
@@ -128,80 +131,94 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
       padding: EdgeInsets.zero,
       itemCount: controller.state.consumptionList.length,
       itemBuilder: (context, index) {
-        return _buildConsumptionItem(controller.state.consumptionList[index]);
+        return _buildConsumptionRecordsItem(
+          controller.state.consumptionList[index],
+        );
       },
     );
   }
 
-  Widget _buildConsumptionItem(ConsumptionRecordBean record) {
+  Widget _buildConsumptionRecordsItem(ConsumptionRecordBean record) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 32.w),
       child: Column(
         children: [
-          // 上方线条
+          // Top Line Divider
           Container(
-            width: 343.w,
+            width: 309.w,
             decoration: ShapeDecoration(
               shape: RoundedRectangleBorder(
                 side: BorderSide(
                   width: 1,
                   strokeAlign: BorderSide.strokeAlignCenter,
-                  color: Colors.white.withValues(alpha: 0.10),
+                  color: Colors.white.withOpacity(0.10),
                 ),
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
+            padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 32.w),
             child: Column(
               children: [
-                // 上面的row
+                // Top Row: time & type (Left), coins (Right)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       "Purchase Single Episode",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                         fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w500,
+                        height: 1,
+                        letterSpacing: -0,
                       ),
                     ),
                     Text(
-                      record.createdAt ?? "",
+                      '${record.createdAt ?? 0}',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 12.sp,
+                        color: const Color(0xFF999999),
+                        fontSize: 12,
                         fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                        letterSpacing: -0,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 8.h),
-                // 下面的row
+                SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Text(
-                        'EP.${record.episode} ${record.name}',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 12.sp,
-                          fontFamily: 'PingFang SC',
-                        ),
+                        "Ep.${record.episode ?? 0}. ${record.name ?? ''}",
                         overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: const Color(0xFF999999) /* 9灰 */,
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                          height: 1.25,
+                        ),
                       ),
                     ),
-                    SizedBox(width: 12.w),
+                    SizedBox(width: 30.w),
                     Text(
                       '-${record.coins ?? 0} Coins',
                       style: TextStyle(
                         color: const Color(0xFFFF0BBA),
-                        fontSize: 14.sp,
+                        fontSize: 14,
                         fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: -0,
                         fontFamily: 'DDinPro',
                       ),
                     ),
@@ -213,37 +230,5 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
         ],
       ),
     );
-  }
-
-  static Widget _buildFooter(BuildContext context, LoadStatus? mode) {
-    Widget body;
-    if (mode == LoadStatus.idle) {
-      body = const Text(
-        "Pull up load",
-        style: TextStyle(color: Colors.white54),
-      );
-    } else if (mode == LoadStatus.loading) {
-      body = const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      );
-    } else if (mode == LoadStatus.failed) {
-      body = const Text(
-        "Load Failed! Click retry!",
-        style: TextStyle(color: Colors.white54),
-      );
-    } else if (mode == LoadStatus.canLoading) {
-      body = const Text(
-        "Release to load more",
-        style: TextStyle(color: Colors.white54),
-      );
-    } else {
-      body = const Text(
-        "No more data",
-        style: TextStyle(color: Colors.white54),
-      );
-    }
-    return SizedBox(height: 55.0, child: Center(child: body));
   }
 }
