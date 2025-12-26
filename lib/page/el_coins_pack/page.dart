@@ -30,52 +30,33 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
         return Scaffold(
           extendBodyBehindAppBar: true,
           body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment(0.71, -0.71),
-                end: Alignment(-0.71, 0.71),
-                colors: [
-                  Color(0xFFB0027C),
-                  Color(0xFF44267C),
-                  Color(0xFF280A62),
-                  Color(0xFF16003E),
-                ],
+            padding: EdgeInsets.only(top: ScreenUtil().statusBarHeight),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('el_coin_pack_bg.png'.icon),
+                fit: BoxFit.fill,
               ),
             ),
-            child: Stack(
+            child: Column(
               children: [
-                // Decorative blur circles from HTML
-                Positioned(
-                  right: -50.w,
-                  top: -50.h,
-                  child: Container(
-                    width: 260.w,
-                    height: 260.w,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.05),
+                _buildAppBar('My Refills'),
+                SizedBox(height: 6.h),
+                Expanded(
+                  child: SmartRefresher(
+                    controller: controller.refreshController,
+                    enablePullDown: true,
+                    enablePullUp: false,
+                    onRefresh: controller.onRefresh,
+                    header: const ClassicHeader(
+                      height: 40,
+                      textStyle: TextStyle(color: Colors.white),
+                      idleText: 'Pull to refresh',
+                      releaseText: 'Release to refresh',
+                      refreshingText: 'Refreshing...',
+                      completeText: 'Refresh completed',
+                      failedText: 'Refresh failed',
                     ),
-                  ),
-                ),
-                SafeArea(
-                  child: Column(
-                    children: [
-                      _buildAppBar('My Refills'),
-                      Expanded(
-                        child: SmartRefresher(
-                          controller: controller.refreshController,
-                          enablePullDown: true,
-                          onRefresh: controller.onRefresh,
-                          header: const ClassicHeader(
-                            height: 40,
-                            textStyle: TextStyle(color: Colors.white),
-                          ),
-                          child: _buildContent(),
-                        ),
-                      ),
-                    ],
+                    child: _buildContent(),
                   ),
                 ),
               ],
@@ -88,26 +69,30 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
 
   Widget _buildAppBar(String title) {
     return Container(
-      height: 44.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.only(left: 11.w, right: 11.w, top: 4.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
-            child: Image.asset('ely_back.png'.icon, height: 20.h),
+            child: Padding(
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
+              child: Image.asset('ely_back.png'.icon, height: 20.h),
+            ),
           ),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
-              fontSize: 18.sp,
+              fontSize: 18,
               fontFamily: 'PingFang SC',
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(width: 24.w), // Placeholder to balance back button
+          // 右侧可以放置其他操作按钮，暂时留空
+          SizedBox(width: 30.w),
         ],
       ),
     );
@@ -127,6 +112,17 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
         description: 'Please check your network',
         buttonText: 'Try again',
         onButtonPressed: controller.onRefresh,
+      );
+    }
+
+    if (controller.state.loadStatus == LoadStatusType.loadNoData) {
+      return ElNoDataWidget(
+        imagePath: 'ely_nodata.png',
+        imageWidth: 180,
+        imageHeight: 223,
+        title: null,
+        description: 'There is no data for the moment.',
+        buttonText: null,
       );
     }
 
@@ -222,7 +218,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           Container(
             width: 1.w,
             height: 32.h,
-            color: Colors.white.withValues(alpha: 0.25),
+            color: Colors.white.withOpacity(0.25),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -243,7 +239,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: Colors.white.withOpacity(0.5),
             fontSize: 12.sp,
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -257,7 +253,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             Text(
               value,
               style: TextStyle(
-                color: const Color(0xFFFF0BBA),
+                color: Color(0xFFFF0BBA),
                 fontSize: 18.sp,
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w700,
@@ -279,7 +275,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             TextSpan(
               text: 'Active Refills: ',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: Colors.white.withOpacity(0.5),
                 fontSize: 12.sp,
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,
@@ -288,7 +284,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             TextSpan(
               text: '${controller.state.activeRefills}',
               style: TextStyle(
-                color: const Color(0xFFFFB7EB),
+                color: Color(0xFFFFB7EB),
                 fontSize: 12.sp,
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w700,
@@ -312,7 +308,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
       child: Text(
         'Get a Refill to Claim',
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.5),
+          color: Colors.white.withOpacity(0.5),
           fontSize: 14.sp,
           fontFamily: 'Inter',
           fontWeight: FontWeight.w700,
@@ -353,7 +349,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: Colors.white.withOpacity(0.5),
                     blurRadius: 40.w,
                   ),
                 ],
@@ -375,7 +371,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                       Text(
                         title,
                         style: TextStyle(
-                          color: const Color(0xFFDF23B8),
+                          color: Color(0xFFDF23B8),
                           fontSize: 14.sp,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
@@ -393,7 +389,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                           Text(
                             coins,
                             style: TextStyle(
-                              color: const Color(0xFFFF0BBA),
+                              color: Color(0xFFFF0BBA),
                               fontSize: 18.sp,
                               fontFamily: 'DDinPro',
                               fontWeight: FontWeight.w900,
@@ -406,7 +402,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                               vertical: 2.h,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.4),
+                              color: Colors.black.withOpacity(0.4),
                               borderRadius: BorderRadius.circular(4.w),
                             ),
                             child: Text(
@@ -450,7 +446,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                       Text(
                         '/week',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: Colors.white.withOpacity(0.8),
                           fontSize: 12.sp,
                           fontFamily: 'DDinPro',
                           fontWeight: FontWeight.w400,
@@ -474,7 +470,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
         Text(
           'Subscription Rules',
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: Colors.white.withOpacity(0.5),
             fontSize: 14.sp,
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -487,7 +483,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           '3. Daily bonus coins available from the next day.\n'
           '4. All coins will be revoked when the subscription expires, including both initial and daily coins.',
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: Colors.white.withOpacity(0.5),
             fontSize: 12.sp,
             fontFamily: 'Inter',
             fontWeight: FontWeight.w400,
