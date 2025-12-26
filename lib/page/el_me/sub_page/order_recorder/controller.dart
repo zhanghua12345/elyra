@@ -1,9 +1,9 @@
-import 'package:elyra/page/el_me/sub_page/history/state.dart';
+import 'package:elyra/page/el_me/sub_page/order_recorder/state.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class MyHistoryPageController extends GetxController {
-  final state = MyHistoryPageState();
+class OrderRecorderPageController extends GetxController {
+  final state = OrderRecorderState();
   final RefreshController refreshController = RefreshController(
     initialRefresh: false,
   );

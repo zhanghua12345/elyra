@@ -1,16 +1,16 @@
-import 'package:elyra/page/el_me/sub_page/history/controller.dart';
+import 'package:elyra/page/el_me/sub_page/order_recorder/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class MyHistoryPage extends StatelessWidget {
-  const MyHistoryPage({super.key});
+class OrderRecorderPage extends StatelessWidget {
+  const OrderRecorderPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<MyHistoryPageController>(
-      init: MyHistoryPageController(),
+    return GetBuilder<OrderRecorderPageController>(
+      init: OrderRecorderPageController(),
       builder: (controller) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -68,7 +68,7 @@ class MyHistoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTabSwitcher(MyHistoryPageController controller) {
+  Widget _buildTabSwitcher(OrderRecorderPageController controller) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       width: 343.w,
@@ -133,7 +133,7 @@ class MyHistoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildList(MyHistoryPageController controller) {
+  Widget _buildList(OrderRecorderPageController controller) {
     final records = controller.state.tabIndex == 0 
         ? controller.state.coinRecords 
         : controller.state.vipRecords;

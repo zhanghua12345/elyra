@@ -1,6 +1,6 @@
 import 'package:elyra/widgets/bad_status_widget.dart';
 
-class MyHistoryPageState {
+class OrderRecorderState {
   LoadStatusType loadStatus = LoadStatusType.loadSuccess;
   bool isLoading = false;
   

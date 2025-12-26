@@ -209,7 +209,7 @@ class _MePageState extends State<MePage> {
                 ),
                 // Top Up 按钮
                 GestureDetector(
-                  onTap: () => {Get.toNamed('/my_history')},
+                  onTap: () => {Get.toNamed('/my_wallet')},
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.w,
