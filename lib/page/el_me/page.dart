@@ -348,7 +348,7 @@ class _MePageState extends State<MePage> {
           children: [
             // Main Content Row
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 26.h),
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 26.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -359,10 +359,10 @@ class _MePageState extends State<MePage> {
                       children: [
                         Image.asset(
                           'el_me_guan.png'.icon,
-                          width: 40.w,
-                          height: 40.w,
+                          width: 23.w,
+                          height: 20.w,
                         ),
-                        SizedBox(width: 12.w),
+                        SizedBox(width: 7.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
