@@ -49,6 +49,7 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
                     enablePullDown: true,
                     enablePullUp: true,
                     onRefresh: controller.onRefresh,
+                    onLoading: controller.onLoadMore,
                     header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),

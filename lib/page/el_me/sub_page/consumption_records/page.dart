@@ -49,6 +49,7 @@ class _ConsumptionRecordsPageState extends State<ConsumptionRecordsPage> {
                     enablePullDown: true,
                     enablePullUp: true,
                     onRefresh: controller.onRefresh,
+                    onLoading: controller.onLoadMore,
                     header: ClassicHeader(
                       height: 40,
                       textStyle: TextStyle(color: Colors.white),
