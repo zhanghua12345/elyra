@@ -7,16 +7,14 @@ String consumptionRecordBeanToJson(ConsumptionRecordBean data) =>
     json.encode(data.toJson());
 
 class ConsumptionRecordBean {
-  String? id;
-  String? customerId;
-  num? coins;
+  num? shortPlayId;
+  String? coins;
   String? name;
   num? episode;
   String? createdAt;
 
   ConsumptionRecordBean({
-    this.id,
-    this.customerId,
+    this.shortPlayId,
     this.coins,
     this.name,
     this.episode,
@@ -24,8 +22,7 @@ class ConsumptionRecordBean {
   });
 
   ConsumptionRecordBean.fromJson(dynamic json) {
-    id = json['id']?.toString();
-    customerId = json['customer_id']?.toString();
+    shortPlayId = json['short_play_id'];
     coins = json['coins'];
     name = json['name'];
     episode = json['episode'];
@@ -33,15 +30,13 @@ class ConsumptionRecordBean {
   }
 
   ConsumptionRecordBean copyWith({
-    String? id,
-    String? customerId,
-    num? coins,
+    num? shortPlayId,
+    String? coins,
     String? name,
     num? episode,
     String? createdAt,
   }) => ConsumptionRecordBean(
-    id: id ?? this.id,
-    customerId: customerId ?? this.customerId,
+    shortPlayId: shortPlayId ?? this.shortPlayId,
     coins: coins ?? this.coins,
     name: name ?? this.name,
     episode: episode ?? this.episode,
@@ -50,8 +45,7 @@ class ConsumptionRecordBean {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['id'] = id;
-    map['customer_id'] = customerId;
+    map['short_play_id'] = shortPlayId;
     map['coins'] = coins;
     map['name'] = name;
     map['episode'] = episode;

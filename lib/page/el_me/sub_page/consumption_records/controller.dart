@@ -15,7 +15,7 @@ class ConsumptionRecordsController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    getConsumptionData();
+    getConsumptionRecordsData();
   }
 
   @override
@@ -24,7 +24,7 @@ class ConsumptionRecordsController extends GetxController {
     super.onClose();
   }
 
-  getConsumptionData({
+  getConsumptionRecordsData({
     RefreshController? refreshCtrl,
     bool loadMore = false,
   }) async {
@@ -50,7 +50,17 @@ class ConsumptionRecordsController extends GetxController {
         queryParameters: params,
       );
 
-      final rCtrl = refreshCtrl ?? refreshController;
+      if (refreshCtrl != null) {
+        refreshCtrl.refreshCompleted();
+      } else {
+        refreshController.refreshCompleted();
+      }
+
+      if (refreshCtrl != null) {
+        refreshCtrl.refreshCompleted();
+      } else {
+        refreshController.refreshCompleted();
+      }
 
       if (response.success) {
         // 解析分页信息
@@ -59,60 +69,72 @@ class ConsumptionRecordsController extends GetxController {
         state.totalPages = pagination['page_total'] ?? 0;
         state.hasMore = state.currentPage < state.totalPages;
 
-        List<dynamic> listData = response.data['list'] ?? [];
-        List<ConsumptionRecordBean> newItems = listData
-            .map<ConsumptionRecordBean>(
-              (item) => ConsumptionRecordBean.fromJson(item),
-            )
-            .toList();
-
         if (loadMore) {
-          state.consumptionList.addAll(newItems);
-          rCtrl.loadComplete();
+          // 加载更多数据
+          if (response.data['list'] != null &&
+              response.data['list'].length > 0) {
+            try {
+              List<ConsumptionRecordBean> newItems = response.data['list']
+                  .map<ConsumptionRecordBean>((item) => ConsumptionRecordBean.fromJson(item))
+                  .toList();
+              state.consumptionList.addAll(newItems);
+            } catch (e) {
+              print('Error mapping new items: $e');
+              // 如果解析失败，我们仍然更新状态以停止加载
+              state.loadStatus = LoadStatusType.loadFailed;
+            }
+          }
         } else {
-          state.consumptionList = newItems;
-          rCtrl.refreshCompleted();
-          state.loadStatus = state.consumptionList.isEmpty
-              ? LoadStatusType.loadNoData
-              : LoadStatusType.loadSuccess;
-        }
+          // 刷新数据
+          state.consumptionList.clear();
 
-        if (!state.hasMore) {
-          rCtrl.loadNoData();
+          if (response.data['list'] != null &&
+              response.data['list'].length > 0) {
+            try {
+              List<ConsumptionRecordBean> newItems = response.data['list']
+                  .map<ConsumptionRecordBean>((item) => ConsumptionRecordBean.fromJson(item))
+                  .toList();
+              state.consumptionList = newItems;
+
+              state.loadStatus = LoadStatusType.loadSuccess;
+            } catch (e) {
+              print('Error mapping items: $e');
+              state.loadStatus = LoadStatusType.loadFailed;
+            }
+          } else {
+            state.loadStatus = LoadStatusType.loadNoData;
+          }
         }
+        update();
       } else {
-        if (loadMore) {
-          rCtrl.loadFailed();
-        } else {
-          rCtrl.refreshFailed();
-          state.loadStatus = LoadStatusType.loadFailed;
-        }
-      }
-      update();
-    } catch (e) {
-      final rCtrl = refreshCtrl ?? refreshController;
-      if (loadMore) {
-        rCtrl.loadFailed();
-      } else {
-        rCtrl.refreshFailed();
         state.loadStatus = LoadStatusType.loadFailed;
+        update();
       }
+    } catch (e) {
+      if (refreshCtrl != null) {
+        refreshCtrl.refreshFailed();
+      } else {
+        refreshController.refreshFailed();
+      }
+      state.loadStatus = LoadStatusType.loadFailed;
       update();
     } finally {
       state.isLoading = false;
-      update();
+      if (refreshCtrl == null) {
+        refreshController.loadComplete(); // 停止加载更多动画
+      }
     }
   }
 
   void onRefresh() {
-    getConsumptionData();
+    getConsumptionRecordsData();
   }
 
   void onLoadMore() {
     if (state.hasMore) {
-      getConsumptionData(loadMore: true);
+      getConsumptionRecordsData(loadMore: true);
     } else {
-      refreshController.loadNoData();
+      refreshController.loadNoData(); // 没有更多数据
     }
   }
 }

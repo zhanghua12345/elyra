@@ -142,7 +142,7 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 32.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         children: [
           // Top Line Divider
@@ -159,82 +159,105 @@ class _RewardCoinsPageState extends State<RewardCoinsPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            padding: EdgeInsets.symmetric(vertical: 16.h,horizontal: 16.w),
+            child: Column(
               children: [
-                // Left Column
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        record.createdAt ?? "",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 12.sp,
-                          fontFamily: 'PingFang SC',
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        record.type ?? "",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'PingFang SC',
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      if (isExpired)
-                        Text(
-                          'Expired',
-                          style: TextStyle(
-                            color: const Color(0xFFFF0BBA),
-                            fontSize: 12.sp,
-                            fontFamily: 'PingFang SC',
-                          ),
-                        )
-                      else
-                        Row(
-                          children: [
-                            Image.asset('el_time_order.png'.icon, width: 18.w, height: 18.w),
-                            SizedBox(width: 4.w),
-                            Text(
-                              'Expires in ${record.diffDatetime ?? ""}',
-                              style: TextStyle(
-                                color: const Color(0xFFFFB6EA),
-                                fontSize: 12.sp,
-                                fontFamily: 'PingFang SC',
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-                // Right Column
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                // Top Row: time & type (Left), coins (Right)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          record.createdAt ?? "",
+                          style: TextStyle(
+                            color: const Color(0xFF999999),
+                            fontSize: 12,
+                            fontFamily: 'PingFang SC',
+                            fontWeight: FontWeight.w400,
+                            height: 1,
+                            letterSpacing: -0,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          record.type ?? "",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontFamily: 'PingFang SC',
+                            fontWeight: FontWeight.w600,
+                            height: 1,
+                            letterSpacing: -0,
+                          ),
+                        ),
+                      ],
+                    ),
                     Text(
-                      '${record.coins ?? 0}',
+                      '+${record.coins ?? 0}',
                       style: TextStyle(
                         color: const Color(0xFFFF0BBA),
-                        fontSize: 20.sp,
+                        fontSize: 14,
                         fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: -0,
                         fontFamily: 'DDinPro',
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                  ],
+                ),
+                SizedBox(height: 8.h),
+                // Bottom Row: Expiration (Left), Remaining (Right)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (isExpired)
+                      Text(
+                        'Expired',
+                        style: TextStyle(
+                          color: const Color(0xFF8B8B8B) /* 灰色 */,
+                          fontSize: 12,
+                          fontFamily: 'PingFang SC',
+                          fontWeight: FontWeight.w400,
+                          height: 1,
+                          letterSpacing: -0,
+                        ),
+                      )
+                    else
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'el_time_order.png'.icon,
+                            width: 12.w,
+                            height: 12.w,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Expires in ${record.diffDatetime ?? ""}',
+                            style: TextStyle(
+                              color: const Color(0xFFFF0BBA),
+                              fontSize: 12,
+                              fontFamily: 'PingFang SC',
+                              fontWeight: FontWeight.w400,
+                              height: 1,
+                              letterSpacing: -0,
+                            ),
+                          ),
+                        ],
+                      ),
                     Text(
-                      'Remaining: ${record.leftCoins ?? 0}',
+                      '${record.leftCoins ?? 0}',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 12.sp,
+                        color: const Color(0xFF8B8B8B) /* 灰色 */,
+                        fontSize: 12,
                         fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w400,
+                        height: 1,
+                        letterSpacing: -0,
                       ),
                     ),
                   ],
