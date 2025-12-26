@@ -1,5 +1,6 @@
 import 'package:elyra/page/el_about/page.dart';
 import 'package:elyra/page/el_coins_pack/page.dart';
+import 'package:elyra/page/el_me/sub_page/consumption_records/page.dart';
 import 'package:elyra/page/el_me/sub_page/el_account_logout/page.dart';
 import 'package:elyra/page/el_feedback/feedback_detail/page.dart';
 import 'package:elyra/page/el_feedback/feedback_index/page.dart';
@@ -7,6 +8,7 @@ import 'package:elyra/page/el_feedback/feedback_list/page.dart';
 import 'package:elyra/page/el_language/page.dart';
 import 'package:elyra/page/el_me/sub_page/el_my_wallet/page.dart';
 import 'package:elyra/page/el_me/sub_page/order_recorder/page.dart';
+import 'package:elyra/page/el_me/sub_page/reward_coins/page.dart';
 import 'package:elyra/page/el_play/page.dart';
 import 'package:elyra/page/el_me/sub_page/el_setting/page.dart';
 import 'package:elyra/page/el_store/page.dart';
@@ -41,6 +43,9 @@ class AppRoutes {
   static const String orderRecorder = '/order_recorder';
   static const String coinsPack = '/coins_pack';
   static const String myWallet = '/my_wallet';
+  static const String rewardCoins = '/reward_coins';
+  static const String consumptionRecords = '/consumption_records';
+  
 
   static final routes = [
     GetPage(name: splash, page: () => const SplashPage()),
@@ -63,5 +68,7 @@ class AppRoutes {
     GetPage(name: orderRecorder, page: () => const OrderRecorderPage()),
     GetPage(name: coinsPack, page: () => const ElCoinsPackPage()),
     GetPage(name: myWallet, page: () => const MyWalletPage()),
+    GetPage(name: rewardCoins, page: () => const RewardCoinsPage()),
+    GetPage(name: consumptionRecords, page: () => const ConsumptionRecordsPage()),
   ];
 }
