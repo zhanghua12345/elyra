@@ -5,13 +5,13 @@ class RewardCoinsState {
   RewardCoinsState();
 
   LoadStatusType loadStatus = LoadStatusType.loading;
-  bool isLoading = false;
-
-  // 分页信息
-  int currentPage = 1;
-  int pageSize = 20;
-  bool hasMore = true;
-
   // 奖励金币数据列表
   List<RewardCoinItem> rewardList = [];
+
+  // 分页参数
+  int currentPage = 1;
+  int pageSize = 20;
+  int totalPages = 0;
+  bool isLoading = false;
+  bool hasMore = true;
 }

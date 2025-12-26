@@ -15,7 +15,7 @@ class RewardCoinsController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    loadData();
+    getRewardCoinsData();
   }
 
   @override
@@ -24,80 +24,118 @@ class RewardCoinsController extends GetxController {
     super.onClose();
   }
 
-  // 加载数据的方法
-  Future<void> loadData({bool isRefresh = true}) async {
-    if (state.isLoading) return;
+  getRewardCoinsData({
+    RefreshController? refreshCtrl,
+    bool loadMore = false,
+  }) async {
+    // 如果正在加载，或者加载更多时没有更多数据，则直接返回
+    if (state.isLoading || (loadMore && !state.hasMore)) return;
 
-    if (isRefresh) {
-      state.currentPage = 1;
-      state.hasMore = true;
+    // 更新状态
+    if (!loadMore) {
       state.loadStatus = LoadStatusType.loading;
-      update();
-      await Future.delayed(Duration(milliseconds: 500));
     }
-
     state.isLoading = true;
+    update();
     try {
-      final response = await HttpClient().request(
+ // 构造请求参数
+      Map<String, dynamic> params = {
+        'current_page': loadMore ? state.currentPage + 1 : 1,
+        'page_size': state.pageSize,
+      };
+
+      ApiResponse response = await HttpClient().request(
         Apis.sendCoinList,
         method: HttpMethod.post,
-        data: {"current_page": state.currentPage, "page_size": state.pageSize},
+         data: params,
       );
 
-      if (response.success && response.data != null) {
-        final rewardBean = RewardCoinBean.fromJson(response.data);
-        final list = rewardBean.list ?? [];
-
-        if (isRefresh) {
-          state.rewardList = list;
-        } else {
-          state.rewardList.addAll(list);
-        }
-
-        // 判断是否还有更多数据
-        state.hasMore = list.length >= state.pageSize;
-        state.currentPage++;
-
-        state.loadStatus = state.rewardList.isEmpty
-            ? LoadStatusType.loadNoData
-            : LoadStatusType.loadSuccess;
+      if (refreshCtrl != null) {
+        refreshCtrl.refreshCompleted();
       } else {
-        if (isRefresh) {
-          state.loadStatus = LoadStatusType.loadFailed;
+        refreshController.refreshCompleted();
+      }
+
+      if (refreshCtrl != null) {
+        refreshCtrl.refreshCompleted();
+      } else {
+        refreshController.refreshCompleted();
+      }
+
+      if (response.success) {
+        // 解析分页信息
+        var pagination = response.data['pagination'];
+        state.currentPage = pagination['current_page'] ?? 1;
+        state.totalPages = pagination['page_total'] ?? 0;
+        state.hasMore = state.currentPage < state.totalPages;
+
+        if (loadMore) {
+          // 加载更多数据
+          if (response.data['list'] != null &&
+              response.data['list'].length > 0) {
+            try {
+              List<RewardCoinItem> newItems = response.data['list']
+                  .map<RewardCoinItem>((item) => RewardCoinItem.fromJson(item))
+                  .toList();
+              state.rewardList.addAll(newItems);
+            } catch (e) {
+              print('Error mapping new items: $e');
+              // 如果解析失败，我们仍然更新状态以停止加载
+              state.loadStatus = LoadStatusType.loadFailed;
+            }
+          }
+        } else {
+          // 刷新数据
+          state.rewardList.clear();
+
+          if (response.data['list'] != null &&
+              response.data['list'].length > 0) {
+            try {
+              List<RewardCoinItem> newItems = response.data['list']
+                  .map<RewardCoinItem>((item) => RewardCoinItem.fromJson(item))
+                  .toList();
+              state.rewardList = newItems;
+
+              state.loadStatus = LoadStatusType.loadSuccess;
+            } catch (e) {
+              print('Error mapping items: $e');
+              state.loadStatus = LoadStatusType.loadFailed;
+            }
+          } else {
+            state.loadStatus = LoadStatusType.loadNoData;
+          }
         }
-      }
-      update();
-    } catch (err) {
-      if (isRefresh) {
+        update();
+      } else {
         state.loadStatus = LoadStatusType.loadFailed;
+        update();
       }
+    } catch (e) {
+      if (refreshCtrl != null) {
+        refreshCtrl.refreshFailed();
+      } else {
+        refreshController.refreshFailed();
+      }
+      state.loadStatus = LoadStatusType.loadFailed;
       update();
     } finally {
       state.isLoading = false;
-      if (isRefresh) {
-        refreshController.refreshCompleted();
-      } else {
-        if (state.hasMore) {
-          refreshController.loadComplete();
-        } else {
-          refreshController.loadNoData();
-        }
+      if (refreshCtrl == null) {
+        refreshController.loadComplete(); // 停止加载更多动画
       }
-      update();
     }
   }
 
-  // 下拉刷新
+ 
   void onRefresh() {
-    loadData(isRefresh: true);
+    getRewardCoinsData();
   }
 
-  // 上拉加载更多
   void onLoadMore() {
     if (state.hasMore) {
-      loadData(isRefresh: false);
+      getRewardCoinsData(loadMore: true);
     } else {
-      refreshController.loadNoData();
+      refreshController.loadNoData(); // 没有更多数据
     }
   }
 }
