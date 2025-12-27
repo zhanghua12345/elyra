@@ -215,15 +215,38 @@ class StorePopupBuy extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Column(
                       children: [
-                        _buildCoinItem(
-                          'You receive ${item.coins} coins after purchase',
-                        ),
-                        SizedBox(height: 24.h),
-                        _buildCoinItem('${item.sendCoins} coins within a week'),
-                        SizedBox(height: 24.h),
-                        _buildCoinItem(
-                          'Get ${(item.sendCoins / 7).toInt()} coins by logging into the app daily',
-                        ),
+                        if (item.extInfo?.subCoinsTxtList?.isNotEmpty == true)
+                          ...item.extInfo!.subCoinsTxtList!.asMap().entries.map(
+                            (entry) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      entry.key <
+                                          item
+                                                  .extInfo!
+                                                  .subCoinsTxtList!
+                                                  .length -
+                                              1
+                                      ? 24.h
+                                      : 0,
+                                ),
+                                child: _buildCoinItem(entry.value),
+                              );
+                            },
+                          )
+                        else ...[
+                          _buildCoinItem(
+                            'You receive ${item.coins} coins after purchase',
+                          ),
+                          SizedBox(height: 24.h),
+                          _buildCoinItem(
+                            '${item.sendCoins} coins within a week',
+                          ),
+                          SizedBox(height: 24.h),
+                          _buildCoinItem(
+                            'Get ${(item.sendCoins / 7).toInt()} coins by logging into the app daily',
+                          ),
+                        ],
                       ],
                     ),
                   ),
