@@ -153,9 +153,9 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
         children: [
           SizedBox(height: 20.h),
           _buildSectionTitle('REWARDS OVERVIEW', 'left'),
-          SizedBox(height: 24.h),
+          SizedBox(height: 23.h),
           _buildRewardsDisplay(),
-          SizedBox(height: 24.h),
+          SizedBox(height: 23.h),
           _buildRefillCount(),
           SizedBox(height: 12.h),
           _buildClaimButtonOrPlaceholder(),
@@ -170,14 +170,19 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             ),
           ),
           SizedBox(height: 16.h),
-          _buildSectionTitle('Active Refills', 'center'),
+          _buildSectionTitle(
+            controller.state.receiveList.isNotEmpty
+                ? 'Active Refills'
+                : 'Weekly Refill',
+            'center',
+          ),
           if (controller.state.receiveList.isNotEmpty) ...[
-            SizedBox(height: 24.h),
+            SizedBox(height: 12.h),
             _buildReceiveList(),
           ],
-          SizedBox(height: 20.h),
+          SizedBox(height: 12.h),
           _buildRefillList(),
-          SizedBox(height: 32.h),
+          SizedBox(height: 3.h),
           _buildRulesSection(),
           SizedBox(height: 40.h),
         ],
@@ -324,7 +329,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           width: double.infinity,
           height: 48.h,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
             ),
             borderRadius: BorderRadius.circular(24.w),
