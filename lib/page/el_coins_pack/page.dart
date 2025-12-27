@@ -94,7 +94,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             behavior: HitTestBehavior.translucent,
             onTap: () => Get.back(),
             child: Padding(
-              padding: EdgeInsets.all(5.w),
+              padding: EdgeInsets.all(5.w), // 扩大点击热区
               child: Image.asset('ely_back.png'.icon, height: 20.h),
             ),
           ),
@@ -160,7 +160,15 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           SizedBox(height: 12.h),
           _buildClaimButtonOrPlaceholder(),
           SizedBox(height: 16.h),
-          
+          Center(
+            child: CustomPaint(
+              size: Size(319.w, 1.h),
+              painter: DashedLinePainter(
+                color: Colors.white.withValues(alpha: 0.25),
+                axis: Axis.horizontal,
+              ),
+            ),
+          ),
           SizedBox(height: 16.h),
           _buildSectionTitle('Active Refills', 'center'),
           if (controller.state.receiveList.isNotEmpty) ...[
@@ -226,10 +234,12 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             controller.state.weeklyTotal.toString(),
           ),
           SizedBox(width: 18.w),
-          Container(
-            width: 1.w,
-            height: 32.h,
-            color: Colors.white.withOpacity(0.25),
+          CustomPaint(
+            size: Size(1.w, 32.h),
+            painter: DashedLinePainter(
+              color: Colors.white.withOpacity(0.25),
+              axis: Axis.vertical,
+            ),
           ),
           SizedBox(width: 18.w),
           _buildStatTile(
@@ -450,10 +460,12 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
               ],
             ),
             SizedBox(height: 12.h),
-            Container(
-              width: 319.w,
-              height: 1.h,
-              color: const Color(0x3F0F0F0F),
+            CustomPaint(
+              size: Size(319.w, 1.h),
+              painter: DashedLinePainter(
+                color: const Color(0x3F0F0F0F),
+                axis: Axis.horizontal,
+              ),
             ),
             SizedBox(height: 12.h),
             Row(
@@ -509,10 +521,12 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                       ],
                     ),
                     SizedBox(width: 12.w),
-                    Container(
-                      width: 1.w,
-                      height: 32.h,
-                      color: Colors.white.withValues(alpha: 0.25),
+                    CustomPaint(
+                      size: Size(1.w, 32.h),
+                      painter: DashedLinePainter(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        axis: Axis.vertical,
+                      ),
                     ),
                     SizedBox(width: 12.w),
                     Column(
@@ -693,4 +707,51 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
       ],
     );
   }
+}
+
+class DashedLinePainter extends CustomPainter {
+  final Color color;
+  final Axis axis;
+  final double dashWidth;
+  final double dashSpace;
+
+  DashedLinePainter({
+    required this.color,
+    required this.axis,
+    this.dashWidth = 4,
+    this.dashSpace = 2,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = (axis == Axis.horizontal ? size.height : size.width)
+      ..style = PaintingStyle.stroke;
+
+    if (axis == Axis.horizontal) {
+      double startX = 0;
+      while (startX < size.width) {
+        canvas.drawLine(
+          Offset(startX, size.height / 2),
+          Offset(startX + dashWidth, size.height / 2),
+          paint,
+        );
+        startX += dashWidth + dashSpace;
+      }
+    } else {
+      double startY = 0;
+      while (startY < size.height) {
+        canvas.drawLine(
+          Offset(size.width / 2, startY),
+          Offset(size.width / 2, startY + dashWidth),
+          paint,
+        );
+        startY += dashWidth + dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
