@@ -55,10 +55,17 @@ class StorePageController extends GetxController {
   }
 
   /// 加载数据
-  void loadData() async {
+  void loadData({bool isSilent = false}) async {
     if (state.isLoading) return;
     state.isLoading = true;
-    state.loadStatus = LoadStatusType.loading;
+    if (!isSilent) {
+      state.loadStatus = LoadStatusType.loading;
+    } else {
+      EasyLoading.show(
+        status: 'Loading...',
+        maskType: EasyLoadingMaskType.none,
+      );
+    }
     update();
 
     try {
@@ -105,6 +112,7 @@ class StorePageController extends GetxController {
     } finally {
       state.isLoading = false;
       refreshController.refreshCompleted();
+      if (isSilent) EasyLoading.dismiss();
       update();
     }
   }
@@ -617,7 +625,7 @@ class StorePageController extends GetxController {
           if (isDialogInstance) {
             Get.back();
           }
-          loadData();
+          loadData(isSilent: true);
           // 充值成功后更新 el_me 页面的用户信息
           _refreshMePageUserInfo();
 
