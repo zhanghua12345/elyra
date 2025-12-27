@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage>
                               ),
                               Row(
                                 children: [
-
                                   GestureDetector(
                                     behavior: HitTestBehavior.translucent,
                                     onTap: () {
@@ -191,7 +190,9 @@ class _HomePageState extends State<HomePage>
                                         style: TextStyle(
                                           color: _currentTab == index
                                               ? Colors.white
-                                              : Colors.white.withValues(alpha: 0.6),
+                                              : Colors.white.withValues(
+                                                  alpha: 0.6,
+                                                ),
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w900,
                                           fontFamily: 'DDinPro',
@@ -237,6 +238,38 @@ class _HomePageState extends State<HomePage>
                             child: Center(
                               child: _HomeVideoHistoryWidgetRefresh(
                                 key: _historyWidgetKey,
+                              ),
+                            ),
+                          ),
+
+                          // Daily Coins 入口
+                          Positioned(
+                            bottom: 100.h,
+                            right: 16.w,
+                            child: GestureDetector(
+                              onTap: () => Get.toNamed('/coins_pack'),
+                              child: Container(
+                                width: 82.w,
+                                height: 72.h,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage('el_coin_tip.png'.icon),
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                alignment: Alignment.bottomLeft,
+                                padding: EdgeInsets.only(bottom: 3.h,left: 6.w),
+                                child: Text(
+                                  'Daily Coins',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10.sp,
+                                    fontStyle: FontStyle.italic,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.40,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
