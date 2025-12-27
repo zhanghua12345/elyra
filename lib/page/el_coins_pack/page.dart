@@ -4,6 +4,7 @@ import 'package:elyra/page/el_store/controller.dart';
 import 'package:elyra/widgets/bad_status_widget.dart';
 import 'package:elyra/widgets/el_nodata_widget.dart';
 import 'package:elyra/widgets/week_coin_item.dart';
+import 'package:elyra/bean/reward_overview_bean.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -157,7 +158,11 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           SizedBox(height: 24.h),
           _buildRefillCount(),
           SizedBox(height: 12.h),
-          _buildClaimPlaceholder(),
+          _buildClaimButtonOrPlaceholder(),
+          if (controller.state.receiveList.isNotEmpty) ...[
+            SizedBox(height: 24.h),
+            _buildReceiveList(),
+          ],
           SizedBox(height: 40.h),
           Center(
             child: Container(
@@ -316,7 +321,56 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
     );
   }
 
-  Widget _buildClaimPlaceholder() {
+  Widget _buildClaimButtonOrPlaceholder() {
+    final coinInfo = controller.state.coinInfo;
+    if (coinInfo?.isExistSub == 1 && (coinInfo?.receiveCoins ?? 0) > 0) {
+      return GestureDetector(
+        onTap: () => controller.receiveDay('all'),
+        child: Container(
+          width: double.infinity,
+          height: 48.h,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFE424AE), Color(0xFF6018E6)],
+            ),
+            borderRadius: BorderRadius.circular(24.w),
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Claim All',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Image.asset(
+                  'ely_gold.png'.icon,
+                  width: 20.w,
+                  height: 20.w,
+                ),
+              ),
+              Text(
+                '${coinInfo?.receiveCoins ?? 0}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       height: 48.h,
@@ -333,6 +387,161 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           fontFamily: 'Inter',
           fontWeight: FontWeight.w700,
         ),
+      ),
+    );
+  }
+
+  Widget _buildReceiveList() {
+    return Column(
+      children: controller.state.receiveList.map((item) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: _buildReceiveItem(item),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildReceiveItem(RewardReceiveItem item) {
+    return Container(
+      width: 343.w,
+      height: 122.h,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('el_coin_item_bg.png'.icon),
+          fit: BoxFit.fill,
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${item.title} (${item.dayText})',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Total Reward',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 10,
+                          fontFamily: 'PingFang SC',
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Image.asset(
+                            'ely_gold.png'.icon,
+                            width: 14.w,
+                            height: 14.w,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '${item.weekMaxTotal ?? 0}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'DDinPro',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 20.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Remaining',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 10,
+                          fontFamily: 'PingFang SC',
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Image.asset(
+                            'ely_gold.png'.icon,
+                            width: 14.w,
+                            height: 14.w,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '${item.weekRemainingTotal ?? 0}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'DDinPro',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if ((item.receiveCoins ?? 0) > 0)
+                GestureDetector(
+                  onTap: () => controller.receiveDay(item.id!),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Claim',
+                        style: TextStyle(
+                          color: Color(0xFFFFD67C),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'PingFang SC',
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Row(
+                        children: [
+                          Image.asset(
+                            'ely_gold.png'.icon,
+                            width: 14.w,
+                            height: 14.w,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '${item.receiveCoins}',
+                            style: const TextStyle(
+                              color: Color(0xFFFF7700),
+                              fontSize: 14,
+                              fontFamily: 'DDinPro',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

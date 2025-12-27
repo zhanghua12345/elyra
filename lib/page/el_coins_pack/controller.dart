@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:elyra/bean/pay_settings_bean.dart';
+import 'package:elyra/bean/reward_overview_bean.dart';
 import 'package:elyra/page/el_coins_pack/state.dart';
 import 'package:elyra/request/http.dart';
 import 'package:elyra/request/index.dart';
+import 'package:elyra/utils/toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -36,12 +38,7 @@ class ElCoinsPackController extends GetxController {
     try {
       // 1. 获取支付配置 (用于展示 coinsWeekList)
       Map<String, dynamic> payParams = {};
-      if (Platform.isIOS) {
-        try {
-        } catch (e) {
-          debugPrint('---receipt err:$e');
-        }
-      }
+      // iOS Receipt 逻辑暂由 StorePageController 集中处理，此处精简
 
       final payRes = await HttpClient().request(
         Apis.paySettingsV4,
@@ -60,18 +57,20 @@ class ElCoinsPackController extends GetxController {
         state.coinsWeekList.sort((a, b) => b.sort.compareTo(a.sort));
       }
 
-      // 2. 获取领取详情 (REWARDS OVERVIEW)
+      // 2. 获取领取详情 (REWARDS OVERVIEW + receive_list)
       final rewardRes = await HttpClient().request(
         Apis.getReceiveDayCoinInfo,
         method: HttpMethod.get,
       );
 
       if (rewardRes.success && rewardRes.data != null) {
-        var data = rewardRes.data;
-        // 映射字段：每周总额，可领取，激活数
-        state.weeklyTotal = data['weekly_total_coins'] ?? 0;
-        state.claimableCoins = data['day_coins'] ?? 0;
-        state.activeRefills = data['count'] ?? 0;
+        state.coinInfo = RewardOverviewBean.fromJson(rewardRes.data);
+        state.receiveList = state.coinInfo?.receiveList ?? [];
+
+        // 映射核心字段
+        state.weeklyTotal = state.coinInfo?.weeklyTotalCoins ?? 0;
+        state.claimableCoins = state.coinInfo?.dayCoins ?? 0;
+        state.activeRefills = state.coinInfo?.count ?? 0;
       }
 
       state.loadStatus = LoadStatusType.loadSuccess;
@@ -82,6 +81,27 @@ class ElCoinsPackController extends GetxController {
       state.isLoading = false;
       refreshController.refreshCompleted();
       update();
+    }
+  }
+
+  /// 领取金币逻辑 (id 可以是具体条目 ID 或 'all')
+  Future<void> receiveDay(String id) async {
+    try {
+      final res = await HttpClient().request(
+        Apis.receiveDayCoin,
+        method: HttpMethod.post,
+        data: {"id": id},
+      );
+
+      if (res.success) {
+        Message.show(res.message ?? "Claimed successfully");
+        loadData(); // 领取成功后刷新页面数据
+      } else {
+        Message.show(res.message ?? "Claim failed");
+      }
+    } catch (e) {
+      debugPrint("receiveDay error: $e");
+      Message.show("Claim failed");
     }
   }
 
