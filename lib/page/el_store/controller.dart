@@ -373,7 +373,6 @@ class StorePageController extends GetxController {
           EasyLoading.dismiss();
           state.currentOrderCode = "";
         }
-        InAppPurchaseUtil.completePurchase(purchaseDetails);
       } else if (purchaseDetails.status == PurchaseStatus.error) {
         // 购买失败
         debugPrint('Purchase failed: ${purchaseDetails.error?.message}');
@@ -404,9 +403,8 @@ class StorePageController extends GetxController {
           orderCode: state.currentOrderCode,
         );
         state.currentOrderCode = "";
-        InAppPurchaseUtil.completePurchase(purchaseDetails);
       }
-      InAppPurchaseUtil.completePurchase(purchaseDetails, isRetry: true);
+      InAppPurchaseUtil.completePurchase(purchaseDetails);
     }
   }
 
@@ -629,12 +627,12 @@ class StorePageController extends GetxController {
             Get.back();
           }
           loadData(isSilent: true);
-          // 充值成功后更新 el_me 页面的用户信息
-          _refreshMePageUserInfo();
-
-          // 🔥 触发支付成功回调
-          onPaymentSuccess?.call();
         }
+        // 充值成功后更新 el_me 页面的用户信息
+        _refreshMePageUserInfo();
+
+        // 🔥 触发支付成功回调
+        onPaymentSuccess?.call();
 
         // 移除缓存
         PurchaseRestoreUtil().removeGoods(goods);
@@ -668,11 +666,6 @@ class StorePageController extends GetxController {
   Future<void> restorePay({bool showTips = true}) async {
     if (state.isRestore) return;
     state.isRestore = true;
-
-    if (showTips) {
-      // 手动触发恢复时，也触发平台的恢复购买流
-      await InAppPurchaseUtil.restorePurchases();
-    }
 
     List<PayItem> restoreGoodsList = await PurchaseRestoreUtil()
         .getCachedGoodsList();
