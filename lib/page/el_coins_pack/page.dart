@@ -405,143 +405,263 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
   Widget _buildReceiveItem(RewardReceiveItem item) {
     return Container(
       width: 343.w,
-      height: 122.h,
+      padding: EdgeInsets.all(1.5.w),
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('el_coin_item_bg.png'.icon),
-          fit: BoxFit.fill,
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: const LinearGradient(
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+          colors: [Color(0xFF6018E6), Color(0xFFFF0BBA)],
         ),
       ),
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${item.title} (${item.dayText})',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontFamily: 'PingFang SC',
-              fontWeight: FontWeight.w600,
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14.r),
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFFFFDCE0), Color(0xFFFFD8F4)],
           ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Total Reward',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 10,
-                          fontFamily: 'PingFang SC',
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 14.w,
-                            height: 14.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            '${item.weekMaxTotal ?? 0}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontFamily: 'DDinPro',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 20.w),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Remaining',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 10,
-                          fontFamily: 'PingFang SC',
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 14.w,
-                            height: 14.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            '${item.weekRemainingTotal ?? 0}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontFamily: 'DDinPro',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if ((item.receiveCoins ?? 0) > 0)
-                GestureDetector(
-                  onTap: () => controller.receiveDay(item.id!),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Claim',
-                        style: TextStyle(
-                          color: Color(0xFFFFD67C),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'PingFang SC',
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 14.w,
-                            height: 14.w,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            '${item.receiveCoins}',
-                            style: const TextStyle(
-                              color: Color(0xFFFF7700),
-                              fontSize: 14,
-                              fontFamily: 'DDinPro',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+        ),
+        padding: EdgeInsets.only(
+          left: 12.w,
+          right: 12.w,
+          top: 14.h,
+          bottom: 14.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// 2000 渐变文字
+                ShaderMask(
+                  shaderCallback: (bounds) {
+                    return const LinearGradient(
+                      colors: [Color(0xFFFF0BBA), Color(0xFF6018E6)],
+                    ).createShader(bounds);
+                  },
+                  child: Text(
+                    '${item.title}',
+                    style: TextStyle(
+                      color: const Color(0xFFFF0BBA),
+                      fontSize: 14,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      height: 1.57,
+                    ),
                   ),
                 ),
-            ],
-          ),
-        ],
+                Text(
+                  '（Day ${item.dayText}）',
+                  style: const TextStyle(
+                    color: const Color(0xFFDF23B8),
+                    fontSize: 14,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    height: 1.57,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Container(
+              transform: Matrix4.identity()
+                ..translate(0.0, 0.0)
+                ..rotateZ(-3.14),
+              width: 319,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: const Color(0x3F0F0F0F),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Total Reward',
+                          style: TextStyle(
+                            color: const Color(0xFFDF23B8),
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            height: 1.50,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Row(
+                          children: [
+                            Image.asset(
+                              'ely_gold.png'.icon,
+                              width: 14.w,
+                              height: 14.w,
+                            ),
+                            SizedBox(width: 4.w),
+                            ShaderMask(
+                              shaderCallback: (bounds) {
+                                return const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFF0BBA),
+                                    Color(0xFF6018E6),
+                                  ],
+                                ).createShader(bounds);
+                              },
+                              child: Text(
+                                '${item.weekMaxTotal ?? 0}',
+                                style: TextStyle(
+                                  color: const Color(0xFFFF0BBA),
+                                  fontSize: 14,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.57,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 12.w),
+                    Container(
+                      transform: Matrix4.identity()
+                        ..translate(0.0, 0.0)
+                        ..rotateZ(1.57),
+                      height: 32,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            width: 1,
+                            strokeAlign: BorderSide.strokeAlignCenter,
+                            color: Colors.white.withValues(
+                              alpha: 0.25,
+                            ) /* Color */,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Remaining',
+                          style: TextStyle(
+                            color: const Color(0xFFDF23B8),
+                            fontSize: 12,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            height: 1.50,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Row(
+                          children: [
+                            Image.asset(
+                              'ely_gold.png'.icon,
+                              width: 14.w,
+                              height: 14.w,
+                            ),
+                            SizedBox(width: 4.w),
+                            ShaderMask(
+                              shaderCallback: (bounds) {
+                                return const LinearGradient(
+                                  colors: [
+                                    Color(0xFFFF0BBA),
+                                    Color(0xFF6018E6),
+                                  ],
+                                ).createShader(bounds);
+                              },
+                              child: Text(
+                                '${item.weekRemainingTotal ?? 0}',
+                                style: TextStyle(
+                                  color: const Color(0xFFFF0BBA),
+                                  fontSize: 14,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.57,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () => controller.receiveDay(item.id!),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      height: 48.h,
+                      width: 120.w,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment(-1, .5),
+                          end: Alignment(0, .5),
+                          colors: [
+                            const Color(0xFFFF0BBA),
+                            const Color(0xFF6018E6),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(24.r),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Claim',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              height: 1.29,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Row(
+                            children: [
+                              Image.asset(
+                                'ely_gold.png'.icon,
+                                width: 14.w,
+                                height: 14.w,
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                '${item.receiveCoins}',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.90),
+                                  fontSize: 12.sp,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
