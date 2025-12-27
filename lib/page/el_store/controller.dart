@@ -340,7 +340,11 @@ class StorePageController extends GetxController {
             goods.serverVerificationData =
                 purchaseDetails.verificationData.serverVerificationData;
 
-            EasyLoading.dismiss();
+            // 支付完成后，展示验证中的 loading
+            EasyLoading.show(
+              status: 'Verifying...',
+              maskType: EasyLoadingMaskType.black,
+            );
 
             bool isSuccess = await verifyPay(goods);
 
@@ -358,6 +362,7 @@ class StorePageController extends GetxController {
           }
         } catch (e) {
           debugPrint('--purchase-success-err:$e');
+          EasyLoading.dismiss();
           state.currentOrderCode = "";
         }
         InAppPurchaseUtil.completePurchase(purchaseDetails);
@@ -365,7 +370,6 @@ class StorePageController extends GetxController {
         // 购买失败
         debugPrint('Purchase failed: ${purchaseDetails.error?.message}');
         EasyLoading.dismiss();
-
         UserUtil().reportErrorEvent(
           'platform pay failed',
           'pay_error',
@@ -441,16 +445,17 @@ class StorePageController extends GetxController {
       Apis.createOrder,
       data: params,
     );
-    EasyLoading.dismiss();
 
     if (res.success) {
       if (res.data['code'] == 30007) {
+        EasyLoading.dismiss();
         Message.show('You are already subscribed!');
         return;
       }
 
       final orderCode = res.data['order_code'];
       if (orderCode == null || orderCode.isEmpty) {
+        EasyLoading.dismiss();
         Message.show('Failed to create order');
         return;
       }
@@ -606,8 +611,13 @@ class StorePageController extends GetxController {
       );
       if (res.success && res.data['status'] == 'success') {
         if (!isRestore) {
-          Message.show('Pay Success');
-          Future.delayed(Duration(seconds: 1), () => loadData());
+          EasyLoading.showSuccess('Pay Success');
+
+          // 如果是弹窗实例，支付成功后自动关闭弹窗
+          if (isDialogInstance) {
+            Get.back();
+          }
+          loadData();
           // 充值成功后更新 el_me 页面的用户信息
           _refreshMePageUserInfo();
 
@@ -629,11 +639,13 @@ class StorePageController extends GetxController {
       );
 
       if (!isRestore) {
+        EasyLoading.dismiss();
         PurchaseRestoreUtil().cacheFailedGoods(goods);
       }
       return false;
     } catch (e) {
       if (!isRestore) {
+        EasyLoading.dismiss();
         PurchaseRestoreUtil().cacheFailedGoods(goods);
       }
       debugPrint('---verifyPay-err:$e');
