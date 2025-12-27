@@ -313,7 +313,6 @@ class StorePageController extends GetxController {
       if (purchaseDetails.status == PurchaseStatus.pending) {
         // 购买中
         debugPrint('Purchase is pending: ${purchaseDetails.productID}');
-        InAppPurchaseUtil.completePurchase(purchaseDetails);
       } else if (purchaseDetails.status == PurchaseStatus.purchased ||
           purchaseDetails.status == PurchaseStatus.restored) {
         // 购买成功或恢复购买
@@ -333,30 +332,33 @@ class StorePageController extends GetxController {
                 (item) => item.productDetails?.id == purchaseDetails.productID,
               );
 
-          if (goods == null) {
-            UserUtil().reportErrorEvent(
-              'platform pay failed',
-              'pay_error',
-              errMsg: '未找到匹配商品: ${purchaseDetails.productID}',
-            );
-            return;
-          }
+          // 只处理当前点击的订单或手动恢复流程
+          if (goods != null &&
+              (goods.orderCode == state.currentOrderCode ||
+                  purchaseDetails.status == PurchaseStatus.restored)) {
+            goods.transactionId = purchaseDetails.purchaseID;
+            goods.serverVerificationData =
+                purchaseDetails.verificationData.serverVerificationData;
 
-          // 设置交易信息
-          goods.transactionId = purchaseDetails.purchaseID;
-          goods.serverVerificationData =
-              purchaseDetails.verificationData.serverVerificationData;
+            EasyLoading.dismiss();
 
-          EasyLoading.dismiss();
-
-          if (goods.orderCode != null && goods.orderCode!.isNotEmpty) {
             bool isSuccess = await verifyPay(goods);
+
+            // 支付后清空当前订单号
+            if (goods.orderCode == state.currentOrderCode) {
+              state.currentOrderCode = "";
+              goods.orderCode = null;
+            }
+
             if (isSuccess) {
               InAppPurchaseUtil.consumeIfNeeded(purchaseDetails);
             }
+          } else {
+            debugPrint('收到了非当前订单的流信息: ${purchaseDetails.productID}');
           }
         } catch (e) {
           debugPrint('--purchase-success-err:$e');
+          state.currentOrderCode = "";
         }
         InAppPurchaseUtil.completePurchase(purchaseDetails);
       } else if (purchaseDetails.status == PurchaseStatus.error) {
@@ -364,20 +366,10 @@ class StorePageController extends GetxController {
         debugPrint('Purchase failed: ${purchaseDetails.error?.message}');
         EasyLoading.dismiss();
 
-        PayItem? goods =
-            [
-              ...state.coinsBigList,
-              ...state.coinsSmallList,
-              ...state.coinsWeekList,
-              ...state.subList,
-            ].firstWhereOrNull(
-              (item) => item.productDetails?.id == purchaseDetails.productID,
-            );
-
         UserUtil().reportErrorEvent(
           'platform pay failed',
           'pay_error',
-          orderCode: goods?.orderCode ?? '',
+          orderCode: state.currentOrderCode,
           errMsg: purchaseDetails.error?.toString(),
         );
 
@@ -385,29 +377,22 @@ class StorePageController extends GetxController {
             false) {
           InAppPurchaseUtil.completePurchase(purchaseDetails, isRetry: true);
         } else {
-          Message.show('There were some problems with the payment');
+          Message.show('Payment Error');
         }
+        state.currentOrderCode = "";
       } else if (purchaseDetails.status == PurchaseStatus.canceled) {
         // 购买取消
         debugPrint('Purchase canceled: ${purchaseDetails.productID}');
         EasyLoading.dismiss();
         Message.show('User canceled');
 
-        PayItem? goods =
-            [
-              ...state.coinsBigList,
-              ...state.coinsSmallList,
-              ...state.coinsWeekList,
-              ...state.subList,
-            ].firstWhereOrNull(
-              (item) => item.productDetails?.id == purchaseDetails.productID,
-            );
-
         UserUtil().reportErrorEvent(
           'user pay canceled',
           'pay_cancel',
-          orderCode: goods?.orderCode ?? '',
+          orderCode: state.currentOrderCode,
         );
+        state.currentOrderCode = "";
+        InAppPurchaseUtil.completePurchase(purchaseDetails);
       }
       InAppPurchaseUtil.completePurchase(purchaseDetails, isRetry: true);
     }
@@ -471,6 +456,7 @@ class StorePageController extends GetxController {
       }
 
       goods.orderCode = orderCode;
+      state.currentOrderCode = orderCode;
 
       // 执行购买
       try {
@@ -604,6 +590,13 @@ class StorePageController extends GetxController {
         orderCode: goods.orderCode,
         transactionId: transactionId,
       );
+    } else {
+      UserUtil().reportErrorEvent(
+        'requested server paying',
+        'pay_paying',
+        orderCode: goods.orderCode,
+        transactionId: transactionId,
+      );
     }
 
     try {
@@ -652,6 +645,11 @@ class StorePageController extends GetxController {
   Future<void> restorePay({bool showTips = true}) async {
     if (state.isRestore) return;
     state.isRestore = true;
+
+    if (showTips) {
+      // 手动触发恢复时，也触发平台的恢复购买流
+      await InAppPurchaseUtil.restorePurchases();
+    }
 
     List<PayItem> restoreGoodsList = await PurchaseRestoreUtil()
         .getCachedGoodsList();

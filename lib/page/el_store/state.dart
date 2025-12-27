@@ -8,24 +8,25 @@ class StoreState {
 
   LoadStatusType loadStatus = LoadStatusType.loading;
   bool isLoading = false;
-  
+
   // 支付配置数据
   PaySettingsBean? paySettings;
-  
+
   // 分类后的数据
   List<PayItem> coinsBigList = [];
   List<PayItem> coinsSmallList = [];
   List<PayItem> coinsWeekList = [];
   List<PayItem> subList = [];
-  
+
   // 排序列表
   List<String> sortList = [];
-  
+
   // IAP相关
   StreamSubscription<List<PurchaseDetails>>? purchaseSubscription;
   List<PurchaseDetails> purchaseList = [];
   bool isRestore = false;
-  
+  String currentOrderCode = "";
+
   // 上下文信息
   num? shortPlayId;
   num? videoId;
