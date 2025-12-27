@@ -63,4 +63,6 @@ class Apis {
       "/getCustomerOrder"; // 充值列表 get current_page page_size buy_type
   static const String getReceiveDayCoinInfo =
       "/getReceiveDayCoinInfo"; // 获取领取金币详情 get
+      static const String receiveDayCoin =
+      "/receiveDayCoin"; // 获取领取金币详情 post
 }

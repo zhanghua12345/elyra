@@ -24,10 +24,22 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
   void initState() {
     super.initState();
     controller = Get.put(ElCoinsPackController());
-    // WeekCoinItem requires StorePageController
-    storeController = Get.isRegistered<StorePageController>()
-        ? Get.find<StorePageController>()
-        : Get.put(StorePageController());
+
+    // 初始化 Controller（只创建一次）
+    storeController = Get.put(
+      StorePageController()..isDialogInstance = true,
+      tag: 'coins_pack',
+    );
+
+    storeController.loadData();
+  }
+
+  @override
+  void dispose() {
+    // 弹窗销毁时清理 Controller
+    Get.delete<ElCoinsPackController>();
+    Get.delete<StorePageController>(tag: 'coins_pack');
+    super.dispose();
   }
 
   @override
@@ -309,22 +321,39 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
   }
 
   Widget _buildRefillList() {
-    if (controller.state.coinsWeekList.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
-      itemCount: controller.state.coinsWeekList.length,
-      separatorBuilder: (context, index) => SizedBox(height: 16.h),
-      itemBuilder: (context, index) {
-        final item = controller.state.coinsWeekList[index];
-        return WeekCoinItem(
-          item: item,
-          controller: storeController,
-          width: 343,
-          isOldPrice: true,
+    // 横向滚动列表
+    return GetBuilder<StorePageController>(
+      tag: 'coins_pack',
+      builder: (controller) {
+        if (controller.state.coinsWeekList.isEmpty) {
+          return const SizedBox(
+            height: 84,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return SizedBox(
+          height: 84,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: controller.state.coinsWeekList.length,
+            itemBuilder: (context, index) {
+              final item = controller.state.coinsWeekList[index];
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index < controller.state.coinsWeekList.length - 1
+                      ? 12.w
+                      : 0,
+                ),
+                child: WeekCoinItem(
+                  item: item,
+                  controller: controller,
+                  width: 320,
+                ),
+              );
+            },
+          ),
         );
       },
     );
