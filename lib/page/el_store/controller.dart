@@ -61,10 +61,7 @@ class StorePageController extends GetxController {
     if (!isSilent) {
       state.loadStatus = LoadStatusType.loading;
     } else {
-      EasyLoading.show(
-        status: 'Loading...',
-        maskType: EasyLoadingMaskType.none,
-      );
+      EasyLoading.show(status: 'Loading...');
     }
     update();
 
@@ -349,10 +346,7 @@ class StorePageController extends GetxController {
                 purchaseDetails.verificationData.serverVerificationData;
 
             // 支付完成后，展示验证中的 loading
-            EasyLoading.show(
-              status: 'Verifying...',
-              maskType: EasyLoadingMaskType.black,
-            );
+            EasyLoading.show(status: 'Verifying...');
 
             bool isSuccess = await verifyPay(goods);
 
@@ -425,7 +419,7 @@ class StorePageController extends GetxController {
       return;
     }
 
-    EasyLoading.show(status: 'Paying...', maskType: EasyLoadingMaskType.black);
+    EasyLoading.show(status: 'Paying...');
 
     Map<String, dynamic> params = {
       "pay_setting_id": goods.id,
