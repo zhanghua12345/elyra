@@ -432,8 +432,8 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 /// 2000 渐变文字
                 ShaderMask(
@@ -455,8 +455,8 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                 ),
                 Text(
                   '（Day ${item.dayText}）',
-                  style: const TextStyle(
-                    color: const Color(0xFFDF23B8),
+                  style: TextStyle(
+                    color: Color(0xFFDF23B8),
                     fontSize: 14,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
@@ -467,19 +467,9 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             ),
             SizedBox(height: 12.h),
             Container(
-              transform: Matrix4.identity()
-                ..translate(0.0, 0.0)
-                ..rotateZ(-3.14),
-              width: 319,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 1,
-                    strokeAlign: BorderSide.strokeAlignCenter,
-                    color: const Color(0x3F0F0F0F),
-                  ),
-                ),
-              ),
+              width: 319.w,
+              height: 1.h,
+              color: const Color(0x3F0F0F0F),
             ),
             SizedBox(height: 12.h),
             Row(
@@ -536,21 +526,9 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                     ),
                     SizedBox(width: 12.w),
                     Container(
-                      transform: Matrix4.identity()
-                        ..translate(0.0, 0.0)
-                        ..rotateZ(1.57),
-                      height: 32,
-                      decoration: ShapeDecoration(
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                            width: 1,
-                            strokeAlign: BorderSide.strokeAlignCenter,
-                            color: Colors.white.withValues(
-                              alpha: 0.25,
-                            ) /* Color */,
-                          ),
-                        ),
-                      ),
+                      width: 1.w,
+                      height: 32.h,
+                      color: Colors.white.withValues(alpha: 0.25),
                     ),
                     SizedBox(width: 12.w),
                     Column(
@@ -635,6 +613,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                           ),
                           SizedBox(height: 2.h),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
                                 'ely_gold.png'.icon,
