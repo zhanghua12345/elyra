@@ -61,7 +61,10 @@ class StorePageController extends GetxController {
     if (!isSilent) {
       state.loadStatus = LoadStatusType.loading;
     } else {
-      EasyLoading.show(status: 'Loading...');
+      EasyLoading.show(
+        status: 'Loading...',
+        maskType: EasyLoadingMaskType.clear,
+      );
     }
     update();
 
@@ -346,7 +349,10 @@ class StorePageController extends GetxController {
                 purchaseDetails.verificationData.serverVerificationData;
 
             // 支付完成后，展示验证中的 loading
-            EasyLoading.show(status: 'Verifying...');
+            EasyLoading.show(
+              status: 'Verifying...',
+              maskType: EasyLoadingMaskType.clear,
+            );
 
             bool isSuccess = await verifyPay(goods);
 
@@ -419,7 +425,7 @@ class StorePageController extends GetxController {
       return;
     }
 
-    EasyLoading.show(status: 'Paying...');
+    EasyLoading.show(status: 'Paying...', maskType: EasyLoadingMaskType.clear);
 
     Map<String, dynamic> params = {
       "pay_setting_id": goods.id,
@@ -613,7 +619,10 @@ class StorePageController extends GetxController {
       );
       if (res.success && res.data['status'] == 'success') {
         if (!isRestore) {
-          EasyLoading.showSuccess('Pay Success');
+          EasyLoading.showSuccess(
+            'Pay Success',
+            maskType: EasyLoadingMaskType.clear,
+          );
 
           // 如果是弹窗实例，支付成功后自动关闭弹窗
           if (isDialogInstance) {
@@ -675,7 +684,7 @@ class StorePageController extends GetxController {
       return;
     }
 
-    EasyLoading.show(status: 'Restore...');
+    EasyLoading.show(status: 'Restore...', maskType: EasyLoadingMaskType.clear);
     for (PayItem payItem in restoreGoodsList) {
       bool isSuccess = await verifyPay(
         payItem,
