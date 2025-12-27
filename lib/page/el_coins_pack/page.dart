@@ -583,7 +583,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
                   ],
                 ),
                 GestureDetector(
-                  onTap: () => controller.receiveDay(item.id!),
+                  onTap: () => controller.receiveDay(item.id.toString()),
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Container(

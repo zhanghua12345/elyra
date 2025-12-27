@@ -46,10 +46,11 @@ class ElCoinsPackController extends GetxController {
         state.coinInfo = RewardOverviewBean.fromJson(rewardRes.data);
         state.receiveList = state.coinInfo?.receiveList ?? [];
 
-        // 映射核心字段
-        state.weeklyTotal = state.coinInfo?.weeklyTotalCoins ?? 0;
-        state.claimableCoins = state.coinInfo?.dayCoins ?? 0;
-        state.activeRefills = state.coinInfo?.count ?? 0;
+        // 映射核心字段 (直接从接口返回数据读取以确保与后端字段对齐)
+        var data = rewardRes.data;
+        state.weeklyTotal = data['week_total'] ?? 0;
+        state.claimableCoins = data['receive_coins'] ?? 0;
+        state.activeRefills = data['receive_count'] ?? 0;
       }
 
       state.loadStatus = LoadStatusType.loadSuccess;

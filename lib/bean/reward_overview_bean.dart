@@ -7,28 +7,31 @@ String rewardOverviewBeanToJson(RewardOverviewBean data) =>
     json.encode(data.toJson());
 
 class RewardOverviewBean {
-  int? isExistSub;
+  num? weekMaxTotal;
+  num? weekTotal;
+  num? weekRemainingTotal;
   num? receiveCoins;
-  num? weeklyTotalCoins;
-  num? dayCoins;
-  num? count;
+  num? receiveCount;
+  int? isExistSub;
   List<RewardReceiveItem>? receiveList;
 
   RewardOverviewBean({
-    this.isExistSub,
+    this.weekMaxTotal,
+    this.weekTotal,
+    this.weekRemainingTotal,
     this.receiveCoins,
-    this.weeklyTotalCoins,
-    this.dayCoins,
-    this.count,
+    this.receiveCount,
+    this.isExistSub,
     this.receiveList,
   });
 
   RewardOverviewBean.fromJson(dynamic json) {
-    isExistSub = json['is_exist_sub'];
+    weekMaxTotal = json['week_max_total'];
+    weekTotal = json['week_total'];
+    weekRemainingTotal = json['week_remaining_total'];
     receiveCoins = json['receive_coins'];
-    weeklyTotalCoins = json['weekly_total_coins'];
-    dayCoins = json['day_coins'];
-    count = json['count'];
+    receiveCount = json['receive_count'];
+    isExistSub = json['is_exist_sub'];
     if (json['receive_list'] != null) {
       receiveList = [];
       json['receive_list'].forEach((v) {
@@ -38,28 +41,31 @@ class RewardOverviewBean {
   }
 
   RewardOverviewBean copyWith({
-    int? isExistSub,
+    num? weekMaxTotal,
+    num? weekTotal,
+    num? weekRemainingTotal,
     num? receiveCoins,
-    num? weeklyTotalCoins,
-    num? dayCoins,
-    num? count,
+    num? receiveCount,
+    int? isExistSub,
     List<RewardReceiveItem>? receiveList,
   }) => RewardOverviewBean(
-    isExistSub: isExistSub ?? this.isExistSub,
+    weekMaxTotal: weekMaxTotal ?? this.weekMaxTotal,
+    weekTotal: weekTotal ?? this.weekTotal,
+    weekRemainingTotal: weekRemainingTotal ?? this.weekRemainingTotal,
     receiveCoins: receiveCoins ?? this.receiveCoins,
-    weeklyTotalCoins: weeklyTotalCoins ?? this.weeklyTotalCoins,
-    dayCoins: dayCoins ?? this.dayCoins,
-    count: count ?? this.count,
+    receiveCount: receiveCount ?? this.receiveCount,
+    isExistSub: isExistSub ?? this.isExistSub,
     receiveList: receiveList ?? this.receiveList,
   );
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['is_exist_sub'] = isExistSub;
+    map['week_max_total'] = weekMaxTotal;
+    map['week_total'] = weekTotal;
+    map['week_remaining_total'] = weekRemainingTotal;
     map['receive_coins'] = receiveCoins;
-    map['weekly_total_coins'] = weeklyTotalCoins;
-    map['day_coins'] = dayCoins;
-    map['count'] = count;
+    map['receive_count'] = receiveCount;
+    map['is_exist_sub'] = isExistSub;
     if (receiveList != null) {
       map['receive_list'] = receiveList?.map((v) => v.toJson()).toList();
     }
@@ -68,55 +74,67 @@ class RewardOverviewBean {
 }
 
 class RewardReceiveItem {
-  String? id;
+  num? id;
   String? title;
-  String? dayText;
   num? weekMaxTotal;
-  num? weekRemainingTotal;
+  num? weekTotal;
   num? receiveCoins;
+  String? dayText;
+  num? weekRemainingTotal;
+  num? remainingDiffDay;
 
   RewardReceiveItem({
     this.id,
     this.title,
-    this.dayText,
     this.weekMaxTotal,
-    this.weekRemainingTotal,
+    this.weekTotal,
     this.receiveCoins,
+    this.dayText,
+    this.weekRemainingTotal,
+    this.remainingDiffDay,
   });
 
   RewardReceiveItem.fromJson(dynamic json) {
-    id = json['id']?.toString();
+    id = json['id'];
     title = json['title'];
-    dayText = json['day_text'];
     weekMaxTotal = json['week_max_total'];
-    weekRemainingTotal = json['week_remaining_total'];
+    weekTotal = json['week_total'];
     receiveCoins = json['receive_coins'];
+    dayText = json['day_text'];
+    weekRemainingTotal = json['week_remaining_total'];
+    remainingDiffDay = json['remaining_diff_day'];
   }
 
   RewardReceiveItem copyWith({
-    String? id,
+    num? id,
     String? title,
-    String? dayText,
     num? weekMaxTotal,
-    num? weekRemainingTotal,
+    num? weekTotal,
     num? receiveCoins,
+    String? dayText,
+    num? weekRemainingTotal,
+    num? remainingDiffDay,
   }) => RewardReceiveItem(
     id: id ?? this.id,
     title: title ?? this.title,
-    dayText: dayText ?? this.dayText,
     weekMaxTotal: weekMaxTotal ?? this.weekMaxTotal,
-    weekRemainingTotal: weekRemainingTotal ?? this.weekRemainingTotal,
+    weekTotal: weekTotal ?? this.weekTotal,
     receiveCoins: receiveCoins ?? this.receiveCoins,
+    dayText: dayText ?? this.dayText,
+    weekRemainingTotal: weekRemainingTotal ?? this.weekRemainingTotal,
+    remainingDiffDay: remainingDiffDay ?? this.remainingDiffDay,
   );
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = id;
     map['title'] = title;
-    map['day_text'] = dayText;
     map['week_max_total'] = weekMaxTotal;
-    map['week_remaining_total'] = weekRemainingTotal;
+    map['week_total'] = weekTotal;
     map['receive_coins'] = receiveCoins;
+    map['day_text'] = dayText;
+    map['week_remaining_total'] = weekRemainingTotal;
+    map['remaining_diff_day'] = remainingDiffDay;
     return map;
   }
 }

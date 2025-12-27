@@ -349,10 +349,10 @@ class StorePageController extends GetxController {
                 purchaseDetails.verificationData.serverVerificationData;
 
             // 支付完成后，展示验证中的 loading
-            // EasyLoading.show(
-            //   status: 'Verifying...',
-            //   maskType: EasyLoadingMaskType.clear,
-            // );
+            EasyLoading.show(
+              status: 'Loading...',
+              maskType: EasyLoadingMaskType.clear,
+            );
 
             bool isSuccess = await verifyPay(goods);
 
