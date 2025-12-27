@@ -493,7 +493,7 @@ class _MePageState extends State<MePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '+Extra 500',
+                            'VIP Member',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12.sp,
@@ -502,19 +502,12 @@ class _MePageState extends State<MePage> {
                               height: 0.83,
                             ),
                           ),
-                          SizedBox(width: 3.w),
-                          Image.asset(
-                            'ely_gold.png'.icon,
-                            width: 12.w,
-                            height: 12.w,
-                          ),
-                          SizedBox(width: 4.w),
                         ],
                       ),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 2.w),
                     Text(
-                      'Bonus expires in 35 days',
+                      'VIP Auto renew,cancel anytime',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
