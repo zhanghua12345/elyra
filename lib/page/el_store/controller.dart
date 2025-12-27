@@ -28,7 +28,7 @@ class StorePageController extends GetxController {
 
   // 🔥 新增:标记是否是对话框中的实例
   bool isDialogInstance = false;
-    
+
   // 🔥 支付成功回调(用于通知外部)
   VoidCallback? onPaymentSuccess;
 
@@ -88,10 +88,7 @@ class StorePageController extends GetxController {
         if (state.paySettings != null && state.paySettings!.sort.isNotEmpty) {
           state.sortList = state.paySettings!.sort;
 
-          // 分类数据
-          _classifyData();
-
-          // 初始化商店商品
+          // 初始化商店商品 (内部会完成商品匹配、过滤、分类及 UI 更新，避免 intermediate 状态导致 UI 闪烁)
           await initStore();
 
           state.loadStatus = LoadStatusType.loadSuccess;
@@ -620,7 +617,7 @@ class StorePageController extends GetxController {
           Future.delayed(Duration(seconds: 1), () => loadData());
           // 充值成功后更新 el_me 页面的用户信息
           _refreshMePageUserInfo();
-          
+
           // 🔥 触发支付成功回调
           onPaymentSuccess?.call();
         }

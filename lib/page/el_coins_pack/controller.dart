@@ -36,28 +36,7 @@ class ElCoinsPackController extends GetxController {
     update();
 
     try {
-      // 1. 获取支付配置 (用于展示 coinsWeekList)
-      Map<String, dynamic> payParams = {};
-      // iOS Receipt 逻辑暂由 StorePageController 集中处理，此处精简
-
-      final payRes = await HttpClient().request(
-        Apis.paySettingsV4,
-        data: payParams,
-        method: HttpMethod.post,
-      );
-
-      if (payRes.success && payRes.data != null) {
-        final paySettings = PaySettingsBean.fromJson(payRes.data);
-        final allItems = [...paySettings.listCoins, ...paySettings.listSubVip];
-
-        // 过滤周包金币 (sub_coins)
-        state.coinsWeekList = allItems
-            .where((item) => item.buyType == 'sub_coins')
-            .toList();
-        state.coinsWeekList.sort((a, b) => b.sort.compareTo(a.sort));
-      }
-
-      // 2. 获取领取详情 (REWARDS OVERVIEW + receive_list)
+      // 获取领取详情 (REWARDS OVERVIEW + receive_list)
       final rewardRes = await HttpClient().request(
         Apis.getReceiveDayCoinInfo,
         method: HttpMethod.get,
