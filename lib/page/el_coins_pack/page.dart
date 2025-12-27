@@ -36,7 +36,7 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
 
   @override
   void dispose() {
-    // 弹窗销毁时清理 Controller
+    // 销毁时清理 Controller
     Get.delete<ElCoinsPackController>();
     Get.delete<StorePageController>(tag: 'coins_pack');
     super.dispose();
@@ -159,6 +159,24 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           SizedBox(height: 12.h),
           _buildClaimPlaceholder(),
           SizedBox(height: 40.h),
+          Center(
+            child: Container(
+              transform: Matrix4.identity()
+                ..translate(0.0, 0.0)
+                ..rotateZ(-3.14),
+              width: 319.w,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: Colors.white.withOpacity(0.25),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 24.h),
           _buildSectionTitle('WEEKLY REFILL', 'center'),
           SizedBox(height: 20.h),
           _buildRefillList(),
@@ -219,7 +237,6 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
             controller.state.weeklyTotal.toString(),
           ),
           SizedBox(width: 18.w),
-
           Container(
             width: 1.w,
             height: 32.h,
@@ -321,39 +338,34 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
   }
 
   Widget _buildRefillList() {
-    // 横向滚动列表
+    // 纵向列表
     return GetBuilder<StorePageController>(
       tag: 'coins_pack',
-      builder: (controller) {
-        if (controller.state.coinsWeekList.isEmpty) {
+      builder: (storeCtrl) {
+        if (storeCtrl.state.coinsWeekList.isEmpty) {
           return const SizedBox(
             height: 84,
             child: Center(child: CircularProgressIndicator()),
           );
         }
 
-        return SizedBox(
-          height: 84,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: controller.state.coinsWeekList.length,
-            itemBuilder: (context, index) {
-              final item = controller.state.coinsWeekList[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  right: index < controller.state.coinsWeekList.length - 1
-                      ? 12.w
-                      : 0,
-                ),
-                child: WeekCoinItem(
-                  item: item,
-                  controller: controller,
-                  width: 320,
-                ),
-              );
-            },
-          ),
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: storeCtrl.state.coinsWeekList.length,
+          itemBuilder: (context, index) {
+            final item = storeCtrl.state.coinsWeekList[index];
+            return Padding(
+              padding: EdgeInsets.only(bottom: 16.h),
+              child: WeekCoinItem(
+                item: item,
+                controller: storeCtrl,
+                width: 343,
+                isOldPrice: true,
+              ),
+            );
+          },
         );
       },
     );
