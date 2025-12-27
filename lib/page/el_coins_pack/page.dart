@@ -159,30 +159,14 @@ class _ElCoinsPackPageState extends State<ElCoinsPackPage> {
           _buildRefillCount(),
           SizedBox(height: 12.h),
           _buildClaimButtonOrPlaceholder(),
+          SizedBox(height: 16.h),
+          
+          SizedBox(height: 16.h),
+          _buildSectionTitle('Active Refills', 'center'),
           if (controller.state.receiveList.isNotEmpty) ...[
             SizedBox(height: 24.h),
             _buildReceiveList(),
           ],
-          SizedBox(height: 40.h),
-          Center(
-            child: Container(
-              transform: Matrix4.identity()
-                ..translate(0.0, 0.0)
-                ..rotateZ(-3.14),
-              width: 319.w,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 1,
-                    strokeAlign: BorderSide.strokeAlignCenter,
-                    color: Colors.white.withOpacity(0.25),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 24.h),
-          _buildSectionTitle('WEEKLY REFILL', 'center'),
           SizedBox(height: 20.h),
           _buildRefillList(),
           SizedBox(height: 32.h),
